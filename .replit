@@ -15,44 +15,6 @@ name = "Project"
 mode = "parallel"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Streamlit Frontend"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "FastAPI Backend"
-
-[[workflows.workflow]]
-name = "Streamlit Frontend"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "streamlit run test_streamlit.py --server.port=5000 --server.address=0.0.0.0"
-waitForPort = 5000
-
-[[workflows.workflow]]
-name = "FastAPI Backend"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8001"
-waitForPort = 8001
-
 [[ports]]
 localPort = 5000
 externalPort = 5000
