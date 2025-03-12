@@ -5,6 +5,7 @@ import pandas as pd
 import sys
 import os
 import logging
+from .clustered_results import clustered_results
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -32,6 +33,9 @@ def search_results():
             if not results:
                 st.info("No search results available for the selected period.")
                 return
+
+            # Show topic clusters visualization
+            clustered_results(results)
 
             # Create a dataframe for better display
             df_rows = []
@@ -61,6 +65,7 @@ def search_results():
             logger.info(f"Filtered to {len(filtered_df)} rows")
 
             # Display results in an expandable format
+            st.subheader("Search Result Details")
             for _, row in filtered_df.iterrows():
                 with st.expander(f"{row['Title']} ({row['Keyword']} - {row['Date']})"):
                     st.write(row["Description"])

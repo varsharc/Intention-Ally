@@ -26,13 +26,13 @@ def search_preferences():
         "Asia": False,
         "Other": False
     }
-    
+
     # Create columns for region selection
     cols = st.columns(3)
     for i, (region, default) in enumerate(regions.items()):
         with cols[i % 3]:
             regions[region] = st.checkbox(region, value=default, key=f"region_{region}")
-    
+
     # Credibility Filters
     st.write("Content Type Preferences")
     content_types = {
@@ -41,7 +41,7 @@ def search_preferences():
         "Industry Reports": False,
         "Blog Posts": False
     }
-    
+
     # Create columns for content type selection
     cols = st.columns(2)
     for i, (content_type, default) in enumerate(content_types.items()):
@@ -51,7 +51,7 @@ def search_preferences():
                 value=default,
                 key=f"content_{content_type}"
             )
-    
+
     # Time Range Filter
     st.write("Time Range")
     time_range = st.select_slider(
@@ -59,17 +59,26 @@ def search_preferences():
         options=["Last 24 hours", "Last week", "Last month", "Last 6 months", "Last year", "Any time"],
         value="Last month"
     )
-    
-    # Credibility Score Threshold
+
+    # Credibility Score Threshold with detailed tooltip
     st.write("Minimum Credibility Score")
+    credibility_tooltip = """
+    Credibility score (0-100) is calculated based on multiple factors:
+    • Domain Authority (40%): Website's overall authority and trustworthiness
+    • Backlink Quality (30%): Number and quality of referring domains
+    • Content Engagement (20%): User interaction metrics from Brave
+    • Source Age (10%): How long the domain has been established
+
+    Higher scores indicate more authoritative and trustworthy sources.
+    """
     min_credibility = st.slider(
         "Filter results by minimum credibility score",
         min_value=0,
         max_value=100,
         value=50,
-        help="Higher values will show more authoritative sources"
+        help=credibility_tooltip
     )
-    
+
     # Save preferences button
     if st.button("Save Preferences"):
         try:
