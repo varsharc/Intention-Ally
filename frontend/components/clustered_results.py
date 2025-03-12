@@ -219,8 +219,9 @@ def clustered_results(search_results):
                 .attr('stroke', '#fff')
                 .attr('stroke-width', 1.5)
                 .on('mouseover', function(event, d) {
+                    let clusterText = d.cluster == -1 ? 'Unclustered' : d.cluster;
                     tooltip.style('visibility', 'visible')
-                        .html('<strong>' + d.title + '</strong><br/>Keyword: ' + d.keyword + '<br/>Cluster: ' + (d.cluster == -1 ? 'Unclustered' : d.cluster))
+                        .html('<strong>' + d.title + '</strong><br/>Keyword: ' + d.keyword + '<br/>Cluster: ' + clusterText)
                         .style('left', (event.pageX + 10) + 'px')
                         .style('top', (event.pageY - 20) + 'px');
                 })
