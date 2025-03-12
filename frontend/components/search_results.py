@@ -21,6 +21,22 @@ def search_results():
     # Date range selector
     days = st.slider("Show results from last N days", 1, 30, 7)
 
+    # Add manual search trigger button
+    if st.button("Run Manual Search"):
+        try:
+            logger.info("Triggering manual search")
+            response = requests.post(get_api_url("run-search"))
+            if response.status_code == 200:
+                st.success("Manual search completed successfully!")
+                data = response.json()
+                logger.info(f"Manual search results: {data}")
+            else:
+                st.error("Failed to run manual search")
+                logger.error(f"Manual search error: {response.status_code}, {response.text}")
+        except Exception as e:
+            st.error("Error running manual search")
+            logger.error(f"Manual search exception: {str(e)}")
+
     # Fetch results
     try:
         logger.info(f"Fetching search results for last {days} days")
@@ -29,9 +45,10 @@ def search_results():
         if response.status_code == 200:
             results = response.json()
             logger.info(f"Received {len(results)} search entries")
+            logger.info(f"Search results structure: {results[:1] if results else 'No results'}")
 
             if not results:
-                st.info("No search results available for the selected period.")
+                st.info("No search results available for the selected period. Try running a manual search.")
                 return
 
             # Show topic clusters visualization

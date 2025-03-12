@@ -18,19 +18,25 @@ def calculate_similarity_clusters(search_results):
         urls = []
         keywords = []
 
+        # Log input data structure
+        logger.info(f"Processing search results: {len(search_results)} entries")
+
         for search in search_results:
-            for result in search["results"]:
-                text = f"{result['title']} {result['description']}"
+            logger.info(f"Processing search entry for keyword: {search.get('keyword', 'unknown')}")
+            logger.info(f"Number of results in this entry: {len(search.get('results', []))}")
+
+            for result in search.get("results", []):
+                text = f"{result.get('title', '')} {result.get('description', '')}"
                 texts.append(text)
-                titles.append(result['title'])
-                urls.append(result['url'])
-                keywords.append(search['keyword'])
+                titles.append(result.get('title', ''))
+                urls.append(result.get('url', ''))
+                keywords.append(search.get('keyword', ''))
 
         if not texts:
-            logger.warning("No texts found for clustering")
+            logger.warning("No texts found for clustering - empty search results")
             return None
 
-        logger.info(f"Processing {len(texts)} documents for clustering")
+        logger.info(f"Extracted {len(texts)} documents for clustering")
 
         # Calculate TF-IDF
         vectorizer = TfidfVectorizer(stop_words='english', max_features=1000)
@@ -78,7 +84,7 @@ def calculate_similarity_clusters(search_results):
             'probabilities': probabilities
         }
     except Exception as e:
-        logger.error(f"Error calculating clusters: {str(e)}")
+        logger.error(f"Error in calculate_similarity_clusters: {str(e)}", exc_info=True)
         return None
 
 def clustered_results(search_results):
@@ -87,17 +93,21 @@ def clustered_results(search_results):
 
     try:
         if not search_results:
-            st.info("No search results available for clustering.")
+            st.info("No search results available for clustering. Please run a manual search to get fresh data.")
             return
+
+        # Debug: Display raw search results
+        with st.expander("Debug: Search Results Data"):
+            st.json(search_results[:1])  # Show first entry as example
 
         # Calculate clusters
         cluster_data = calculate_similarity_clusters(search_results)
         if not cluster_data:
-            st.warning("Unable to create clusters from the current search results.")
+            st.warning("Unable to create clusters from the current search results. Try running a manual search to get fresh data.")
             return
 
-        # Debug: Display raw cluster data
-        with st.expander("Debug: Raw Cluster Data"):
+        # Debug: Display cluster data
+        with st.expander("Debug: Cluster Data"):
             st.write({
                 "Number of texts": len(cluster_data['titles']),
                 "Unique clusters": len(np.unique(cluster_data['cluster_labels'])),
@@ -141,6 +151,9 @@ def clustered_results(search_results):
                         'target': str(j),
                         'value': min(probabilities[i], probabilities[j])
                     })
+
+        # Debug: Log data structure
+        logger.info(f"Generated visualization data: {len(nodes)} nodes, {len(links)} links")
 
         # Create the visualization
         st.components.v1.html(f"""
@@ -288,5 +301,5 @@ def clustered_results(search_results):
         """)
 
     except Exception as e:
-        logger.error(f"Error in clustered results: {str(e)}")
-        st.error("An error occurred while creating the topic clusters")
+        logger.error(f"Error in clustered results: {str(e)}", exc_info=True)
+        st.error("An error occurred while creating the topic clusters. Check the debug section for details.")
