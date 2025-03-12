@@ -15,7 +15,7 @@ class Storage:
     def _initialize_storage(self):
         if not os.path.exists(self.results_path):
             self._save_results([])
-        if not os.path.exists(self.keywords_path):
+        if not os.path.exists(self.keywords_path) or os.path.getsize(self.keywords_path) == 0:
             self._save_keywords([])
 
     def _save_results(self, results: List[Dict]):
@@ -27,9 +27,16 @@ class Storage:
             json.dump(keywords, f, default=str)
 
     def get_keywords(self) -> List[Keyword]:
-        with open(self.keywords_path, 'r') as f:
-            data = json.load(f)
-            return [Keyword(**k) for k in data]
+        try:
+            with open(self.keywords_path, 'r') as f:
+                data = json.load(f)
+                return [Keyword(
+                    value=k.get("value", ""),
+                    created_at=datetime.fromisoformat(k.get("created_at", datetime.now().isoformat())),
+                    is_active=k.get("is_active", True)
+                ) for k in data]
+        except json.JSONDecodeError:
+            return []
 
     def add_keyword(self, keyword: str) -> bool:
         keywords = self.get_keywords()
@@ -38,10 +45,12 @@ class Storage:
         
         new_keyword = Keyword(
             value=keyword,
-            created_at=datetime.now()
+            created_at=datetime.now(),
+            is_active=True
         )
-        keywords.append(new_keyword.dict())
-        self._save_keywords(keywords)
+        keywords_dict = [k.dict() for k in keywords]
+        keywords_dict.append(new_keyword.dict())
+        self._save_keywords(keywords_dict)
         return True
 
     def remove_keyword(self, keyword: str):

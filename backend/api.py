@@ -59,9 +59,14 @@ async def get_keywords():
 @app.post("/keywords")
 async def add_keyword(keyword: str):
     try:
+        if not keyword or keyword.strip() == "":
+            raise HTTPException(status_code=400, detail="Keyword cannot be empty")
+        
         if storage.add_keyword(keyword):
             return {"message": "Keyword added successfully"}
         raise HTTPException(status_code=400, detail="Maximum keywords limit reached")
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error adding keyword: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
