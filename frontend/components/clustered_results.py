@@ -38,9 +38,9 @@ def calculate_similarity_clusters(search_results):
         # Ensure no negative distances by using 1 - normalized similarity
         distance_matrix = np.clip(1 - similarity_matrix, 0, 1)
 
-        # Cluster using DBSCAN with adjusted parameters
+        # Cluster using DBSCAN with parameters that scale better with more data
         clustering = DBSCAN(
-            eps=0.4,  # Balanced epsilon for good cluster formation
+            eps=0.45,  # Slightly increased epsilon for better cluster formation with more data
             min_samples=2,  # Minimum points to form a cluster
             metric='precomputed',
             n_jobs=-1  # Use all available cores
@@ -151,13 +151,24 @@ def clustered_results(search_results):
         if not d3_data:
             st.error("Error preparing visualization data")
             return
+            
+        # Display raw data for debugging
+        with st.expander("Debug: Cluster Data"):
+            st.write(f"Total nodes: {len(d3_data['nodes'])}")
+            st.write(f"Total links: {len(d3_data['links'])}")
+            st.dataframe(d3_data['nodes'][:5] if d3_data['nodes'] else [])
 
         # Convert data to JSON for JavaScript
         d3_data_json = json.dumps(d3_data)
         
         # Log D3 data structure to debug visualization
         logger.info(f"D3 data structure: nodes={len(d3_data['nodes'])}, links={len(d3_data['links'])}")
-        logger.info(f"Node clusters: {[node['cluster'] for node in d3_data['nodes'][:5]]}...")
+        logger.info(f"Node clusters: {[node['cluster'] for node in d3_data['nodes'][:5] if d3_data['nodes']]}...")
+        
+        # Check if we have meaningful data to display
+        if not d3_data['nodes']:
+            st.warning("No clusters found in the data. Try adjusting search parameters.")
+            return
         
         # Create the D3.js visualization HTML
         d3_html = f"""
@@ -209,7 +220,7 @@ def clustered_results(search_results):
                 .attr('stroke-width', 1.5)
                 .on('mouseover', function(event, d) {
                     tooltip.style('visibility', 'visible')
-                        .html(`<strong>${d.title}</strong><br/>Keyword: ${d.keyword}<br/>Cluster: ${d.cluster === -1 ? 'Unclustered' : d.cluster}`)
+                        .html('<strong>' + d.title + '</strong><br/>Keyword: ' + d.keyword + '<br/>Cluster: ' + (d.cluster === -1 ? 'Unclustered' : d.cluster))
                         .style('left', (event.pageX + 10) + 'px')
                         .style('top', (event.pageY - 20) + 'px');
                 })
@@ -224,8 +235,8 @@ def clustered_results(search_results):
                     .on('drag', dragged)
                     .on('end', dragended));
 
-            // Create the simulation
-            const simulation = d3.forceSimulation(data.nodes)
+            // Simulation is already created above, this is a duplicate declaration
+            // simulation is used here only to update node/link positions
                 .force('link', d3.forceLink(data.links).id(d => d.id))
                 .force('charge', d3.forceManyBody().strength(-100))
                 .force('center', d3.forceCenter(width / 2, height / 2));
