@@ -24,7 +24,7 @@ def keyword_manager():
 
         if submit_button and new_keyword:
             try:
-                response = requests.post(get_api_url("keywords"), json=new_keyword)
+                response = requests.post(get_api_url(f"keywords?keyword={new_keyword}"))
                 if response.status_code == 200:
                     st.success("Keyword added successfully!")
                 else:
