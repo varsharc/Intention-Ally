@@ -20,6 +20,7 @@ def calculate_similarity_clusters(search_results):
 
         # Log input data structure
         logger.info(f"Processing search results: {len(search_results)} entries")
+        logger.info(f"First search result structure: {json.dumps(search_results[0], indent=2)}")
 
         for search in search_results:
             logger.info(f"Processing search entry for keyword: {search.get('keyword', 'unknown')}")
@@ -66,7 +67,7 @@ def calculate_similarity_clusters(search_results):
         mds = MDS(n_components=2, dissimilarity='precomputed', random_state=42)
         coordinates = mds.fit_transform(1 - similarity_matrix)
 
-        # Use DBSCAN with relaxed parameters
+        # Use DBSCAN with very relaxed parameters
         clustering = DBSCAN(
             eps=0.8,  # Very relaxed distance threshold
             min_samples=1,  # Allow single-point clusters
@@ -101,16 +102,27 @@ def clustered_results(search_results):
             st.info("No search results available for clustering. Please run a manual search to get fresh data.")
             return
 
-        # Debug: Display raw search results
-        with st.expander("Debug: Search Results Data"):
-            st.write("First search result entry:")
-            st.json(search_results[0] if search_results else None)
+        # Debug: Display raw search results structure
+        with st.expander("Debug: Search Results Structure"):
+            st.json(search_results[0])
+            st.write(f"Total search results entries: {len(search_results)}")
+            total_results = sum(len(s.get('results', [])) for s in search_results)
+            st.write(f"Total individual results: {total_results}")
 
         # Calculate clusters
         cluster_data = calculate_similarity_clusters(search_results)
         if not cluster_data:
             st.warning("Unable to generate cluster visualization. Please check the debug section for details.")
             return
+
+        # Debug: Display clustering results
+        with st.expander("Debug: Clustering Results"):
+            st.write({
+                "Number of documents": len(cluster_data['titles']),
+                "Number of clusters": len(np.unique(cluster_data['cluster_labels'])),
+                "Cluster sizes": np.bincount(cluster_data['cluster_labels'][cluster_data['cluster_labels'] != -1]).tolist(),
+                "Number of noise points": np.sum(cluster_data['cluster_labels'] == -1)
+            })
 
         # Create D3.js compatible data structure
         nodes = []
@@ -124,8 +136,8 @@ def clustered_results(search_results):
         probabilities = cluster_data['probabilities']
 
         # Create nodes with normalized coordinates
-        x_scale = 800 / (np.max(coordinates[:, 0]) - np.min(coordinates[:, 0]))
-        y_scale = 600 / (np.max(coordinates[:, 1]) - np.min(coordinates[:, 1]))
+        x_scale = 800 / (np.max(coordinates[:, 0]) - np.min(coordinates[:, 0]) + 1e-10)
+        y_scale = 600 / (np.max(coordinates[:, 1]) - np.min(coordinates[:, 1]) + 1e-10)
 
         for i in range(len(titles)):
             nodes.append({
@@ -152,7 +164,17 @@ def clustered_results(search_results):
                             'value': float(similarity)
                         })
 
+        # Debug: Display D3.js data structure
+        with st.expander("Debug: D3.js Data Structure"):
+            st.write({
+                "Number of nodes": len(nodes),
+                "Number of links": len(links),
+                "Sample node": nodes[0] if nodes else None,
+                "Sample link": links[0] if links else None
+            })
+
         # Create the visualization
+        viz_data = {'nodes': nodes, 'links': links}
         st.components.v1.html("""
             <div id="cluster-viz" style="width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 5px;"></div>
             <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -283,7 +305,7 @@ def clustered_results(search_results):
                 }
             })();
             </script>
-        """ % json.dumps({'nodes': nodes, 'links': links}), height=600)
+        """ % json.dumps(viz_data), height=600)
 
         # Add explanation
         st.markdown("""
