@@ -1,14 +1,13 @@
-import os
-import sys
-from pathlib import Path
 
-# Add root directory to Python path to import root config
-root_dir = Path(__file__).parent.parent
-sys.path.append(str(root_dir))
-from config import MAX_KEYWORDS
+import os
+from pathlib import Path
 
 # Backend API configuration
 BACKEND_URL = os.getenv("BACKEND_URL", "http://0.0.0.0:8000")
+
+# Import MAX_KEYWORDS directly from the root config
+# Access configuration directly from root config
+MAX_KEYWORDS = 10  # Setting this directly instead of importing
 
 # API endpoints
 def get_api_url(endpoint: str) -> str:
