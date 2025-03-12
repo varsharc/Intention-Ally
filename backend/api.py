@@ -6,10 +6,22 @@ from .scheduler import SearchScheduler
 from .brave_search import search_brave
 from config import BACKEND_HOST, BACKEND_PORT
 import uvicorn
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Intentionly API")
 storage = Storage()
-scheduler = SearchScheduler(storage)
+
+# Initialize scheduler after storage
+try:
+    scheduler = SearchScheduler(storage)
+    logger.info("Scheduler initialized successfully")
+except Exception as e:
+    logger.error(f"Failed to initialize scheduler: {str(e)}")
+    raise
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,26 +33,47 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    scheduler.start()
+    try:
+        scheduler.start()
+        logger.info("Scheduler started successfully")
+    except Exception as e:
+        logger.error(f"Failed to start scheduler: {str(e)}")
+        raise
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    scheduler.shutdown()
+    try:
+        scheduler.shutdown()
+        logger.info("Scheduler shutdown successfully")
+    except Exception as e:
+        logger.error(f"Failed to shutdown scheduler: {str(e)}")
 
 @app.get("/keywords")
 async def get_keywords():
-    return storage.get_keywords()
+    try:
+        return storage.get_keywords()
+    except Exception as e:
+        logger.error(f"Error getting keywords: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/keywords")
 async def add_keyword(keyword: str):
-    if storage.add_keyword(keyword):
-        return {"message": "Keyword added successfully"}
-    raise HTTPException(status_code=400, message="Maximum keywords limit reached")
+    try:
+        if storage.add_keyword(keyword):
+            return {"message": "Keyword added successfully"}
+        raise HTTPException(status_code=400, detail="Maximum keywords limit reached")
+    except Exception as e:
+        logger.error(f"Error adding keyword: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/keywords/{keyword}")
 async def remove_keyword(keyword: str):
-    storage.remove_keyword(keyword)
-    return {"message": "Keyword removed successfully"}
+    try:
+        storage.remove_keyword(keyword)
+        return {"message": "Keyword removed successfully"}
+    except Exception as e:
+        logger.error(f"Error removing keyword: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/search/{keyword}")
 async def search(keyword: str) -> SearchResponse:
@@ -52,6 +85,7 @@ async def search(keyword: str) -> SearchResponse:
             results=results
         )
     except Exception as e:
+        logger.error(f"Error performing search: {str(e)}")
         return SearchResponse(
             success=False,
             message=str(e)
@@ -59,10 +93,19 @@ async def search(keyword: str) -> SearchResponse:
 
 @app.get("/results")
 async def get_results(days: int = 7):
-    return storage.get_search_results(days)
+    try:
+        return storage.get_search_results(days)
+    except Exception as e:
+        logger.error(f"Error getting search results: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 def start():
-    uvicorn.run(app, host=BACKEND_HOST, port=BACKEND_PORT)
+    try:
+        logger.info(f"Starting server on {BACKEND_HOST}:{BACKEND_PORT}")
+        uvicorn.run(app, host=BACKEND_HOST, port=BACKEND_PORT)
+    except Exception as e:
+        logger.error(f"Failed to start server: {str(e)}")
+        raise
 
 if __name__ == "__main__":
     start()
