@@ -6,7 +6,7 @@ BRAVE_SEARCH_URL = "https://api.search.brave.com/res/v1/web/search"
 
 # Backend Configuration
 BACKEND_HOST = "0.0.0.0"
-BACKEND_PORT = 8000
+BACKEND_PORT = 8001
 
 # Storage Configuration
 STORAGE_DIR = "data"
