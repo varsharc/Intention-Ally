@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 # Backend API configuration
-BACKEND_URL = os.getenv("BACKEND_URL", "http://0.0.0.0:8001")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://0.0.0.0:8002")  # Changed port to 8002
 
 # Setting this directly instead of importing
 MAX_KEYWORDS = 10  # Avoid circular import

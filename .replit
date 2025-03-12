@@ -50,8 +50,8 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8001"
-waitForPort = 8001
+args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8002"
+waitForPort = 8002
 
 [[ports]]
 localPort = 5001
@@ -60,3 +60,7 @@ externalPort = 80
 [[ports]]
 localPort = 8001
 externalPort = 8001
+
+[[ports]]
+localPort = 8002
+externalPort = 3000
