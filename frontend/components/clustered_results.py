@@ -68,7 +68,7 @@ def calculate_similarity_clusters(search_results):
         logger.info(f"Similarity matrix shape: {similarity_matrix.shape}")
         logger.info(f"Cluster labels: {cluster_labels[:10]}...")
         logger.info(f"Coordinates shape: {coordinates.shape}")
-        
+
         # Check for NaN values in coordinates
         if np.isnan(coordinates).any():
             logger.warning("Found NaN coordinates! Replacing with zeros.")
@@ -151,7 +151,7 @@ def clustered_results(search_results):
         if not d3_data:
             st.error("Error preparing visualization data")
             return
-            
+
         # Display raw data for debugging
         with st.expander("Debug: Cluster Data"):
             st.write(f"Total nodes: {len(d3_data['nodes'])}")
@@ -160,16 +160,16 @@ def clustered_results(search_results):
 
         # Convert data to JSON for JavaScript
         d3_data_json = json.dumps(d3_data)
-        
+
         # Log D3 data structure to debug visualization
         logger.info(f"D3 data structure: nodes={len(d3_data['nodes'])}, links={len(d3_data['links'])}")
         logger.info(f"Node clusters: {[node['cluster'] for node in d3_data['nodes'][:5] if d3_data['nodes']]}...")
-        
+
         # Check if we have meaningful data to display
         if not d3_data['nodes']:
             st.warning("No clusters found in the data. Try adjusting search parameters.")
             return
-        
+
         # Create the D3.js visualization HTML
         d3_html = f"""
         <div id="cluster-visualization" style="width: 100%; height: 600px; border: 1px solid #ccc;"></div>
@@ -187,17 +187,17 @@ def clustered_results(search_results):
                 .append('svg')
                 .attr('width', width)
                 .attr('height', height);
-                
+
             // Define color scale for clusters
             const color = d3.scaleOrdinal(d3.schemeCategory10);
-            
+
             // Create force-directed simulation
             const simulation = d3.forceSimulation(data.nodes)
                 .force('link', d3.forceLink(data.links).id(d => d.id).distance(80))
                 .force('charge', d3.forceManyBody().strength(-100))
                 .force('center', d3.forceCenter(width / 2, height / 2))
                 .force('collide', d3.forceCollide(d => 5 + d.confidence * 15));
-                
+
             // Add links (edges)
             const link = svg.append('g')
                 .selectAll('line')
@@ -207,7 +207,7 @@ def clustered_results(search_results):
                 .attr('stroke', '#999')
                 .attr('stroke-opacity', 0.6)
                 .attr('stroke-width', d => Math.sqrt(d.value) * 2);
-                
+
             // Add nodes (circles)
             const node = svg.append('g')
                 .selectAll('circle')
@@ -236,11 +236,6 @@ def clustered_results(search_results):
                     .on('drag', dragged)
                     .on('end', dragended));
 
-            // Simulation is already created above, this is a duplicate declaration
-            // simulation is used here only to update node/link positions
-                .force('link', d3.forceLink(data.links).id(d => d.id))
-                .force('charge', d3.forceManyBody().strength(-100))
-                .force('center', d3.forceCenter(width / 2, height / 2));
 
             // Add the links
             const link = svg.append('g')
@@ -259,15 +254,15 @@ def clustered_results(search_results):
                 .attr('r', d => 5 + d.confidence * 5)
                 .style('fill', d => d3.schemeCategory10[d.cluster % 10])
                 .style('cursor', 'pointer')
-                .on('mouseover', function(event, d) {{
+                .on('mouseover', function(event, d) {
                     d3.select(this).style('stroke', '#000').style('stroke-width', 2);
                     tooltip.style('visibility', 'visible')
-                        .html(`Title: ${{d.title}}<br>Keyword: ${{d.keyword}}<br>Cluster: ${{d.cluster}}`);
-                }})
-                .on('mouseout', function() {{
+                        .html(`Title: ${d.title}<br>Keyword: ${d.keyword}<br>Cluster: ${d.cluster}`);
+                })
+                .on('mouseout', function() {
                     d3.select(this).style('stroke', null);
                     tooltip.style('visibility', 'hidden');
-                }})
+                })
                 .on('click', (event, d) => window.open(d.url, '_blank'));
 
             // Add drag behavior
@@ -288,7 +283,7 @@ def clustered_results(search_results):
                 .style('z-index', '10');
 
             // Update positions on each tick
-            simulation.on('tick', () => {{
+            simulation.on('tick', () => {
                 link
                     .attr('x1', d => d.source.x)
                     .attr('y1', d => d.source.y)
@@ -298,25 +293,25 @@ def clustered_results(search_results):
                 node
                     .attr('cx', d => d.x)
                     .attr('cy', d => d.y);
-            }});
+            });
 
             // Drag functions
-            function dragstarted(event) {{
+            function dragstarted(event) {
                 if (!event.active) simulation.alphaTarget(0.3).restart();
                 event.subject.fx = event.subject.x;
                 event.subject.fy = event.subject.y;
-            }}
+            }
 
-            function dragged(event) {{
+            function dragged(event) {
                 event.subject.fx = event.x;
                 event.subject.fy = event.y;
-            }}
+            }
 
-            function dragended(event) {{
+            function dragended(event) {
                 if (!event.active) simulation.alphaTarget(0);
                 event.subject.fx = null;
                 event.subject.fy = null;
-            }}
+            }
         }})();
         </script>
         """
