@@ -1,12 +1,14 @@
+import asyncio
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from .models import SearchResponse, Keyword
+from .models import SearchResponse, Keyword, KeywordSearch, SearchResult
 from .storage import Storage
 from .scheduler import SearchScheduler
 from .brave_search import search_brave
 from config import BACKEND_HOST, BACKEND_PORT
 import uvicorn
 import logging
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -61,7 +63,7 @@ async def add_keyword(keyword: str):
     try:
         if not keyword or keyword.strip() == "":
             raise HTTPException(status_code=400, detail="Keyword cannot be empty")
-        
+
         if storage.add_keyword(keyword):
             return {"message": "Keyword added successfully"}
         raise HTTPException(status_code=400, detail="Maximum keywords limit reached")
@@ -102,6 +104,42 @@ async def get_results(days: int = 7):
         return storage.get_search_results(days)
     except Exception as e:
         logger.error(f"Error getting search results: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/run-search")
+async def run_manual_search():
+    """Manually trigger a search for all keywords"""
+    try:
+        keywords = storage.get_keywords()
+        results = []
+
+        if not keywords:
+            return {"message": "No keywords found to search"}
+
+        for i, keyword in enumerate(keywords):
+            if keyword.is_active:
+                try:
+                    # Add delay between searches to respect rate limits
+                    if i > 0:
+                        await asyncio.sleep(2)  # 2 second delay between searches
+
+                    logger.info(f"Searching for keyword: {keyword.value}")
+                    search_results = await search_brave(keyword.value)
+                    search = KeywordSearch(
+                        keyword=keyword.value,
+                        results=search_results,
+                        timestamp=datetime.now()
+                    )
+                    storage.save_search_results(search)
+                    results.append({"keyword": keyword.value, "count": len(search_results)})
+                    logger.info(f"Successfully saved results for keyword: {keyword.value}")
+                except Exception as e:
+                    logger.error(f"Error searching for keyword {keyword.value}: {str(e)}")
+                    results.append({"keyword": keyword.value, "error": str(e)})
+
+        return {"message": "Manual search completed", "results": results}
+    except Exception as e:
+        logger.error(f"Error in manual search: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 def start():

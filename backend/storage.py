@@ -13,9 +13,18 @@ class Storage:
         self._initialize_storage()
 
     def _initialize_storage(self):
+        """Initialize storage files if they don't exist"""
         if not os.path.exists(self.results_path):
             self._save_results([])
-        if not os.path.exists(self.keywords_path) or os.path.getsize(self.keywords_path) == 0:
+        if not os.path.exists(self.keywords_path):
+            self._save_keywords([])
+        # Ensure the keywords file is not empty
+        try:
+            with open(self.keywords_path, 'r') as f:
+                content = f.read().strip()
+                if not content:
+                    self._save_keywords([])
+        except:
             self._save_keywords([])
 
     def _save_results(self, results: List[Dict]):
@@ -32,18 +41,10 @@ class Storage:
                 data = json.load(f)
                 if not isinstance(data, list):
                     return []
-                
+
                 keywords = []
                 for k in data:
-                    if isinstance(k, str):
-                        # Handle old format where keywords were stored as strings
-                        keywords.append(Keyword(
-                            value=k,
-                            created_at=datetime.now(),
-                            is_active=True
-                        ))
-                    elif isinstance(k, dict):
-                        # Handle dictionary format
+                    if isinstance(k, dict):
                         keywords.append(Keyword(
                             value=k.get("value", ""),
                             created_at=datetime.fromisoformat(k.get("created_at", datetime.now().isoformat())),
@@ -51,37 +52,30 @@ class Storage:
                         ))
                 return keywords
         except (json.JSONDecodeError, FileNotFoundError):
+            self._initialize_storage()
             return []
 
     def add_keyword(self, keyword: str) -> bool:
         keywords = self.get_keywords()
+
+        # Check current keyword count
         if len(keywords) >= 10:
             return False
-        
+
         # Check if keyword already exists
-        if any(k.value == keyword for k in keywords):
-            return True  # Already exists, consider it successful
-            
+        if any(k.value.lower() == keyword.lower() for k in keywords):
+            return True
+
         new_keyword = Keyword(
             value=keyword,
             created_at=datetime.now(),
             is_active=True
         )
-        
-        try:
-            keywords_dict = [k.dict() for k in keywords]
-            keywords_dict.append(new_keyword.dict())
-            self._save_keywords(keywords_dict)
-            return True
-        except Exception as e:
-            print(f"Error adding keyword: {str(e)}")
-            # Fallback to simpler approach if needed
-            try:
-                simple_keywords = [k.value for k in keywords] + [keyword]
-                self._save_keywords(simple_keywords)
-                return True
-            except:
-                raise
+
+        keywords_dict = [k.dict() for k in keywords]
+        keywords_dict.append(new_keyword.dict())
+        self._save_keywords(keywords_dict)
+        return True
 
     def remove_keyword(self, keyword: str):
         keywords = self.get_keywords()
@@ -98,7 +92,7 @@ class Storage:
         results = self._load_results()
         cutoff_date = datetime.now() - timedelta(days=days)
         recent_results = [
-            r for r in results 
+            r for r in results
             if datetime.fromisoformat(r['timestamp']) > cutoff_date
         ]
         return [KeywordSearch(**r) for r in recent_results]
@@ -111,7 +105,7 @@ class Storage:
         results = self._load_results()
         cutoff_date = datetime.now() - timedelta(days=RETENTION_DAYS)
         filtered_results = [
-            r for r in results 
+            r for r in results
             if datetime.fromisoformat(r['timestamp']) > cutoff_date
         ]
         self._save_results(filtered_results)

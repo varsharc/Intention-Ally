@@ -6,29 +6,13 @@ import sys
 import os
 import logging
 
-# Add root directory to Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-from frontend.config import get_api_url
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-import streamlit as st
-import requests
-import pandas as pd
-from datetime import datetime
-import logging
-import sys
-import os
-
 # Add root directory to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from frontend.config import get_api_url
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 def search_results():
     st.subheader("Search Results")
@@ -38,9 +22,12 @@ def search_results():
 
     # Fetch results
     try:
+        logger.info(f"Fetching search results for last {days} days")
         response = requests.get(get_api_url(f"results?days={days}"))
+
         if response.status_code == 200:
             results = response.json()
+            logger.info(f"Received {len(results)} search entries")
 
             if not results:
                 st.info("No search results available for the selected period.")
@@ -49,6 +36,7 @@ def search_results():
             # Create a dataframe for better display
             df_rows = []
             for search in results:
+                logger.info(f"Processing results for keyword: {search['keyword']}")
                 for result in search["results"]:
                     df_rows.append({
                         "Keyword": search["keyword"],
@@ -59,6 +47,7 @@ def search_results():
                     })
 
             df = pd.DataFrame(df_rows)
+            logger.info(f"Created DataFrame with {len(df)} rows")
 
             # Add filters
             keywords = df["Keyword"].unique()
@@ -69,6 +58,7 @@ def search_results():
             )
 
             filtered_df = df[df["Keyword"].isin(selected_keywords)]
+            logger.info(f"Filtered to {len(filtered_df)} rows")
 
             # Display results in an expandable format
             for _, row in filtered_df.iterrows():
@@ -78,6 +68,7 @@ def search_results():
         else:
             st.error("Failed to fetch search results")
             logger.error(f"Error fetching results: {response.status_code}")
+            logger.error(f"Response content: {response.text}")
     except requests.exceptions.ConnectionError as e:
         st.error("Unable to connect to backend service. Please try again later.")
         logger.error(f"Connection error fetching results: {str(e)}")

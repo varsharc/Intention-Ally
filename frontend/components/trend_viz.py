@@ -7,13 +7,13 @@ import logging
 import sys
 import os
 
-# Add root directory to Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-from frontend.config import get_api_url
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Add root directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+from frontend.config import get_api_url
 
 def trend_visualization():
     st.subheader("Search Trends")
@@ -23,9 +23,12 @@ def trend_visualization():
 
     # Fetch data
     try:
+        logger.info(f"Fetching trend data for last {days} days")
         response = requests.get(get_api_url(f"results?days={days}"))
+
         if response.status_code == 200:
             results = response.json()
+            logger.info(f"Received {len(results)} search entries for trends")
 
             if not results:
                 st.info("No trend data available for the selected period.")
@@ -34,6 +37,7 @@ def trend_visualization():
             # Process data for visualization
             trend_data = []
             for search in results:
+                logger.info(f"Processing trend data for keyword: {search['keyword']}")
                 trend_data.append({
                     "Keyword": search["keyword"],
                     "Date": datetime.fromisoformat(search["timestamp"]).strftime("%Y-%m-%d"),
@@ -41,6 +45,7 @@ def trend_visualization():
                 })
 
             df = pd.DataFrame(trend_data)
+            logger.info(f"Created trends DataFrame with {len(df)} rows")
 
             # Line chart of search results over time
             st.subheader("Search Results Over Time")
@@ -56,9 +61,11 @@ def trend_visualization():
 
             summary_df.columns = ["Average Results", "Minimum", "Maximum", "Number of Searches"]
             st.dataframe(summary_df)
+            logger.info("Successfully displayed trend visualizations")
         else:
             st.error("Failed to fetch trend data")
             logger.error(f"Error fetching trend data: {response.status_code}")
+            logger.error(f"Response content: {response.text}")
     except requests.exceptions.ConnectionError as e:
         st.error("Unable to connect to backend service. Please try again later.")
         logger.error(f"Connection error fetching trend data: {str(e)}")

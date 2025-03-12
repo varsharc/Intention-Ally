@@ -1,13 +1,11 @@
-
 import os
 from pathlib import Path
 
 # Backend API configuration
 BACKEND_URL = os.getenv("BACKEND_URL", "http://0.0.0.0:8001")
 
-# Import MAX_KEYWORDS directly from the root config
-# Access configuration directly from root config
-MAX_KEYWORDS = 10  # Setting this directly instead of importing
+# Setting this directly instead of importing
+MAX_KEYWORDS = 10  # Avoid circular import
 
 # API endpoints
 def get_api_url(endpoint: str) -> str:
