@@ -1,0 +1,165 @@
+Input Data Structure
+Sample search result:
+
+{...}
+Processing keyword: carbon insetting
+
+Processing keyword: carbon insetting
+
+Processing keyword: Textile sustainability
+
+Processing keyword: digital product passports
+
+Processing keyword: carbon insets
+
+Processing keyword: sustainability in textile
+
+Processing keyword: sustainability in fashion
+
+Processing keyword: Fashion sustainability
+
+Processing keyword: textile regulation
+
+Processing keyword: fashion regulation
+
+Processing keyword: climate regulation in fashion
+
+Processing keyword: carbon insetting
+
+Processing keyword: Textile sustainability
+
+Processing keyword: digital product passports
+
+Processing keyword: carbon insets
+
+Processing keyword: sustainability in textile
+
+Processing keyword: sustainability in fashion
+
+Processing keyword: Fashion sustainability
+
+Processing keyword: textile regulation
+
+Processing keyword: fashion regulation
+
+Processing keyword: climate regulation in fashion
+
+Processing keyword: carbon insetting
+
+Processing keyword: Textile sustainability
+
+Processing keyword: digital product passports
+
+Processing keyword: carbon insets
+
+Processing keyword: sustainability in textile
+
+Processing keyword: sustainability in fashion
+
+Processing keyword: Fashion sustainability
+
+Processing keyword: textile regulation
+
+Processing keyword: fashion regulation
+
+Processing keyword: climate regulation in fashion
+
+Processing keyword: carbon insetting
+
+Processing keyword: Textile sustainability
+
+Processing keyword: digital product passports
+
+Processing keyword: carbon insets
+
+Processing keyword: sustainability in textile
+
+Processing keyword: sustainability in fashion
+
+Processing keyword: Fashion sustainability
+
+Processing keyword: textile regulation
+
+Processing keyword: fashion regulation
+
+Processing keyword: climate regulation in fashion
+
+Processing keyword: carbon insetting
+
+Processing keyword: Textile sustainability
+
+Processing keyword: digital product passports
+
+Processing keyword: carbon insets
+
+Processing keyword: sustainability in textile
+
+Processing keyword: sustainability in fashion
+
+Processing keyword: Fashion sustainability
+
+Processing keyword: textile regulation
+
+Processing keyword: fashion regulation
+
+Processing keyword: climate regulation in fashion
+
+Processing keyword: carbon insetting
+
+Processing keyword: Textile sustainability
+
+Processing keyword: digital product passports
+
+Processing keyword: carbon insets
+
+Processing keyword: sustainability in textile
+
+Processing keyword: sustainability in fashion
+
+Processing keyword: Fashion sustainability
+
+Processing keyword: textile regulation
+
+Processing keyword: fashion regulation
+
+Processing keyword: climate regulation in fashion
+
+Processing keyword: carbon insetting
+
+Processing keyword: Textile sustainability
+
+Processing keyword: digital product passports
+
+Processing keyword: carbon insets
+
+Processing keyword: sustainability in textile
+
+Processing keyword: sustainability in fashion
+
+Processing keyword: Fashion sustainability
+
+Processing keyword: textile regulation
+
+Processing keyword: fashion regulation
+
+Processing keyword: climate regulation in fashion
+
+Extracted Data
+Number of documents: 710
+
+Sample document:
+
+What is Carbon insetting? Greener logistics starts from looking within Carbon insetting is <strong>a practice where funds are directed to addressing greenhouse gases emissions at the source – within the sector that is emitting them</strong>. These include investing in growing the sustainable fuel industry, fleet renewal programs, carbon neutral retrofitting and eco-efficiency ...
+
+TF-IDF Calculation
+TF-IDF Matrix Shape: (710, 100)
+
+Similarity Matrix
+Sample similarities (first 3x3):
+
+Clustering Process
+DBSCAN parameters: eps=0.3, min_samples=1
+
+Error processing data: Negative values in data passed to X.
+
+Failed to generate visualization. Check the debug information above.

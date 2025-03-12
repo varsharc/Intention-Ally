@@ -61,16 +61,22 @@ def calculate_similarity_clusters(search_results):
         tfidf_matrix = vectorizer.fit_transform(texts)
         st.write(f"TF-IDF Matrix Shape: {tfidf_matrix.shape}")
 
-        # Calculate similarity
+        # Calculate normalized similarity matrix
         similarity_matrix = cosine_similarity(tfidf_matrix)
+        # Ensure similarity values are between 0 and 1
+        similarity_matrix = np.clip(similarity_matrix, 0, 1)
+
         st.write("### Similarity Matrix")
         st.write("Sample similarities (first 3x3):")
         st.dataframe(pd.DataFrame(similarity_matrix[:3, :3]))
 
+        # Convert to distance matrix with proper normalization
+        distance_matrix = np.clip(1 - similarity_matrix, 0, 1)
+
         # Cluster the documents
         st.write("### Clustering Process")
-        eps = 0.3  # Similarity threshold
-        min_samples = 1  # Allow single-document clusters
+        eps = 0.7  # Increased threshold for more inclusive clusters
+        min_samples = 2  # Minimum points per cluster
         st.write(f"DBSCAN parameters: eps={eps}, min_samples={min_samples}")
 
         clustering = DBSCAN(
@@ -78,9 +84,6 @@ def calculate_similarity_clusters(search_results):
             min_samples=min_samples,
             metric='precomputed'
         )
-
-        # Convert similarity to distance
-        distance_matrix = 1 - similarity_matrix
         cluster_labels = clustering.fit_predict(distance_matrix)
 
         # Analyze clusters
@@ -89,11 +92,11 @@ def calculate_similarity_clusters(search_results):
         st.write("Cluster sizes:", np.bincount(cluster_labels[cluster_labels != -1]).tolist())
         st.write("Number of noise points:", np.sum(cluster_labels == -1))
 
-        # Calculate cluster probabilities
+        # Calculate cluster probabilities with normalization
         probabilities = np.zeros(len(texts))
         for i in range(len(texts)):
             similar_docs = similarity_matrix[i] > 0.3
-            probabilities[i] = np.mean(similarity_matrix[i][similar_docs])
+            probabilities[i] = np.clip(np.mean(similarity_matrix[i][similar_docs]), 0.1, 1.0)
 
         # Generate 2D coordinates
         st.write("### Generating Visualization Coordinates")
@@ -107,39 +110,39 @@ def calculate_similarity_clusters(search_results):
         )
         st.dataframe(coord_df)
 
-        # Prepare visualization data
-        st.write("### Preparing D3.js Data")
+        # Scale coordinates
+        x_min, x_max = np.min(coordinates[:, 0]), np.max(coordinates[:, 0])
+        y_min, y_max = np.min(coordinates[:, 1]), np.max(coordinates[:, 1])
+        x_scale = 800 / (x_max - x_min + 1e-10)
+        y_scale = 600 / (y_max - y_min + 1e-10)
 
-        # Scale coordinates to fit visualization
-        x_scale = 800 / (np.max(coordinates[:, 0]) - np.min(coordinates[:, 0]) + 1e-10)
-        y_scale = 600 / (np.max(coordinates[:, 1]) - np.min(coordinates[:, 1]) + 1e-10)
-
+        # Create nodes with normalized coordinates
         nodes = []
-        links = []
-
-        # Create nodes
         for i in range(len(texts)):
+            x_coord = (coordinates[i, 0] - x_min) * x_scale
+            y_coord = (coordinates[i, 1] - y_min) * y_scale
             nodes.append({
                 'id': str(i),
                 'title': titles[i],
                 'url': urls[i],
                 'keyword': keywords[i],
-                'x': float(coordinates[i, 0] * x_scale),
-                'y': float(coordinates[i, 1] * y_scale),
+                'x': float(x_coord),
+                'y': float(y_coord),
                 'cluster': int(cluster_labels[i]),
                 'confidence': float(probabilities[i])
             })
 
         # Create links between similar nodes
-        for i in range(len(nodes)):
-            for j in range(i + 1, len(nodes)):
+        links = []
+        for i in range(len(texts)):
+            for j in range(i + 1, len(texts)):
                 if cluster_labels[i] != -1 and cluster_labels[i] == cluster_labels[j]:
-                    similarity = similarity_matrix[i, j]
-                    if similarity > 0.3:
+                    sim_value = similarity_matrix[i, j]
+                    if sim_value > 0.3:  # Threshold for creating links
                         links.append({
                             'source': str(i),
                             'target': str(j),
-                            'value': float(similarity)
+                            'value': float(sim_value)
                         })
 
         st.write("### D3.js Data Summary")
@@ -150,17 +153,12 @@ def calculate_similarity_clusters(search_results):
         if links:
             st.write("Sample link:", links[0])
 
-        viz_data = {'nodes': nodes, 'links': links}
-
-        return viz_data
+        return {'nodes': nodes, 'links': links}
 
     except Exception as e:
         logger.error(f"Error in clustering: {str(e)}", exc_info=True)
         st.error(f"Error processing data: {str(e)}")
         return None
-
-def generate_d3_data(cluster_data):
-    return cluster_data # This function is now redundant
 
 def clustered_results(search_results):
     """Main entry point for clustering visualization"""
