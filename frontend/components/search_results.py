@@ -14,6 +14,22 @@ from frontend.config import get_api_url
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+import streamlit as st
+import requests
+import pandas as pd
+from datetime import datetime
+import logging
+import sys
+import os
+
+# Add root directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+from frontend.config import get_api_url
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def search_results():
     st.subheader("Search Results")
 

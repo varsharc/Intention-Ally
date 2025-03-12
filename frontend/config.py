@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 # Backend API configuration
-BACKEND_URL = os.getenv("BACKEND_URL", "http://0.0.0.0:8000")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://0.0.0.0:8001")
 
 # Import MAX_KEYWORDS directly from the root config
 # Access configuration directly from root config
