@@ -30,19 +30,21 @@ def calculate_similarity_clusters(search_results):
             return None
 
         # Calculate TF-IDF
-        vectorizer = TfidfVectorizer(stop_words='english')
+        vectorizer = TfidfVectorizer(stop_words='english', max_features=1000)
         tfidf_matrix = vectorizer.fit_transform(texts)
 
-        # Calculate similarity matrix
+        # Calculate similarity matrix and convert to distance
         similarity_matrix = cosine_similarity(tfidf_matrix)
+        # Ensure no negative distances by using 1 - normalized similarity
+        distance_matrix = np.clip(1 - similarity_matrix, 0, 1)
 
-        # Cluster using DBSCAN
+        # Cluster using DBSCAN with adjusted parameters
         clustering = DBSCAN(
-            eps=0.3,  # Maximum distance between samples
-            min_samples=2,  # Minimum samples in a cluster
+            eps=0.5,  # Increased epsilon for more inclusive clusters
+            min_samples=2,  # Minimum points to form a cluster
             metric='precomputed'
         )
-        cluster_labels = clustering.fit_predict(1 - similarity_matrix)  # Using distance = 1 - similarity
+        cluster_labels = clustering.fit_predict(distance_matrix)
 
         # Calculate cluster probabilities (confidence scores)
         probabilities = np.zeros(len(texts))
@@ -56,7 +58,12 @@ def calculate_similarity_clusters(search_results):
         # Use MDS for 2D visualization coordinates
         from sklearn.manifold import MDS
         mds = MDS(n_components=2, dissimilarity='precomputed', random_state=42)
-        coordinates = mds.fit_transform(1 - similarity_matrix)
+        coordinates = mds.fit_transform(distance_matrix)
+
+        # Add debug logging
+        logger.info(f"Number of clusters found: {len(np.unique(cluster_labels))}")
+        logger.info(f"Points per cluster: {np.bincount(cluster_labels[cluster_labels != -1])}")
+        logger.info(f"Number of noise points: {np.sum(cluster_labels == -1)}")
 
         return {
             'coordinates': coordinates,
