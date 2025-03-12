@@ -1,0 +1,16 @@
+[project]
+name = "repl-nix-workspace"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "aiohttp>=3.11.13",
+    "apscheduler>=3.11.0",
+    "fastapi>=0.115.11",
+    "pandas>=2.2.3",
+    "plotly>=6.0.0",
+    "pydantic>=2.10.6",
+    "requests>=2.32.3",
+    "streamlit>=1.43.2",
+    "uvicorn>=0.34.0",
+]

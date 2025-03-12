@@ -1,0 +1,41 @@
+import streamlit as st
+from components.keyword_manager import keyword_manager
+from components.search_results import search_results
+from components.trend_viz import trend_visualization
+
+st.set_page_config(
+    page_title="Intentionly - Search Curate, Track. With Purpose.",
+    page_icon="🎯",
+    layout="wide"
+)
+
+def main():
+    # Header
+    st.title("Intentionly")
+    st.markdown("*Search Curate, Track. With Purpose.*")
+    
+    # Main navigation
+    tabs = st.tabs(["Keywords", "Search Results", "Trends"])
+    
+    with tabs[0]:
+        keyword_manager()
+    
+    with tabs[1]:
+        search_results()
+    
+    with tabs[2]:
+        trend_visualization()
+    
+    # Footer
+    st.markdown("---")
+    st.markdown(
+        """
+        <div style='text-align: center'>
+            <p>Intentionly - Your AI-powered search tracking assistant</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+if __name__ == "__main__":
+    main()
