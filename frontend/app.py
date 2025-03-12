@@ -2,6 +2,7 @@ import streamlit as st
 from components.keyword_manager import keyword_manager
 from components.search_results import search_results
 from components.trend_viz import trend_visualization
+from components.search_preferences import search_preferences
 
 st.set_page_config(
     page_title="Intentionly - Search Curate, Track. With Purpose.",
@@ -13,19 +14,26 @@ def main():
     # Header
     st.title("Intentionly")
     st.markdown("*Search Curate, Track. With Purpose.*")
-    
+
     # Main navigation
-    tabs = st.tabs(["Keywords", "Search Results", "Trends"])
-    
+    tabs = st.tabs(["Keywords", "Search Preferences", "Search Results", "Trends"])
+
     with tabs[0]:
         keyword_manager()
-    
+
     with tabs[1]:
-        search_results()
-    
+        current_preferences = search_preferences()
+
     with tabs[2]:
+        if current_preferences:
+            st.info(f"Applying filters: {len(current_preferences['regions'])} regions, "
+                   f"{len(current_preferences['content_types'])} content types, "
+                   f"timeframe: {current_preferences['time_range']}")
+        search_results()
+
+    with tabs[3]:
         trend_visualization()
-    
+
     # Footer
     st.markdown("---")
     st.markdown(
