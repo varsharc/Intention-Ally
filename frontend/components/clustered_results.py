@@ -23,34 +23,55 @@ def calculate_similarity_clusters(search_results):
 
         for search in search_results:
             logger.info(f"Processing search entry for keyword: {search.get('keyword', 'unknown')}")
-            logger.info(f"Number of results in this entry: {len(search.get('results', []))}")
+            results = search.get("results", [])
+            logger.info(f"Number of results in this entry: {len(results)}")
 
-            for result in search.get("results", []):
-                text = f"{result.get('title', '')} {result.get('description', '')}"
-                texts.append(text)
-                titles.append(result.get('title', ''))
-                urls.append(result.get('url', ''))
-                keywords.append(search.get('keyword', ''))
+            for result in results:
+                # Clean and combine title and description
+                title = result.get('title', '').strip()
+                desc = result.get('description', '').strip()
+                text = f"{title} {desc}"
+
+                if text.strip():  # Only add non-empty texts
+                    texts.append(text)
+                    titles.append(title)
+                    urls.append(result.get('url', ''))
+                    keywords.append(search.get('keyword', ''))
 
         if not texts:
-            logger.warning("No texts found for clustering - empty search results")
+            logger.warning("No valid texts found for clustering")
             return None
 
-        logger.info(f"Extracted {len(texts)} documents for clustering")
+        num_docs = len(texts)
+        logger.info(f"Extracted {num_docs} valid documents for clustering")
 
-        # Calculate TF-IDF
-        vectorizer = TfidfVectorizer(stop_words='english', max_features=1000)
+        # Calculate TF-IDF with better parameters
+        vectorizer = TfidfVectorizer(
+            stop_words='english',
+            max_features=1000,
+            min_df=2,  # Ignore terms that appear in less than 2 documents
+            max_df=0.95  # Ignore terms that appear in more than 95% of documents
+        )
         tfidf_matrix = vectorizer.fit_transform(texts)
         logger.info(f"TF-IDF matrix shape: {tfidf_matrix.shape}")
 
         # Calculate similarity matrix
         similarity_matrix = cosine_similarity(tfidf_matrix)
+        logger.info(f"Similarity matrix shape: {similarity_matrix.shape}")
+
+        # Calculate distance matrix
         distance_matrix = 1 - similarity_matrix
+
+        # Adjust DBSCAN parameters based on data size
+        eps = 0.7  # More lenient distance threshold
+        min_samples = max(2, min(3, num_docs // 10))  # Adaptive minimum samples
+
+        logger.info(f"DBSCAN parameters: eps={eps}, min_samples={min_samples}")
 
         # Cluster using DBSCAN
         clustering = DBSCAN(
-            eps=0.5,  # Maximum distance between points in a cluster
-            min_samples=2,  # Minimum points to form a cluster
+            eps=eps,
+            min_samples=min_samples,
             metric='precomputed'
         )
         cluster_labels = clustering.fit_predict(distance_matrix)
@@ -64,16 +85,23 @@ def calculate_similarity_clusters(search_results):
             else:
                 probabilities[i] = 0.1  # Default for noise points
 
-        # Use MDS for 2D visualization coordinates
+        # Use MDS for 2D visualization
         from sklearn.manifold import MDS
         mds = MDS(n_components=2, dissimilarity='precomputed', random_state=42)
         coordinates = mds.fit_transform(distance_matrix)
 
         # Log clustering results
         unique_clusters = np.unique(cluster_labels)
-        logger.info(f"Number of clusters found: {len(unique_clusters)}")
-        logger.info(f"Cluster sizes: {np.bincount(cluster_labels[cluster_labels != -1])}")
-        logger.info(f"Number of noise points: {np.sum(cluster_labels == -1)}")
+        num_clusters = len(unique_clusters[unique_clusters != -1])
+        noise_points = np.sum(cluster_labels == -1)
+
+        logger.info(f"Number of clusters found: {num_clusters}")
+        logger.info(f"Points per cluster: {np.bincount(cluster_labels[cluster_labels != -1])}")
+        logger.info(f"Number of noise points: {noise_points}")
+
+        if num_clusters == 0:
+            logger.warning("No clusters were formed - all points are noise")
+            return None
 
         return {
             'coordinates': coordinates,
@@ -83,6 +111,7 @@ def calculate_similarity_clusters(search_results):
             'keywords': keywords,
             'probabilities': probabilities
         }
+
     except Exception as e:
         logger.error(f"Error in calculate_similarity_clusters: {str(e)}", exc_info=True)
         return None
@@ -98,21 +127,14 @@ def clustered_results(search_results):
 
         # Debug: Display raw search results
         with st.expander("Debug: Search Results Data"):
-            st.json(search_results[:1])  # Show first entry as example
+            st.write("First search result entry:")
+            st.json(search_results[0] if search_results else None)
 
         # Calculate clusters
         cluster_data = calculate_similarity_clusters(search_results)
         if not cluster_data:
-            st.warning("Unable to create clusters from the current search results. Try running a manual search to get fresh data.")
+            st.warning("Unable to create meaningful clusters from the current search results. Try adjusting search keywords for more related content.")
             return
-
-        # Debug: Display cluster data
-        with st.expander("Debug: Cluster Data"):
-            st.write({
-                "Number of texts": len(cluster_data['titles']),
-                "Unique clusters": len(np.unique(cluster_data['cluster_labels'])),
-                "Coordinates shape": cluster_data['coordinates'].shape
-            })
 
         # Create D3.js compatible data structure
         nodes = []
@@ -131,7 +153,7 @@ def clustered_results(search_results):
 
         for i in range(len(titles)):
             nodes.append({
-                'id': str(i),  # Convert to string for D3.js
+                'id': str(i),
                 'title': titles[i],
                 'url': urls[i],
                 'keyword': keywords[i],
@@ -147,12 +169,12 @@ def clustered_results(search_results):
                 if (cluster_labels[i] != -1 and  # -1 is noise
                     cluster_labels[i] == cluster_labels[j]):
                     links.append({
-                        'source': str(i),  # Use string IDs
+                        'source': str(i),
                         'target': str(j),
                         'value': min(probabilities[i], probabilities[j])
                     })
 
-        # Debug: Log data structure
+        # Debug info
         logger.info(f"Generated visualization data: {len(nodes)} nodes, {len(links)} links")
 
         # Create the visualization
