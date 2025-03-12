@@ -30,12 +30,27 @@ class Storage:
         try:
             with open(self.keywords_path, 'r') as f:
                 data = json.load(f)
-                return [Keyword(
-                    value=k.get("value", ""),
-                    created_at=datetime.fromisoformat(k.get("created_at", datetime.now().isoformat())),
-                    is_active=k.get("is_active", True)
-                ) for k in data]
-        except json.JSONDecodeError:
+                if not isinstance(data, list):
+                    return []
+                
+                keywords = []
+                for k in data:
+                    if isinstance(k, str):
+                        # Handle old format where keywords were stored as strings
+                        keywords.append(Keyword(
+                            value=k,
+                            created_at=datetime.now(),
+                            is_active=True
+                        ))
+                    elif isinstance(k, dict):
+                        # Handle dictionary format
+                        keywords.append(Keyword(
+                            value=k.get("value", ""),
+                            created_at=datetime.fromisoformat(k.get("created_at", datetime.now().isoformat())),
+                            is_active=k.get("is_active", True)
+                        ))
+                return keywords
+        except (json.JSONDecodeError, FileNotFoundError):
             return []
 
     def add_keyword(self, keyword: str) -> bool:
@@ -43,15 +58,30 @@ class Storage:
         if len(keywords) >= 10:
             return False
         
+        # Check if keyword already exists
+        if any(k.value == keyword for k in keywords):
+            return True  # Already exists, consider it successful
+            
         new_keyword = Keyword(
             value=keyword,
             created_at=datetime.now(),
             is_active=True
         )
-        keywords_dict = [k.dict() for k in keywords]
-        keywords_dict.append(new_keyword.dict())
-        self._save_keywords(keywords_dict)
-        return True
+        
+        try:
+            keywords_dict = [k.dict() for k in keywords]
+            keywords_dict.append(new_keyword.dict())
+            self._save_keywords(keywords_dict)
+            return True
+        except Exception as e:
+            print(f"Error adding keyword: {str(e)}")
+            # Fallback to simpler approach if needed
+            try:
+                simple_keywords = [k.value for k in keywords] + [keyword]
+                self._save_keywords(simple_keywords)
+                return True
+            except:
+                raise
 
     def remove_keyword(self, keyword: str):
         keywords = self.get_keywords()
