@@ -38,10 +38,6 @@ def calculate_similarity_clusters(search_results):
                     urls.append(result.get('url', ''))
                     keywords.append(search.get('keyword', ''))
 
-        if not texts:
-            logger.warning("No valid texts found for clustering")
-            return None
-
         num_docs = len(texts)
         logger.info(f"Extracted {num_docs} valid documents for clustering")
 
@@ -49,7 +45,7 @@ def calculate_similarity_clusters(search_results):
         vectorizer = TfidfVectorizer(
             stop_words='english',
             max_features=1000,
-            min_df=2,  # Ignore terms that appear in less than 2 documents
+            min_df=1,  # Allow terms that appear in at least 1 document
             max_df=0.95  # Ignore terms that appear in more than 95% of documents
         )
         tfidf_matrix = vectorizer.fit_transform(texts)
@@ -59,49 +55,29 @@ def calculate_similarity_clusters(search_results):
         similarity_matrix = cosine_similarity(tfidf_matrix)
         logger.info(f"Similarity matrix shape: {similarity_matrix.shape}")
 
-        # Calculate distance matrix
-        distance_matrix = 1 - similarity_matrix
-
-        # Adjust DBSCAN parameters based on data size
-        eps = 0.7  # More lenient distance threshold
-        min_samples = max(2, min(3, num_docs // 10))  # Adaptive minimum samples
-
-        logger.info(f"DBSCAN parameters: eps={eps}, min_samples={min_samples}")
-
-        # Cluster using DBSCAN
-        clustering = DBSCAN(
-            eps=eps,
-            min_samples=min_samples,
-            metric='precomputed'
-        )
-        cluster_labels = clustering.fit_predict(distance_matrix)
-
-        # Calculate cluster probabilities
+        # Calculate cluster probabilities (confidence scores)
         probabilities = np.zeros(len(texts))
         for i in range(len(texts)):
-            if cluster_labels[i] != -1:  # Not noise
-                cluster_members = cluster_labels == cluster_labels[i]
-                probabilities[i] = np.mean(similarity_matrix[i][cluster_members])
-            else:
-                probabilities[i] = 0.1  # Default for noise points
+            similar_docs = similarity_matrix[i] > 0.3  # Threshold for similarity
+            probabilities[i] = np.mean(similarity_matrix[i][similar_docs])
 
-        # Use MDS for 2D visualization
+        # Use MDS for 2D visualization coordinates
         from sklearn.manifold import MDS
         mds = MDS(n_components=2, dissimilarity='precomputed', random_state=42)
-        coordinates = mds.fit_transform(distance_matrix)
+        coordinates = mds.fit_transform(1 - similarity_matrix)
+
+        # Use DBSCAN with relaxed parameters
+        clustering = DBSCAN(
+            eps=0.8,  # Very relaxed distance threshold
+            min_samples=1,  # Allow single-point clusters
+            metric='precomputed'
+        )
+        cluster_labels = clustering.fit_predict(1 - similarity_matrix)
 
         # Log clustering results
-        unique_clusters = np.unique(cluster_labels)
-        num_clusters = len(unique_clusters[unique_clusters != -1])
-        noise_points = np.sum(cluster_labels == -1)
-
-        logger.info(f"Number of clusters found: {num_clusters}")
+        logger.info(f"Number of clusters found: {len(np.unique(cluster_labels))}")
         logger.info(f"Points per cluster: {np.bincount(cluster_labels[cluster_labels != -1])}")
-        logger.info(f"Number of noise points: {noise_points}")
-
-        if num_clusters == 0:
-            logger.warning("No clusters were formed - all points are noise")
-            return None
+        logger.info(f"Number of noise points: {np.sum(cluster_labels == -1)}")
 
         return {
             'coordinates': coordinates,
@@ -133,7 +109,7 @@ def clustered_results(search_results):
         # Calculate clusters
         cluster_data = calculate_similarity_clusters(search_results)
         if not cluster_data:
-            st.warning("Unable to create meaningful clusters from the current search results. Try adjusting search keywords for more related content.")
+            st.warning("Unable to generate cluster visualization. Please check the debug section for details.")
             return
 
         # Create D3.js compatible data structure
@@ -163,28 +139,27 @@ def clustered_results(search_results):
                 'confidence': float(probabilities[i])
             })
 
-        # Create edges between nodes in same cluster
+        # Create edges between nodes with similarity threshold
         for i in range(len(nodes)):
             for j in range(i + 1, len(nodes)):
-                if (cluster_labels[i] != -1 and  # -1 is noise
-                    cluster_labels[i] == cluster_labels[j]):
-                    links.append({
-                        'source': str(i),
-                        'target': str(j),
-                        'value': min(probabilities[i], probabilities[j])
-                    })
-
-        # Debug info
-        logger.info(f"Generated visualization data: {len(nodes)} nodes, {len(links)} links")
+                if cluster_labels[i] != -1 and cluster_labels[i] == cluster_labels[j]:
+                    similarity = 1 - np.sqrt((coordinates[i, 0] - coordinates[j, 0])**2 + 
+                                        (coordinates[i, 1] - coordinates[j, 1])**2)
+                    if similarity > 0.3:  # Only create edges for similar nodes
+                        links.append({
+                            'source': str(i),
+                            'target': str(j),
+                            'value': float(similarity)
+                        })
 
         # Create the visualization
-        st.components.v1.html(f"""
+        st.components.v1.html("""
             <div id="cluster-viz" style="width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 5px;"></div>
             <script src="https://d3js.org/d3.v7.min.js"></script>
             <script>
-            (function() {{
-                const data = {json.dumps({'nodes': nodes, 'links': links})};
-                console.log('Visualization data:', data);  // Debug log
+            (function() {
+                const data = %s;
+                console.log('Visualization data:', data);
 
                 const width = document.getElementById('cluster-viz').offsetWidth;
                 const height = 600;
@@ -195,15 +170,6 @@ def clustered_results(search_results):
                     .attr('width', width)
                     .attr('height', height);
 
-                // Define forces
-                const simulation = d3.forceSimulation(data.nodes)
-                    .force('link', d3.forceLink(data.links)
-                        .id(d => d.id)
-                        .distance(50))
-                    .force('charge', d3.forceManyBody().strength(-200))
-                    .force('center', d3.forceCenter(width / 2, height / 2))
-                    .force('collision', d3.forceCollide().radius(d => 10 + d.confidence * 20));
-
                 // Create container for zoom
                 const g = svg.append('g');
 
@@ -211,9 +177,18 @@ def clustered_results(search_results):
                 svg.call(d3.zoom()
                     .extent([[0, 0], [width, height]])
                     .scaleExtent([0.1, 4])
-                    .on('zoom', (event) => {{
+                    .on('zoom', (event) => {
                         g.attr('transform', event.transform);
-                    }}));
+                    }));
+
+                // Create forces
+                const simulation = d3.forceSimulation(data.nodes)
+                    .force('link', d3.forceLink(data.links)
+                        .id(d => d.id)
+                        .distance(50))
+                    .force('charge', d3.forceManyBody().strength(-100))
+                    .force('center', d3.forceCenter(width / 2, height / 2))
+                    .force('collision', d3.forceCollide().radius(d => 10 + d.confidence * 20));
 
                 // Create links
                 const link = g.append('g')
@@ -250,26 +225,26 @@ def clustered_results(search_results):
                     .style('max-width', '300px');
 
                 // Add interactivity
-                node.on('mouseover', function(event, d) {{
+                node.on('mouseover', function(event, d) {
                         d3.select(this)
                             .style('stroke', '#000')
                             .style('stroke-width', 2);
 
                         tooltip.style('visibility', 'visible')
-                            .html(`
-                                <strong>${{d.title}}</strong><br/>
-                                Keyword: ${{d.keyword}}<br/>
-                                Cluster: ${{d.cluster === -1 ? 'Unclustered' : d.cluster + 1}}
-                            `)
+                            .html(
+                                '<strong>' + d.title + '</strong><br/>' +
+                                'Keyword: ' + d.keyword + '<br/>' +
+                                'Cluster: ' + (d.cluster === -1 ? 'Unclustered' : (d.cluster + 1))
+                            )
                             .style('left', (event.pageX + 10) + 'px')
                             .style('top', (event.pageY - 10) + 'px');
-                    }})
-                    .on('mouseout', function() {{
+                    })
+                    .on('mouseout', function() {
                         d3.select(this)
                             .style('stroke', '#fff')
                             .style('stroke-width', 1.5);
                         tooltip.style('visibility', 'hidden');
-                    }})
+                    })
                     .on('click', (event, d) => window.open(d.url, '_blank'))
                     .call(d3.drag()
                         .on('start', dragstarted)
@@ -277,7 +252,7 @@ def clustered_results(search_results):
                         .on('end', dragended));
 
                 // Update positions on each tick
-                simulation.on('tick', () => {{
+                simulation.on('tick', () => {
                     link
                         .attr('x1', d => d.source.x)
                         .attr('y1', d => d.source.y)
@@ -287,28 +262,28 @@ def clustered_results(search_results):
                     node
                         .attr('cx', d => d.x)
                         .attr('cy', d => d.y);
-                }});
+                });
 
                 // Drag functions
-                function dragstarted(event) {{
+                function dragstarted(event) {
                     if (!event.active) simulation.alphaTarget(0.3).restart();
                     event.subject.fx = event.subject.x;
                     event.subject.fy = event.subject.y;
-                }}
+                }
 
-                function dragged(event) {{
+                function dragged(event) {
                     event.subject.fx = event.x;
                     event.subject.fy = event.y;
-                }}
+                }
 
-                function dragended(event) {{
+                function dragended(event) {
                     if (!event.active) simulation.alphaTarget(0);
                     event.subject.fx = null;
                     event.subject.fy = null;
-                }}
-            }})();
+                }
+            })();
             </script>
-        """, height=600)
+        """ % json.dumps({'nodes': nodes, 'links': links}), height=600)
 
         # Add explanation
         st.markdown("""
