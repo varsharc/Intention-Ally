@@ -2,70 +2,6 @@ import streamlit as st
 import requests
 import pandas as pd
 import plotly.express as px
-from datetime import datetime
-import sys
-import os
-import logging
-
-# Add root directory to Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-from frontend.config import get_api_url
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-def trend_visualization():
-    st.subheader("Trend Analysis")
-
-    try:
-        # Fetch results
-        response = requests.get(get_api_url("results"))
-        if response.status_code == 200:
-            results = response.json()
-
-            if not results:
-                st.info("No data available for trend analysis yet.")
-                return
-
-            # Prepare data for visualization
-            df_rows = []
-            for search in results:
-                date = datetime.fromisoformat(search["timestamp"]).date()
-                keyword = search["keyword"]
-                result_count = len(search["results"])
-                df_rows.append({
-                    "Date": date,
-                    "Keyword": keyword,
-                    "Results": result_count
-                })
-
-            df = pd.DataFrame(df_rows)
-
-            # Create trend line chart
-            fig = px.line(
-                df,
-                x="Date",
-                y="Results",
-                color="Keyword",
-                title="Search Results Trend Over Time",
-                labels={"Results": "Number of Results", "Date": "Search Date"}
-            )
-
-            # Customize layout
-            fig.update_layout(
-                hovermode="x unified",
-                legend_title_text="Keywords",
-                xaxis_title="Date",
-                yaxis_title="Number of Results"
-            )
-
-            st.plotly_chart(fig, use_container_width=True)
-
-            import streamlit as st
-import requests
-import pandas as pd
-import plotly.express as px
 from datetime import datetime, timedelta
 import logging
 import sys
@@ -81,20 +17,20 @@ logger = logging.getLogger(__name__)
 
 def trend_visualization():
     st.subheader("Search Trends")
-    
+
     # Date range selector
     days = st.slider("Show trends from last N days", 1, 30, 7)
-    
+
     # Fetch data
     try:
         response = requests.get(get_api_url(f"results?days={days}"))
         if response.status_code == 200:
             results = response.json()
-            
+
             if not results:
                 st.info("No trend data available for the selected period.")
                 return
-            
+
             # Process data for visualization
             trend_data = []
             for search in results:
@@ -103,20 +39,21 @@ def trend_visualization():
                     "Date": datetime.fromisoformat(search["timestamp"]).strftime("%Y-%m-%d"),
                     "Results": len(search["results"])
                 })
-            
+
             df = pd.DataFrame(trend_data)
-            
+
             # Line chart of search results over time
             st.subheader("Search Results Over Time")
             fig = px.line(df, x="Date", y="Results", color="Keyword", 
                          title="Number of Search Results by Keyword")
             st.plotly_chart(fig, use_container_width=True)
-            
+
             # Summary statistics
             st.subheader("Summary Statistics")
             summary_df = df.groupby("Keyword")["Results"].agg([
                 "mean", "min", "max", "count"
             ]).round(2)
+
             summary_df.columns = ["Average Results", "Minimum", "Maximum", "Number of Searches"]
             st.dataframe(summary_df)
         else:
