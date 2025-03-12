@@ -5,7 +5,7 @@ channel = "stable-24_05"
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["sh", "-c", "streamlit run frontend/app.py --server.port=5000"]
+run = ["sh", "-c", "streamlit run frontend/app.py"]
 
 [workflows]
 runButton = "Project"
@@ -15,9 +15,43 @@ name = "Project"
 mode = "parallel"
 author = "agent"
 
-[[ports]]
-localPort = 5000
-externalPort = 5000
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Streamlit Frontend"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "FastAPI Backend"
+
+[[workflows.workflow]]
+name = "Streamlit Frontend"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run frontend/app.py --server.port=5001"
+waitForPort = 5001
+
+[[workflows.workflow]]
+name = "FastAPI Backend"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8001"
+waitForPort = 8001
 
 [[ports]]
 localPort = 5001
