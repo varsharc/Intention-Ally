@@ -1,0 +1,71 @@
+Debug: Search Results Structure
+
+{
+"keyword":"carbon insetting"
+"results":[
+0:{
+"title":"What is Carbon insetting? Greener logistics starts from looking within"
+"url":"https://www.dhl.com/discover/en-jp/b2b-advice/sustainability-and-green-logistics/what-is-carbon-insetting"
+"description":"Carbon insetting is <strong>a practice where funds are directed to addressing greenhouse gases emissions at the source – within the sector that is emitting them</strong>. These include investing in growing the sustainable fuel industry, fleet renewal programs, carbon neutral retrofitting and eco-efficiency ..."
+"date":"2025-03-12T10:58:24.511857"
+}
+1:{
+"title":"What is carbon insetting?"
+"url":"https://plana.earth/glossary/carbon-insetting"
+"description":"Carbon insetting is <strong>a strategy used by companies to reduce their emissions and carbon footprint within their supply chain or industry</strong>. This approach involves investing in nature-based solutions such as reforestation, agroforestry, renewable energy, and regenerative agriculture."
+"date":"2025-03-12T10:58:24.511879"
+}
+2:{
+"title":"The difference between insetting and offsetting"
+"url":"https://www.sylvera.com/blog/insetting"
+"description":"You’ve heard about <strong>carbon</strong> offsetting, but what is <strong>carbon</strong> <strong>insetting</strong>? Here, we explore the key differences between offsets and <strong>insets</strong>."
+"date":"2025-03-12T10:58:24.511882"
+}
+3:{
+"title":"What is Carbon insetting? | DHL Japan"
+"url":"https://www.dhl.com/discover/en-jp/logistics-advice/sustainability-and-green-logistics/what-is-carbon-insetting"
+"description":"Carbon insetting is <strong>a practice where funds are directed to addressing greenhouse gases emissions at the source – within the sector that is emitting them</strong>. These include investing in growing the sustainable fuel industry, fleet renewal programs, carbon neutral retrofitting and eco-efficiency ..."
+"date":"2025-03-12T10:58:24.511887"
+}
+4:{
+"title":"Inside DP World's Carbon Insetting Supply Chain Strategy | Sustainability Magazine"
+"url":"https://sustainabilitymag.com/articles/dp-world-carbon-inset-hits-10000-containers"
+"description":"DP World&#x27;s robust US$6.3bn investment in sustainable logistics includes a <strong>carbon</strong> <strong>insetting</strong> programme involving the decarbonisation of shipping containers"
+"date":"2025-03-12T10:58:24.511889"
+}
+5:{
+"title":"MOL advances carbon insetting with programme to help customers slash emissions | TradeWinds"
+"url":"https://www.tradewindsnews.com/sustainability/mol-advances-carbon-insetting-with-programme-to-help-customers-slash-emissions/2-1-1778985?zephr_sso_ott=6VLwLY"
+"description":"Insets are <strong>a way to buy emissions reductions from within the shipping industry for voyages where alternative fuels may not be available</strong>. They are like carbon offsets, but avoid the controversial use of emissions reductions from outside of shipping — such as by planting trees."
+"date":"2025-03-12T10:58:24.511891"
+}
+6:{
+"title":"What is carbon insetting? — Sustainable Ships"
+"url":"https://www.sustainable-ships.org/stories/2021/what-is-carbon-insetting"
+"description":"Reducing carbon emissions in the shipping sector can be hard and expensive. Carbon insetting is <strong>a way to compensate for emissions that you are unable to mitigate within your normal operations</strong> - or are too costly to mitigate - but can be mitigated at other places in your fleet or the sector. Carbon i"
+"date":"2025-03-12T10:58:24.511893"
+}
+7:{
+"title":"What is carbon insetting?"
+"url":"https://www.goodshipping.com/news/carbon-insetting"
+"description":"Carbon insetting is <strong>the implementation of carbon reduction initiatives within the company&#x27;s own supply chains or operations</strong>. This includes various projects a company can undertake, such as engine retrofits and fuel switch. A fuel switch means the volume of sustainable biofuel that reduces your ..."
+"date":"2025-03-12T10:58:24.511894"
+}
+8:{
+"title":"Insetting Explained - IPI"
+"url":"https://www.insettingplatform.com/insetting-explained/"
+"description":"Insetting is <strong>a strategic mechanism used to scale effective nature-based solutions</strong>, enabling businesses to deliver against ambitious climate and sustainability goals and harmonise their operations with the ecosystems they depend upon. ... Businesses reduce the GHG emissions of their operations, ..."
+"date":"2025-03-12T10:58:24.511896"
+}
+9:{
+"title":"A Beginner’s Guide to Carbon Insetting: Fostering Sustainability in Your Supply Chain | Insights | 3Degrees"
+"url":"https://3degreesinc.com/insights/a-beginners-guide-to-carbon-insetting-fostering-sustainability-in-your-supply-chain/"
+"description":"What is <strong>carbon</strong> <strong>insetting</strong> and how does <strong>insetting</strong> work? Companies are diligently working to reduce their direct emissions and energy purchases—known as scope 1 and scope 2 emissions—to meet corporate sustainability targets. However, the majority of emissions for most organizations stem from ..."
+"date":"2025-03-12T10:58:24.511898"
+}
+]
+"timestamp":"2025-03-12T10:58:24.512171"
+}
+Total search results entries: 51
+
+Total individual results: 510

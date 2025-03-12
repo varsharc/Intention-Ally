@@ -88,7 +88,6 @@ def calculate_similarity_clusters(search_results):
             'keywords': keywords,
             'probabilities': probabilities
         }
-
     except Exception as e:
         logger.error(f"Error in calculate_similarity_clusters: {str(e)}", exc_info=True)
         return None
@@ -104,6 +103,7 @@ def clustered_results(search_results):
 
         # Debug: Display raw search results structure
         with st.expander("Debug: Search Results Structure"):
+            st.write("First search result entry:")
             st.json(search_results[0])
             st.write(f"Total search results entries: {len(search_results)}")
             total_results = sum(len(s.get('results', [])) for s in search_results)
@@ -151,7 +151,7 @@ def clustered_results(search_results):
                 'confidence': float(probabilities[i])
             })
 
-        # Create edges between nodes with similarity threshold
+        # Create edges between nodes in same cluster
         for i in range(len(nodes)):
             for j in range(i + 1, len(nodes)):
                 if cluster_labels[i] != -1 and cluster_labels[i] == cluster_labels[j]:
@@ -253,11 +253,9 @@ def clustered_results(search_results):
                             .style('stroke-width', 2);
 
                         tooltip.style('visibility', 'visible')
-                            .html(
-                                '<strong>' + d.title + '</strong><br/>' +
+                            .html('<strong>' + d.title + '</strong><br/>' +
                                 'Keyword: ' + d.keyword + '<br/>' +
-                                'Cluster: ' + (d.cluster === -1 ? 'Unclustered' : (d.cluster + 1))
-                            )
+                                'Cluster: ' + (d.cluster === -1 ? 'Unclustered' : (d.cluster + 1)))
                             .style('left', (event.pageX + 10) + 'px')
                             .style('top', (event.pageY - 10) + 'px');
                     })
