@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import logging
 import sys
 import os
+from .word_cloud import generate_word_cloud
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -34,7 +35,13 @@ def trend_visualization():
                 st.info("No trend data available for the selected period.")
                 return
 
-            # Process data for visualization
+            # Word Cloud Visualization
+            st.subheader("Topic Word Cloud")
+            word_cloud_fig = generate_word_cloud(results)
+            if word_cloud_fig:
+                st.plotly_chart(word_cloud_fig, use_container_width=True)
+
+            # Process data for trend visualization
             trend_data = []
             for search in results:
                 logger.info(f"Processing trend data for keyword: {search['keyword']}")
