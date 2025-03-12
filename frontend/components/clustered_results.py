@@ -212,7 +212,8 @@ def clustered_results(search_results):
                 .style('background-color', 'white')
                 .style('padding', '5px')
                 .style('border', '1px solid #ddd')
-                .style('border-radius', '5px');
+                .style('border-radius', '5px')
+                .style('z-index', '10');
 
             // Update positions on each tick
             simulation.on('tick', () => {{
