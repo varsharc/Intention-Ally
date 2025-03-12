@@ -1,0 +1,110 @@
+Level 2 PRD: Enhanced Smart Search & Trend Visualization
+
+Objective:
+Enhance the smart search experience by introducing intelligent user preferences, better clustering and visualization of search results, and a robust trends analysis system, incorporating sentiment analysis and metadata-based ranking for credibility.
+
+1. Smart Search Preferences
+
+Directive: Implement an advanced preference selection system to allow users to refine their search experience based on relevance, geography, credibility, and topic clusters.
+
+User-Specific Source Preferences
+
+Enable selection of multiple sources within a category (e.g., news & media: Indian, European, US, etc.).
+
+Filter sources based on user-defined relevance, allowing exclusion of geographically irrelevant sources.
+
+Option for dynamic personalization based on frequent user selections.
+
+Sorting Based on Credibility
+
+Implement metadata ranking using Brave Search API, leveraging domain authority, backlink count, and engagement scores.
+
+Algorithm-driven ranking function prioritizing sources with higher credibility.
+
+Optional credibility-based filtering (e.g., prioritize peer-reviewed sources for academic searches).
+
+2. Enhanced Clustered Search Results & Visualization
+
+Directive: Improve the way search results are grouped and presented visually to enhance user engagement and ease of discovery.
+
+Cluster Similar Search Results
+
+Implement a proximity-based clustering algorithm to group similar topics.
+
+Use an interactive visualization inspired by music-map.com where similar topics are placed closer together.
+
+The map appears alongside the traditional search result cards to provide an intuitive overview of topic relevance.
+
+Visual Cues for Relevance & Popularity
+
+Top-ranked results should have subtle highlights or badges (e.g., "Trending," "Most Cited").
+
+In-page search result segmentation: separate results into "High Credibility," "Trending," and "New & Emerging".
+
+3. Trend Tracking & Sentiment Visualization
+
+Directive: Introduce a comprehensive trends tracking system with historical search pattern analysis and sentiment detection.
+
+Word Cloud Visualization on the Trends Page
+
+Dynamically generated word cloud showing the most talked-about topics.
+
+Color-coded words:
+
+Green/Blue: Positive sentiment.
+
+Red/Orange: Negative sentiment.
+
+Neutral colors for neutral/mixed sentiment.
+
+Larger words indicate higher frequency/hot topics.
+
+Tracking Trends Over Time
+
+Store short-term search trends temporarily in an in-memory database.
+
+Analyze repeated search frequency over days/weeks to detect emerging "hot topics".
+
+Consider leveraging Brave ranking metadata to detect trending searches globally.
+
+Sentiment Analysis for Trends
+
+AI-driven sentiment analysis using Hugging Face Transformers.
+
+Track sentiment shifts over time (e.g., "textile sustainability" sentiment moving from positive to negative in industry news).
+
+Generate summary insights on sentiment trends: "The sentiment around 'carbon neutrality' has turned more positive this month due to government policy changes."
+
+4. AI Integration & Cost-Efficient Processing
+
+Directive: Introduce lightweight AI functionalities where necessary while avoiding unnecessary computational costs.
+
+Summarization & Sentiment Analysis
+
+Batch process search summaries periodically to optimize API usage.
+
+Use Hugging Face’s local models for text summarization and sentiment classification where possible.
+
+Optionally integrate Claude Sonnet API for premium users needing deeper AI-driven insights.
+
+Backend Algorithm for Ranking Credibility
+
+Develop a credibility ranking algorithm based on metadata from search sources.
+
+Factors considered: domain age, peer-reviewed status, user engagement, Brave metadata.
+
+Next Steps for Replit Agent
+
+Implement dynamic smart search preferences with a user-friendly interface.
+
+Develop a clustering mechanism with a proximity-based visualization for related search results.
+
+Build a sentiment-tracking system, word cloud visualization, and sentiment trend analysis.
+
+Integrate Brave metadata for credibility ranking and trending topic detection.
+
+Optimize AI summarization and sentiment analysis through cost-effective means.
+
+Develop a credibility-based ranking system for sources.
+
+This specification outlines the roadmap for Replit development to improve search intelligence, result clarity, and trend-tracking capabilities.
