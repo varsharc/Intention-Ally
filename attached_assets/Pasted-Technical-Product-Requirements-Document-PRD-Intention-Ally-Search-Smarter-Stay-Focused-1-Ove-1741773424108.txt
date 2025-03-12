@@ -1,0 +1,61 @@
+Technical Product Requirements Document (PRD): Intention-Ally - Search Smarter, Stay Focused
+1. Overview
+The Intentionals is an AI-powered search keyword tracking application that automates daily internet searches using the Brave Search API. It collects, summarizes, and presents relevant information for later use, avoiding algorithmic ranking biases. This document details the implementation plan, including data privacy, cost management, and resource utilization considerations.
+2. Goals & Objectives
+•	Automate daily searches for up to 10 keywords.
+•	Provide summarized insights and references for easy content review.
+•	Track trends over time with line charts.
+•	Ensure cost efficiency and data privacy while using external APIs.
+•	Deploy on Replit (Development) → GitHub → Vercel (Production).
+3. Technical Architecture
+3.1 Stack & Deployment
+•	Backend: FastAPI (Python) hosted on Replit.
+•	Search API: Brave Search API (to avoid query limitations of Google/SerpAPI).
+•	Database: Supabase (Free tier for storing search history & trends).
+•	Frontend: Next.js (React) UI hosted on Vercel.
+•	Scheduling: Cheapest cron-based alternative (Replit tasks or GitHub Actions).
+3.2 Data Flow
+1.	User defines 10 keywords.
+2.	Daily cron job triggers a search using Brave API.
+3.	Results are fetched, summarized, and stored in Supabase.
+4.	Frontend visualizes results and trend graphs over time.
+5.	Old data is automatically deleted after X days (configurable).
+4. Key Functional Components
+4.1 Backend (FastAPI) Implementation
+•	/search?keywords=... → Fetches search results from Brave API.
+•	/summary?url=... → AI summarizes key points from URLs.
+•	/trends → Returns historical data for trend visualization.
+•	Rate Limits: API usage limited to 1 search per day to minimize costs.
+4.2 Frontend (Next.js) Implementation
+•	Dashboard UI (Single Page):
+o	Search results table (Title, Snippet, Link, Date).
+o	Trend graph (Line chart) of keyword frequency over time.
+o	Auto-delete toggle for search history settings.
+4.3 Database (Supabase) Implementation
+•	Tables:
+o	search_results: Stores search data (id, keyword, results, date).
+o	summaries: Stores AI-generated summaries.
+o	Data Retention: Auto-delete records older than X days.
+4.4 Automation & Task Scheduling
+•	Option 1: Replit’s built-in task scheduler (if cost-effective).
+•	Option 2: GitHub Actions (Alternative if Replit scheduling is limited).
+5. Checks & Balances: Data Privacy & Cost Management
+5.1 Data Privacy Considerations
+•	No Personal Data Stored: Only keyword search data is recorded.
+•	API Requests Encrypted: Secure HTTP (HTTPS) enforced.
+•	Minimal Data Retention: Auto-delete after configurable X days.
+•	User-Controlled Data Deletion: Manual clear option in the UI.
+5.2 Cost & Resource Optimization
+•	Brave Search API: Chosen over Google/SerpAPI for free-tier benefits.
+•	Supabase Free Tier: Optimized for minimal writes/reads.
+•	1 API Call per Day: Reduces excessive API usage costs.
+•	Scheduled Jobs Instead of Webhooks: Avoids unnecessary compute costs.
+•	Static Hosting on Vercel: Free-tier hosting with automatic scalability.
+6. Future Monetization Plans (Phase 2)
+•	Premium users can increase keyword limit.
+•	AI-powered deeper content analysis & insights.
+•	API access for developers to build on top of search trends.
+•	Optional notifications & personalized summaries.
+________________________________________
+This PRD ensures a lean, privacy-respecting, and cost-effective implementation of the Intentionals Search Tracker while setting the stage for future enhancements and monetization. 🚀
+
