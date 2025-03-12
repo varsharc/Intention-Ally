@@ -40,9 +40,10 @@ def calculate_similarity_clusters(search_results):
 
         # Cluster using DBSCAN with adjusted parameters
         clustering = DBSCAN(
-            eps=0.5,  # Increased epsilon for more inclusive clusters
+            eps=0.4,  # Balanced epsilon for good cluster formation
             min_samples=2,  # Minimum points to form a cluster
-            metric='precomputed'
+            metric='precomputed',
+            n_jobs=-1  # Use all available cores
         )
         cluster_labels = clustering.fit_predict(distance_matrix)
 
@@ -64,6 +65,14 @@ def calculate_similarity_clusters(search_results):
         logger.info(f"Number of clusters found: {len(np.unique(cluster_labels))}")
         logger.info(f"Points per cluster: {np.bincount(cluster_labels[cluster_labels != -1])}")
         logger.info(f"Number of noise points: {np.sum(cluster_labels == -1)}")
+        logger.info(f"Similarity matrix shape: {similarity_matrix.shape}")
+        logger.info(f"Cluster labels: {cluster_labels[:10]}...")
+        logger.info(f"Coordinates shape: {coordinates.shape}")
+        
+        # Check for NaN values in coordinates
+        if np.isnan(coordinates).any():
+            logger.warning("Found NaN coordinates! Replacing with zeros.")
+            coordinates = np.nan_to_num(coordinates)
 
         return {
             'coordinates': coordinates,
@@ -145,7 +154,11 @@ def clustered_results(search_results):
 
         # Convert data to JSON for JavaScript
         d3_data_json = json.dumps(d3_data)
-
+        
+        # Log D3 data structure to debug visualization
+        logger.info(f"D3 data structure: nodes={len(d3_data['nodes'])}, links={len(d3_data['links'])}")
+        logger.info(f"Node clusters: {[node['cluster'] for node in d3_data['nodes'][:5]]}...")
+        
         # Create the D3.js visualization HTML
         d3_html = f"""
         <div id="cluster-visualization" style="width: 100%; height: 600px; border: 1px solid #ccc;"></div>
@@ -163,6 +176,53 @@ def clustered_results(search_results):
                 .append('svg')
                 .attr('width', width)
                 .attr('height', height);
+                
+            // Define color scale for clusters
+            const color = d3.scaleOrdinal(d3.schemeCategory10);
+            
+            // Create force-directed simulation
+            const simulation = d3.forceSimulation(data.nodes)
+                .force('link', d3.forceLink(data.links).id(d => d.id).distance(80))
+                .force('charge', d3.forceManyBody().strength(-100))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collide', d3.forceCollide(d => 5 + d.confidence * 15));
+                
+            // Add links (edges)
+            const link = svg.append('g')
+                .selectAll('line')
+                .data(data.links)
+                .enter()
+                .append('line')
+                .attr('stroke', '#999')
+                .attr('stroke-opacity', 0.6)
+                .attr('stroke-width', d => Math.sqrt(d.value) * 2);
+                
+            // Add nodes (circles)
+            const node = svg.append('g')
+                .selectAll('circle')
+                .data(data.nodes)
+                .enter()
+                .append('circle')
+                .attr('r', d => 5 + d.confidence * 15)
+                .attr('fill', d => d.cluster === -1 ? '#ccc' : color(d.cluster))
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 1.5)
+                .on('mouseover', function(event, d) {
+                    tooltip.style('visibility', 'visible')
+                        .html(`<strong>${d.title}</strong><br/>Keyword: ${d.keyword}<br/>Cluster: ${d.cluster === -1 ? 'Unclustered' : d.cluster}`)
+                        .style('left', (event.pageX + 10) + 'px')
+                        .style('top', (event.pageY - 20) + 'px');
+                })
+                .on('mouseout', function() {
+                    tooltip.style('visibility', 'hidden');
+                })
+                .on('click', function(event, d) {
+                    window.open(d.url, '_blank');
+                })
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended));
 
             // Create the simulation
             const simulation = d3.forceSimulation(data.nodes)
