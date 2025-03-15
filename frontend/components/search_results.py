@@ -1,63 +1,56 @@
 import streamlit as st
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 import pandas as pd
 import sys
 import os
 import logging
 from .clustered_results import clustered_results
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Add root directory to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from frontend.config import get_api_url
 
+def create_article_card(article):
+    with st.container():
+        st.markdown(f"""
+        <div style='padding: 1rem; border: 1px solid #ddd; border-radius: 5px; margin: 0.5rem 0;'>
+            <h3>{article['Title']}</h3>
+            <p style='color: #666;'>{article['Date']} | {article['Keyword']}</p>
+            <p>{article['Description'][:200]}...</p>
+            <a href='{article['URL']}' target='_blank'>Read More</a>
+        </div>
+        """, unsafe_allow_html=True)
+
 def search_results():
-    st.subheader("Search Results")
-
-    # Date range selector
-    days = st.slider("Show results from last N days", 1, 30, 7)
-
-    # Add manual search trigger button
-    if st.button("Run Manual Search"):
-        try:
-            logger.info("Triggering manual search")
-            response = requests.post(get_api_url("run-search"))
-            if response.status_code == 200:
-                st.success("Manual search completed successfully!")
-                data = response.json()
-                logger.info(f"Manual search results: {data}")
-            else:
-                st.error("Failed to run manual search")
-                logger.error(f"Manual search error: {response.status_code}, {response.text}")
-        except Exception as e:
-            st.error("Error running manual search")
-            logger.error(f"Manual search exception: {str(e)}")
-
-    # Fetch results
     try:
-        logger.info(f"Fetching search results for last {days} days")
-        response = requests.get(get_api_url(f"results?days={days}"))
+        # Manual search button at the top
+        if st.button("Run Manual Search", key="manual_search"):
+            with st.spinner("Running manual search..."):
+                response = requests.post(get_api_url("run-search"))
+                if response.status_code == 200:
+                    st.success("Manual search completed!")
+                else:
+                    st.error("Failed to run manual search")
+
+        # Fetch results
+        response = requests.get(get_api_url("results?days=30"))
 
         if response.status_code == 200:
             results = response.json()
-            logger.info(f"Received {len(results)} search entries")
-            logger.info(f"Search results structure: {results[:1] if results else 'No results'}")
 
             if not results:
-                st.info("No search results available for the selected period. Try running a manual search.")
+                st.info("No search results available. Try running a manual search.")
                 return
 
-            # Show topic clusters visualization
+            # Show topic clusters visualization first
             clustered_results(results)
 
-            # Create a dataframe for better display
+            # Process results into a dataframe
             df_rows = []
             for search in results:
-                logger.info(f"Processing results for keyword: {search['keyword']}")
                 for result in search["results"]:
                     df_rows.append({
                         "Keyword": search["keyword"],
@@ -68,32 +61,58 @@ def search_results():
                     })
 
             df = pd.DataFrame(df_rows)
-            logger.info(f"Created DataFrame with {len(df)} rows")
 
-            # Add filters
-            keywords = df["Keyword"].unique()
-            selected_keywords = st.multiselect(
-                "Filter by keywords",
-                options=keywords,
-                default=keywords
-            )
+            # Filtering and sorting options
+            col1, col2, col3 = st.columns(3)
 
+            with col1:
+                keywords = sorted(df["Keyword"].unique())
+                selected_keywords = st.multiselect(
+                    "Filter by keywords",
+                    options=keywords,
+                    default=keywords
+                )
+
+            with col2:
+                sort_by = st.selectbox(
+                    "Sort by",
+                    ["Date", "Keyword", "Title"]
+                )
+
+            with col3:
+                sort_order = st.selectbox(
+                    "Order",
+                    ["Descending", "Ascending"]
+                )
+
+            # Apply filters and sorting
             filtered_df = df[df["Keyword"].isin(selected_keywords)]
-            logger.info(f"Filtered to {len(filtered_df)} rows")
+            ascending = sort_order == "Ascending"
+            filtered_df = filtered_df.sort_values(by=sort_by, ascending=ascending)
 
-            # Display results in an expandable format
-            st.subheader("Search Result Details")
-            for _, row in filtered_df.iterrows():
-                with st.expander(f"{row['Title']} ({row['Keyword']} - {row['Date']})"):
-                    st.write(row["Description"])
-                    st.markdown(f"[View Article]({row['URL']})")
+            # Pagination
+            items_per_page = 20
+            total_pages = len(filtered_df) // items_per_page + (1 if len(filtered_df) % items_per_page > 0 else 0)
+
+            if total_pages > 1:
+                page = st.number_input("Page", min_value=1, max_value=total_pages, value=1) - 1
+                start_idx = page * items_per_page
+                end_idx = start_idx + items_per_page
+                page_df = filtered_df.iloc[start_idx:end_idx]
+            else:
+                page_df = filtered_df
+
+            # Display results in a grid layout
+            cols = st.columns(4)
+            for idx, row in page_df.iterrows():
+                with cols[idx % 4]:
+                    create_article_card(row)
+
         else:
             st.error("Failed to fetch search results")
-            logger.error(f"Error fetching results: {response.status_code}")
-            logger.error(f"Response content: {response.text}")
-    except requests.exceptions.ConnectionError as e:
+
+    except requests.exceptions.ConnectionError:
         st.error("Unable to connect to backend service. Please try again later.")
-        logger.error(f"Connection error fetching results: {str(e)}")
     except Exception as e:
         st.error("An unexpected error occurred while fetching results")
-        logger.error(f"Unexpected error fetching results: {str(e)}")
+        logger.error(f"Unexpected error: {str(e)}")
