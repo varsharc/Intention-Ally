@@ -20,15 +20,15 @@ try:
     
     logger.debug("Setting page configuration")
     st.set_page_config(
-        page_title="Test App",
+        page_title="Search Trends", #from edited code
         page_icon="📊",
         layout="wide"
     )
     logger.info("Page configuration set successfully")
 
     logger.debug("Attempting to render title")
-    st.title("This is a Streamlit app")
-    st.write("If you can see this, the app is working!") #Adding confirmation message from edited code.
+    st.title("Search Trends Analysis") #from edited code
+    st.write("Testing application load...") #from edited code
     logger.info("Title rendered successfully")
 
 except Exception as e:
