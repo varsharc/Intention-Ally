@@ -1,13 +1,12 @@
 import streamlit as st
 import requests
 import pandas as pd
-import plotly.express as px
+import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import logging
 import sys
 import os
 from .word_cloud import generate_word_cloud
-import networkx as nx # Added for network graph
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -82,31 +81,66 @@ def trend_visualization():
         logger.error(f"Unexpected error fetching trend data: {str(e)}")
 
 
-# Example of how to potentially integrate D3-like visualization (requires significant expansion)
-
 def visualize_clusters(nodes, links):
-    """Visualizes clusters using a network graph (simulating D3)."""
-    #Simulate D3 behaviour for illustration purposes only, needs a proper D3 implementation
+    """Visualizes clusters using Plotly."""
     st.subheader("Topic Clusters Visualization")
-    # Placeholder for D3 chart (replace with actual D3 implementation)
-    # Create force-directed graph with thematic labels
-    graph = nx.Graph()
-    for node in nodes:
-        # Add thematic labels based on clustering
-        theme = _get_theme_for_cluster(node['group'])
-        graph.add_node(node['id'], size=node['size'], group=node['group'], theme=theme)
-    for link in links:
-        graph.add_edge(link['source'], link['target'], weight=link['value'])
 
-    pos = nx.spring_layout(graph) #Example layout, needs improvement for large graphs
-    nx.draw(graph, pos, with_labels=True, node_size=[d['size'] for n,d in graph.nodes(data=True)])
-    st.pyplot() #needs a proper backend
+    # Create a network graph using Plotly
+    edge_x = []
+    edge_y = []
+    for link in links:
+        x0, y0 = nodes[link['source']]['x'], nodes[link['source']]['y']
+        x1, y1 = nodes[link['target']]['x'], nodes[link['target']]['y']
+        edge_x.extend([x0, x1, None])
+        edge_y.extend([y0, y1, None])
+
+    edge_trace = go.Scatter(
+        x=edge_x, y=edge_y,
+        line=dict(width=0.5, color='#888'),
+        hoverinfo='none',
+        mode='lines')
+
+    node_x = [node['x'] for node in nodes]
+    node_y = [node['y'] for node in nodes]
+    node_colors = [node['group'] for node in nodes]
+    node_text = [f"Theme: {_get_theme_for_cluster(node['group'])}<br>Size: {node['size']}" for node in nodes]
+
+    node_trace = go.Scatter(
+        x=node_x, y=node_y,
+        mode='markers+text',
+        hoverinfo='text',
+        text=[_get_theme_for_cluster(node['group']) for node in nodes],
+        textposition="top center",
+        marker=dict(
+            showscale=True,
+            colorscale='Viridis',
+            color=node_colors,
+            size=[n['size']*10 for n in nodes],
+            line_width=2))
+
+    fig = go.Figure(data=[edge_trace, node_trace],
+                   layout=go.Layout(
+                       showlegend=False,
+                       hovermode='closest',
+                       margin=dict(b=0,l=0,r=0,t=0),
+                       xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                       yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+                   )
+
+    st.plotly_chart(fig, use_container_width=True)
 
 def _get_theme_for_cluster(group_id):
-    # Placeholder - needs actual implementation for theme extraction
-    return f"Theme for cluster {group_id}"
+    """Extract theme label for a cluster group."""
+    themes = {
+        1: "Technology",
+        2: "Environment",
+        3: "Business",
+        4: "Science",
+        5: "Politics"
+    }
+    return themes.get(group_id, f"Theme {group_id}")
 
 #Example usage (needs data sourcing)
-nodes = [{'id':'node1', 'size':10, 'group':1}, {'id':'node2', 'size':20, 'group':2}]
-links = [{'source':'node1', 'target':'node2', 'value':1}]
+nodes = [{'id':'node1', 'size':10, 'group':1, 'x':10, 'y':10}, {'id':'node2', 'size':20, 'group':2, 'x':20, 'y':20}]
+links = [{'source':0, 'target':1, 'value':1}]
 visualize_clusters(nodes, links)
