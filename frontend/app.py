@@ -1,3 +1,4 @@
+
 import streamlit as st
 from components.keyword_manager import keyword_manager
 from components.search_results import search_results
@@ -19,20 +20,18 @@ def main():
     tabs = st.tabs(["Topic Clusters", "Article Explorer", "Search Settings"])
 
     with tabs[0]:
+        trend_visualization()
         keyword_manager()
 
     with tabs[1]:
-        current_preferences = search_preferences()
+        search_results()
 
     with tabs[2]:
+        current_preferences = search_preferences()
         if current_preferences:
             st.info(f"Applying filters: {len(current_preferences['regions'])} regions, "
                    f"{len(current_preferences['content_types'])} content types, "
                    f"timeframe: {current_preferences['time_range']}")
-        search_results()
-
-    with tabs[3]:
-        trend_visualization()
 
     # Footer
     st.markdown("---")
