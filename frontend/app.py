@@ -16,7 +16,7 @@ def main():
     st.markdown("*Search Curate, Track. With Purpose.*")
 
     # Main navigation
-    tabs = st.tabs(["Topic Clusters", "Article Explorer", "Search Settings"])
+    tabs = st.tabs(["Keywords", "Search Preferences", "Search Results", "Trends"])
 
     with tabs[0]:
         keyword_manager()
