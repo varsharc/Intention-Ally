@@ -1,69 +1,94 @@
-import streamlit as st
-
-# Set page config must be the first Streamlit command
-st.set_page_config(
-    page_title="Intentionly - Search Curate, Track. With Purpose.",
-    page_icon="🎯",
-    layout="wide"
-)
-
+import os
+import sys
 import logging
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+from pathlib import Path
+
+# Configure logging before anything else
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    force=True
+)
 logger = logging.getLogger(__name__)
 
-# Now import components after page config
-from components.keyword_manager import keyword_manager
-from components.search_results import search_results
-from components.trend_viz import trend_visualization
-from components.search_preferences import search_preferences
+# Add project root to Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+logger.info(f"Adding project root to Python path: {project_root}")
+sys.path.insert(0, project_root)
 
-def main():
+try:
+    logger.info("Initializing Streamlit")
+    import streamlit as st
+
+    # First Streamlit command
+    logger.info("Setting page config")
+    st.set_page_config(
+        page_title="Intentionly - Search Curate, Track. With Purpose.",
+        page_icon="🎯",
+        layout="wide"
+    )
+
+    logger.info("Importing components")
     try:
-        logger.info("Starting Streamlit application initialization")
+        from frontend.components.keyword_manager import keyword_manager
+        from frontend.components.search_results import search_results
+        from frontend.components.trend_viz import trend_visualization
+        from frontend.components.search_preferences import search_preferences
+        logger.info("Successfully imported all components")
+    except ImportError as e:
+        logger.error(f"Failed to import components: {str(e)}")
+        st.error(f"Failed to load application components: {str(e)}")
+        sys.exit(1)
 
-        # Header
-        st.title("Intentionly")
-        st.markdown("*Search Curate, Track. With Purpose.*")
+    def main():
+        try:
+            logger.info("Starting Streamlit application initialization")
 
-        logger.info("Setting up navigation tabs")
-        # Main navigation
-        tabs = st.tabs(["Keywords", "Search Preferences", "Search Results", "Trends"])
+            # Header
+            st.title("Intentionly")
+            st.markdown("*Search Curate, Track. With Purpose.*")
 
-        with tabs[0]:
-            logger.info("Initializing keyword manager")
-            keyword_manager()
+            logger.info("Setting up navigation tabs")
+            # Main navigation
+            tabs = st.tabs(["Keywords", "Search Preferences", "Search Results", "Trends"])
 
-        with tabs[1]:
-            logger.info("Initializing search preferences")
-            current_preferences = search_preferences()
+            with tabs[0]:
+                logger.info("Initializing keyword manager")
+                keyword_manager()
 
-        with tabs[2]:
-            logger.info("Initializing search results")
-            if current_preferences:
-                st.info(f"Applying filters: {len(current_preferences['regions'])} regions, "
-                       f"{len(current_preferences['content_types'])} content types, "
-                       f"timeframe: {current_preferences['time_range']}")
-            search_results()
+            with tabs[1]:
+                logger.info("Initializing search preferences")
+                current_preferences = search_preferences()
 
-        with tabs[3]:
-            logger.info("Initializing trend visualization")
-            trend_visualization()
+            with tabs[2]:
+                logger.info("Initializing search results")
+                if current_preferences:
+                    st.info(f"Applying filters: {len(current_preferences['regions'])} regions, "
+                           f"{len(current_preferences['content_types'])} content types, "
+                           f"timeframe: {current_preferences['time_range']}")
+                search_results()
 
-        # Footer
-        st.markdown("---")
-        st.markdown(
-            """
-            <div style='text-align: center'>
-                <p>Intentionly - Your AI-powered search tracking assistant</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        logger.info("Application initialization completed successfully")
-    except Exception as e:
-        logger.error(f"Error in main application: {str(e)}")
-        st.error(f"An error occurred while loading the application: {str(e)}")
+            with tabs[3]:
+                logger.info("Initializing trend visualization")
+                trend_visualization()
 
-if __name__ == "__main__":
-    main()
+            # Footer
+            st.markdown("---")
+            st.markdown(
+                """
+                <div style='text-align: center'>
+                    <p>Intentionly - Your AI-powered search tracking assistant</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            logger.info("Application initialization completed successfully")
+        except Exception as e:
+            logger.error(f"Error in main application: {str(e)}")
+            st.error(f"An error occurred while loading the application: {str(e)}")
+
+    if __name__ == "__main__":
+        main()
+except Exception as e:
+    logger.error(f"Critical error during application startup: {str(e)}")
+    sys.exit(1)
