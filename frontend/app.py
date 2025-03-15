@@ -1,76 +1,38 @@
 import os
 import sys
 import logging
-from pathlib import Path
+import streamlit as st
 
-# Add project root to Python path
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
-
-# Configure logging
+# Configure logging - using improved configuration from edited code
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    force=True
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
 )
 logger = logging.getLogger(__name__)
 
+logger.info("Starting Streamlit application initialization")
+
 try:
-    import streamlit as st
-
-    # First Streamlit command
+    logger.debug("Attempting to import streamlit")
+    
+    logger.debug("Setting page configuration")
     st.set_page_config(
-        page_title="Intentionly - Search Curate, Track. With Purpose.",
-        page_icon="🎯",
-        layout="wide",
-        initial_sidebar_state="collapsed"
+        page_title="Test App",
+        page_icon="📊",
+        layout="wide"
     )
+    logger.info("Page configuration set successfully")
 
-    # Import components after page config
-    from frontend.components.keyword_manager import keyword_manager
-    from frontend.components.search_results import search_results
-    from frontend.components.trend_viz import trend_visualization
-    from frontend.components.search_preferences import search_preferences
-
-    def main():
-        try:
-            # Header with minimal styling
-            st.title("Intentionly")
-            st.markdown("*Search Curate, Track. With Purpose.*")
-
-            # Main navigation with cleaner layout
-            tabs = st.tabs(["Search Results", "Trends", "Keywords", "Preferences"])
-
-            with tabs[0]:
-                search_results()
-
-            with tabs[1]:
-                trend_visualization()
-
-            with tabs[2]:
-                keyword_manager()
-
-            with tabs[3]:
-                search_preferences()
-
-            # Footer
-            st.markdown("---")
-            st.markdown(
-                """
-                <div style='text-align: center'>
-                    <p>Intentionly - Your AI-powered search tracking assistant</p>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-        except Exception as e:
-            st.error("An unexpected error occurred")
-            logger.error(f"Error in main application: {str(e)}")
-
-    if __name__ == "__main__":
-        main()
+    logger.debug("Attempting to render title")
+    st.title("This is a Streamlit app")
+    st.write("If you can see this, the app is working!") #Adding confirmation message from edited code.
+    logger.info("Title rendered successfully")
 
 except Exception as e:
-    logger.error(f"Critical error during application startup: {str(e)}")
+    logger.error(f"Failed to start Streamlit app: {str(e)}", exc_info=True)
     sys.exit(1)
+
+logger.info("Application startup completed successfully")
