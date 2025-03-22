@@ -8,7 +8,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "streamlit run frontend/app.py"]
 
 [workflows]
-runButton = "Full Stack"
+runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
@@ -26,6 +26,10 @@ args = "Test FastAPI"
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Streamlit App"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Flask Server"
 
 [[workflows.workflow]]
 name = "FastAPI Backend"
@@ -73,17 +77,20 @@ args = "streamlit run frontend/app.py --server.port=5000"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "Full Stack"
-author = 36978150
+name = "Flask Server"
+author = "agent"
 mode = "parallel"
 
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
 [[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8002 --reload"
+task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "streamlit run frontend/app.py --server.port=8501 --server.address=0.0.0.0"
+args = "python app.py"
+waitForPort = 5000
 
 [[ports]]
 localPort = 5000
