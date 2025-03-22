@@ -1,7 +1,21 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
+print("Starting Streamlit application...")
 
-# Set page title
-st.title("Search Keyword Tracker")
-st.write("Hello! If you can see this, the app is working correctly.")
+import streamlit as st
+import logging
+import sys
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+logger = logging.getLogger(__name__)
+
+logger.info("Initializing application")
+
+# Basic app content
+st.title("Simple Test App")
+st.write("If you can see this message, the app is working correctly!")
+
+logger.info("Application rendered successfully")
