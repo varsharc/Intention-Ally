@@ -1,8 +1,35 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone', // Make Next.js output more portable
+  basePath: '',
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'ALLOWALL', // Allow iframe embedding
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*', // Allow cross-origin requests
+          },
+        ],
+      },
+    ];
+  },
+  // Allow any Replit domain to access this app
   allowedDevOrigins: [
-    'ce132cda-9e2d-417d-8fed-b0ec64c27ca5-00-2tx172xuax2xs.picard.replit.dev'
+    'https://*.replit.dev',
+    'https://*.repl.co',
+    'https://*.replit.app',
+    'https://**',
+    '*',
+    '**',
+    '**.replit.dev',
+    '.replit.dev'
   ]
 }
 
