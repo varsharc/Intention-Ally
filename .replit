@@ -21,11 +21,11 @@ args = "Test FastAPI"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Flask Server"
+args = "Next.js Frontend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Next.js Frontend"
+args = "FastAPI Backend"
 
 [[workflows.workflow]]
 name = "FastAPI Backend"
@@ -43,22 +43,6 @@ args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8002"
 waitForPort = 8002
 
 [[workflows.workflow]]
-name = "Flask Server"
-author = "agent"
-mode = "parallel"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python app.py"
-waitForPort = 5000
-
-[[workflows.workflow]]
 name = "Next.js Frontend"
 author = "agent"
 
@@ -71,7 +55,7 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node next-dev.js"
-waitForPort = 3000
+waitForPort = 5000
 
 [[ports]]
 localPort = 3000

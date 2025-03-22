@@ -4,7 +4,8 @@
 
 @layer base {
   body {
-    @apply bg-gray-900 text-gray-200;
+    background-color: #121212; /* Same as our custom gray-900 */
+    color: #e5e5e5; /* light gray for text */
   }
 }
 
