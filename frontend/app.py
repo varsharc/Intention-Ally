@@ -3,9 +3,9 @@ import sys
 import logging
 import streamlit as st
 
-# Configure logging - using improved configuration from edited code
+# Configure logging - using improved configuration from original code
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout)
@@ -13,26 +13,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-logger.info("Starting Streamlit application initialization")
-
 try:
-    logger.debug("Attempting to import streamlit")
-    
-    logger.debug("Setting page configuration")
+    # Basic page config from edited code
     st.set_page_config(
-        page_title="Search Trends", #from edited code
-        page_icon="📊",
+        page_title="Minimal Test",
+        page_icon="🔍",
         layout="wide"
     )
-    logger.info("Page configuration set successfully")
 
-    logger.debug("Attempting to render title")
-    st.title("Search Trends Analysis") #from edited code
-    st.write("Testing application load...") #from edited code
-    logger.info("Title rendered successfully")
+    # Simple test content from edited code
+    st.title("Search Keyword Tracker")
+    st.write("Minimal test - if you can see this, the server is working!")
 
 except Exception as e:
     logger.error(f"Failed to start Streamlit app: {str(e)}", exc_info=True)
     sys.exit(1)
-
-logger.info("Application startup completed successfully")

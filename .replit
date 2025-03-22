@@ -17,30 +17,19 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Streamlit Frontend"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "FastAPI Backend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Test FastAPI"
 
-[[workflows.workflow]]
-name = "Streamlit Frontend"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Streamlit Frontend"
 
 [[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "streamlit run frontend/app.py --server.port=5000 --server.address=0.0.0.0"
-waitForPort = 5000
+task = "workflow.run"
+args = "Test Minimal"
 
 [[workflows.workflow]]
 name = "FastAPI Backend"
@@ -71,6 +60,36 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "python test_server.py"
 waitForPort = 8002
+
+[[workflows.workflow]]
+name = "Streamlit Frontend"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run frontend/app.py --server.port=5000 --server.address=0.0.0.0"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Test Minimal"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run test_minimal.py --server.port=5001 --server.address=0.0.0.0"
+waitForPort = 5001
 
 [[ports]]
 localPort = 5000
