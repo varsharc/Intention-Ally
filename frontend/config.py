@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Backend API configuration
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:3000")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://0.0.0.0:8002")
 logger.info(f"Backend URL configured as: {BACKEND_URL}")
 
 # Import from root config to ensure consistency

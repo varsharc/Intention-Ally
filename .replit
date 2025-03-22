@@ -8,7 +8,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "streamlit run frontend/app.py"]
 
 [workflows]
-runButton = "Project"
+runButton = "Full Stack"
 
 [[workflows.workflow]]
 name = "Project"
@@ -71,6 +71,19 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "streamlit run frontend/app.py --server.port=5000"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Full Stack"
+author = 36978150
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8002"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run frontend/app.py --server.port=8501 --server.address=0.0.0.0"
 
 [[ports]]
 localPort = 5000
