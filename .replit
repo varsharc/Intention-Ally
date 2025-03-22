@@ -5,7 +5,7 @@ channel = "stable-24_05"
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["sh", "-c", "streamlit run frontend/app.py"]
+run = ["sh", "-c", "streamlit run app.py --server.port=5000 --server.address=0.0.0.0"]
 
 [workflows]
 runButton = "Project"
@@ -22,10 +22,6 @@ args = "FastAPI Backend"
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Test FastAPI"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Streamlit Frontend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
@@ -62,21 +58,6 @@ args = "python test_server.py"
 waitForPort = 8002
 
 [[workflows.workflow]]
-name = "Streamlit Frontend"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "streamlit run frontend/app.py --server.port=5000 --server.address=0.0.0.0"
-waitForPort = 5000
-
-[[workflows.workflow]]
 name = "Streamlit App"
 author = "agent"
 
@@ -88,7 +69,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "streamlit run frontend/app.py"
+args = "streamlit run app.py --server.port=5000 --server.address=0.0.0.0"
 waitForPort = 5000
 
 [[ports]]
