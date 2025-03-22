@@ -11,4 +11,4 @@ serverPort = 5000
 gatherUsageStats = false
 
 [logger]
-level = "info"
+level = "debug"

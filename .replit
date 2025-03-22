@@ -29,7 +29,7 @@ args = "Streamlit Frontend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Test Minimal"
+args = "Streamlit App"
 
 [[workflows.workflow]]
 name = "FastAPI Backend"
@@ -77,7 +77,7 @@ args = "streamlit run frontend/app.py --server.port=5000 --server.address=0.0.0.
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "Test Minimal"
+name = "Streamlit App"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -88,8 +88,8 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "streamlit run test_minimal.py --server.port=5001 --server.address=0.0.0.0"
-waitForPort = 5001
+args = "streamlit run frontend/app.py"
+waitForPort = 5000
 
 [[ports]]
 localPort = 5000
