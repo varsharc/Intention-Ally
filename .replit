@@ -72,6 +72,15 @@ task = "shell.exec"
 args = "python -m streamlit run main.py --server.address=0.0.0.0 --server.port=5000"
 waitForPort = 5000
 
+[[workflows.workflow]]
+name = "Streamlit Frontend"
+author = 36978150
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m streamlit run frontend/app.py --server.address=0.0.0.0 --server.port=8501"
+
 [[ports]]
 localPort = 5000
 externalPort = 5000

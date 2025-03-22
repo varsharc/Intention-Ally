@@ -1,14 +1,9 @@
-import os
-import sys
-import logging
+
 import streamlit as st
+import logging
+import sys
 
-# Set explicit server configuration
-os.environ['STREAMLIT_SERVER_HEADLESS'] = 'true'
-os.environ['STREAMLIT_SERVER_PORT'] = '5000'
-os.environ['STREAMLIT_SERVER_ADDRESS'] = '0.0.0.0'
-
-# Configure logging with more detailed output
+# Configure logging
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -25,6 +20,6 @@ st.set_page_config(
 )
 
 st.title("Search Keyword Tracker")
-st.write("Simple test page")
+st.write("Welcome to the Search Keyword Tracker")
 
 logger.info("Application initialization completed successfully")
