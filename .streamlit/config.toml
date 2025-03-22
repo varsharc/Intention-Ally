@@ -2,16 +2,6 @@
 headless = true
 address = "0.0.0.0"
 port = 5000
-enableCORS = false
-enableXsrfProtection = false
-
-[browser]
-serverAddress = "0.0.0.0"
-serverPort = 5000
-gatherUsageStats = false
-
-[logger]
-level = "debug"
 
 [theme]
 primaryColor = "#FF4B4B"
