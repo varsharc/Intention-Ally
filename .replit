@@ -79,7 +79,7 @@ mode = "parallel"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8002"
+args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8002 --reload"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
