@@ -30,6 +30,11 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
+# Add root endpoint for health check
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "Intentionly API is running"}
+
 try:
     # Initialize scheduler after storage
     scheduler = SearchScheduler(storage)
@@ -125,8 +130,7 @@ async def run_manual_search():
         for keyword in keywords:
             if keyword.is_active:
                 try:
-                    # Add a small delay between searches
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(1)  # Add a small delay between searches
                     logger.info(f"Searching for keyword: {keyword.value}")
                     search_results = await search_brave(keyword.value)
 

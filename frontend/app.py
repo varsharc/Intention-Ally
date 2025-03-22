@@ -28,6 +28,14 @@ try:
         layout="wide"
     )
 
+    # Import and verify backend connectivity
+    from frontend.config import verify_backend_connection
+
+    if not verify_backend_connection():
+        st.error("Unable to connect to backend service. Please try again later.")
+        logger.error("Failed to verify backend connectivity")
+        sys.exit(1)
+
     logger.info("Importing components")
     try:
         from frontend.components.keyword_manager import keyword_manager

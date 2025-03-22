@@ -17,26 +17,15 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Streamlit Frontend"
+args = "FastAPI Backend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "FastAPI Backend"
-
-[[workflows.workflow]]
-name = "Streamlit Frontend"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
+args = "Test FastAPI"
 
 [[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "streamlit run frontend/app.py --server.port=5000"
-waitForPort = 5000
+task = "workflow.run"
+args = "Streamlit App"
 
 [[workflows.workflow]]
 name = "FastAPI Backend"
@@ -53,6 +42,36 @@ task = "shell.exec"
 args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8002"
 waitForPort = 8002
 
+[[workflows.workflow]]
+name = "FastAPI Backend"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8002"
+waitForPort = 8002
+
+[[workflows.workflow]]
+name = "Streamlit App"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run frontend/app.py --server.port=5000"
+waitForPort = 5000
+
 [[ports]]
 localPort = 5000
 externalPort = 5000
@@ -68,3 +87,7 @@ externalPort = 8001
 [[ports]]
 localPort = 8002
 externalPort = 3000
+
+[[ports]]
+localPort = 8501
+externalPort = 3001
