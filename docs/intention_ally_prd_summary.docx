@@ -1,0 +1,61 @@
+
+# Intention-Ally: Smart Search & Trend Tracking
+
+## 1. Product Overview
+- AI-powered search keyword tracking application
+- Automates daily internet searches via Brave Search API
+- Collects, summarizes, and visualizes relevant information
+- Avoids algorithmic ranking biases
+
+## 2. Core Features
+- Daily automated searches (up to 10 keywords)
+- Summarized insights and references
+- Trend visualization with line charts
+- Data privacy focus
+- Cost-efficient API usage
+
+## 3. Technical Architecture
+### Stack
+- Backend: FastAPI (Python)
+- Search: Brave Search API
+- Database: Supabase
+- Frontend: Streamlit UI
+- Scheduling: Automated daily cron jobs
+
+### Data Flow
+1. User keyword definition
+2. Daily automated searches
+3. Result processing and storage
+4. Trend visualization
+5. Automated data cleanup
+
+## 4. Key Components
+### Backend (FastAPI)
+- Search endpoint integration
+- Summary generation
+- Trend data processing
+- Rate limiting (1 search/day/keyword)
+
+### Frontend (Streamlit)
+- Search results dashboard
+- Trend visualization
+- Data management interface
+- Settings configuration
+
+### Data Management
+- Efficient storage schema
+- Auto-deletion for old records
+- Privacy-focused data handling
+
+## 5. Implementation Priorities
+- User-friendly interface
+- Reliable search automation
+- Accurate trend tracking
+- Cost optimization
+- Data privacy compliance
+
+## 6. Future Enhancements
+- Increased keyword limits
+- Advanced analytics
+- API access
+- Custom notifications
