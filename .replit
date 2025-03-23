@@ -5,11 +5,11 @@ channel = "stable-24_05"
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["sh", "-c", "npm start"]
+run = ["sh", "-c", "node next-app-server.js"]
 build = ["sh", "-c", "npm run build"]
 
 [workflows]
-runButton = "Project"
+runButton = "Deployment"
 
 [[workflows.workflow]]
 name = "Project"
@@ -85,6 +85,15 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "node html-server.js"
 waitForPort = 5001
+
+[[workflows.workflow]]
+name = "Deployment"
+author = 36978150
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node next-app-server.js"
 
 [[ports]]
 localPort = 3000
