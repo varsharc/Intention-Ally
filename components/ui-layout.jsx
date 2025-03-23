@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 /**
  * Main application layout with responsive sidebar
  */
-export const AppLayout = ({ children }) => {
+const AppLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const toggleSidebar = () => {

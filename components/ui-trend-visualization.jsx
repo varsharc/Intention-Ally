@@ -4,7 +4,7 @@ import TrendVisualization from './TrendVisualization';
 /**
  * TrendVisualizationPanel component wrapper for the TrendVisualization chart
  */
-export const TrendVisualizationPanel = ({ data, keywords }) => {
+const TrendVisualizationPanel = ({ data, keywords }) => {
   return (
     <div className="bg-gray-800 rounded-lg flex flex-col h-[400px]">
       <div className="flex-1">
