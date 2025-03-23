@@ -1,51 +1,79 @@
-const http = require('http');
+const express = require('express');
+const path = require('path');
+const cors = require('cors');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
-// Create a basic HTTP server
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/html' });
-  res.end(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Test Server</title>
-      <style>
-        body {
-          background-color: #1a1a1a;
-          color: #f4f4f4;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          margin: 0;
-        }
-        .container {
-          text-align: center;
-          padding: 2rem;
-          border-radius: 0.5rem;
-          background-color: #2a2a2a;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-          color: #ffcc00;
-          margin-bottom: 1rem;
-        }
-        p {
-          margin-bottom: 1.5rem;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h1>Intention-Ally Test Page</h1>
-        <p>This is a test page using the black, grey, and yellow color palette from Intention-Ally design guidelines.</p>
-      </div>
-    </body>
-    </html>
-  `);
+// Create Express application
+const app = express();
+const PORT = 5000; // Must use port 5000 for Replit
+
+// Enable CORS
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['X-Requested-With', 'Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+// Set Replit-specific headers
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'ALLOWALL');
+  res.setHeader('Cache-Control', 'no-store, must-revalidate');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', '*');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  next();
 });
 
-// Listen on port 5000 instead of 8000
-server.listen(5000, '0.0.0.0', () => {
-  console.log('Test server running at http://0.0.0.0:5000/');
+// Simple request logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
+// Serve static test HTML file
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'test.html'));
+});
+
+// API route for health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Test server is healthy' });
+});
+
+// API route for request headers - useful for debugging
+app.get('/api/headers', (req, res) => {
+  res.json({
+    headers: req.headers,
+    ip: req.ip || req.connection.remoteAddress,
+    method: req.method,
+    url: req.url,
+    params: req.params,
+    query: req.query
+  });
+});
+
+// Proxy API requests to the FastAPI backend
+app.use('/api/backend', createProxyMiddleware({
+  target: 'http://localhost:8002',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/backend': '', // remove the /api/backend path
+  },
+  onError: (err, req, res) => {
+    console.error(`Proxy error: ${err.message}`);
+    res.status(500).json({
+      status: 'error',
+      message: 'Unable to reach the backend server',
+      error: err.message
+    });
+  }
+}));
+
+// Start the server
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Test server running at http://0.0.0.0:${PORT}`);
+  console.log(`API health check available at http://0.0.0.0:${PORT}/api/health`);
+  console.log(`Access test page at http://0.0.0.0:${PORT}/`);
 });
