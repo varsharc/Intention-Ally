@@ -1,15 +1,24 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    background-color: #121212; /* Same as our custom gray-900 */
-    color: #e5e5e5; /* light gray for text */
+    @apply bg-gray-900 text-gray-100;
   }
 }
 
-/* Custom styling */
-.bg-gray-gradient {
-  background: linear-gradient(180deg, #1C1C1C 0%, #000000 100%);
+@layer components {
+  .btn-primary {
+    @apply bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-3 rounded-md transition-colors shadow-lg;
+  }
+  
+  .sidebar-item {
+    @apply flex items-center space-x-3 p-3 hover:bg-gray-800 rounded-md text-gray-300 hover:text-white transition-colors;
+  }
+  
+  .active-sidebar-item {
+    @apply bg-yellow-600 bg-opacity-20 text-white border-l-4 border-yellow-500;
+  }
 }

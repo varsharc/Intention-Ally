@@ -8,7 +8,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "streamlit run frontend/app.py"]
 
 [workflows]
-runButton = "Project"
+runButton = "Next.js Dev"
 
 [[workflows.workflow]]
 name = "Project"
@@ -56,6 +56,15 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "node next-dev.js"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Next.js Dev"
+author = 36978150
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
 
 [[ports]]
 localPort = 3000
