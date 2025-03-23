@@ -2,6 +2,8 @@ const express = require('express');
 const next = require('next');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 // Determine if we're in development or production
 const dev = process.env.NODE_ENV !== 'production';
@@ -13,6 +15,9 @@ const PORT = process.env.PORT || 5000;
 // Prepare the Next.js app
 app.prepare().then(() => {
   const server = express();
+  
+  // Serve static files
+  server.use(express.static(path.join(__dirname, 'public')));
   
   // Logging middleware
   server.use((req, res, next) => {
@@ -41,7 +46,15 @@ app.prepare().then(() => {
   
   // API route for health check
   server.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'Next.js server is healthy' });
+    res.json({ 
+      status: 'ok', 
+      message: 'Next.js server is healthy',
+      timestamp: new Date().toISOString(),
+      env: {
+        node_env: process.env.NODE_ENV,
+        port: PORT
+      }
+    });
   });
   
   // API route for request headers - useful for debugging
@@ -53,6 +66,33 @@ app.prepare().then(() => {
       url: req.url,
       params: req.params,
       query: req.query
+    });
+  });
+  
+  // Deployment page route
+  server.get('/deploy', (req, res) => {
+    try {
+      const deployHtml = fs.readFileSync(path.join(__dirname, 'deploy.html'), 'utf8');
+      res.send(deployHtml);
+    } catch (err) {
+      console.error('Error serving deployment page:', err);
+      res.status(500).send('Error loading deployment page');
+    }
+  });
+  
+  // API route for deployment status
+  server.get('/api/deploy-status', (req, res) => {
+    res.json({
+      status: 'ready',
+      message: 'Intention-Ally application is ready for deployment',
+      features: [
+        'Interactive Knowledge Graph',
+        'Enhanced Trend Visualization',
+        'Firebase Storage Optimization',
+        'Keyword Analysis',
+        'Cross-browser Compatibility'
+      ],
+      timestamp: new Date().toISOString()
     });
   });
   
@@ -85,5 +125,6 @@ app.prepare().then(() => {
     console.log(`> Ready on http://0.0.0.0:${PORT}`);
     console.log(`> API health check available at http://0.0.0.0:${PORT}/api/health`);
     console.log(`> FastAPI backend proxy at http://0.0.0.0:${PORT}/api/backend`);
+    console.log(`> Deployment page available at http://0.0.0.0:${PORT}/deploy`);
   });
 });

@@ -33,11 +33,10 @@ const nextConfig = {
     ];
   },
   // Configuration for Replit and optimization
-  // Add allowedDevOrigins to allow cross-origin in development
   experimental: {
-    allowedDevOrigins: ['*', '.replit.dev', '.repl.co', '.replit.app', '.picard.replit.dev'],
+    // Allow all development origins for Replit
+    allowedDevOrigins: ['*']
   },
-  // The CORS settings are better handled in the Express server directly
   // Optional: Configure webpack for better watching
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
@@ -46,10 +45,24 @@ const nextConfig = {
         aggregateTimeout: 300,
       }
     }
+    
+    // Add Replit domain to allowed origins
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+      };
+    }
+    
     return config
   },
   // Ensure Next.js works with Replit
   poweredByHeader: false,
+  // Disable strict mode for images since we're using external URLs
+  images: {
+    unoptimized: true,
+    domains: ['*'],
+  },
 }
 
 module.exports = nextConfig
