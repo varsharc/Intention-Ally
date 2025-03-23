@@ -22,15 +22,11 @@ const nextConfig = {
           },
           {
             key: 'Access-Control-Allow-Methods',
-            value: 'GET,POST,PUT,DELETE,OPTIONS',
+            value: 'GET,POST,OPTIONS',
           },
           {
             key: 'Access-Control-Allow-Headers',
             value: '*',
-          },
-          {
-            key: 'Access-Control-Allow-Credentials',
-            value: 'true',
           },
         ],
       },
@@ -39,8 +35,9 @@ const nextConfig = {
   // Configuration for Replit and optimization
   // Add allowedDevOrigins to allow cross-origin in development
   experimental: {
-    allowedDevOrigins: ['localhost', '*.replit.dev', '*.repl.co', '*.replit.app', '*.picard.replit.dev', 'replit.com', 'ce132cda-9e2d-417d-8fed-b0ec64c27ca5-00-2tx172xuax2xs.picard.replit.dev'],
+    allowedDevOrigins: ['*', '.replit.dev', '.repl.co', '.replit.app', '.picard.replit.dev', 'replit.com', 'ce132cda-9e2d-417d-8fed-b0ec64c27ca5-00-2tx172xuax2xs.picard.replit.dev'],
   },
+  // The CORS settings are better handled in the Express server directly
   // Optional: Configure webpack for better watching
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {

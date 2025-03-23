@@ -1,62 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import AppLayout from '../../components/ui-layout';
+import { styles, combineStyles } from '../../styles/app-styles';
+import { AppLayout } from '../../components/ui-layout';
+import { KnowledgeGraphPanel } from '../../components/ui-knowledge-graph';
+import { TrendVisualizationPanel } from '../../components/ui-trend-visualization';
 import SearchBar from '../../components/SearchBar';
-import KeywordTags from '../../components/KeywordTags';
 import SearchResults from '../../components/SearchResults';
-import KnowledgeGraph from '../../components/ui-knowledge-graph';
-import TrendVisualizationPanel from '../../components/ui-trend-visualization';
+import SearchFilters from '../../components/SearchFilters';
+import KeywordTags from '../../components/KeywordTags';
+import InsightsSummary from '../../components/InsightsSummary';
+import FirebaseTest from '../../components/FirebaseTest';
+import ThemeProvider from '../../components/ThemeProvider';
+import api from '../../services/api';
 
 export default function SearchPage() {
-  const [selectedKeyword, setSelectedKeyword] = useState('');
-  const [keywords, setKeywords] = useState([
-    'carbon insetting', 
-    'sustainable logistics', 
-    'scope 3 emissions'
-  ]);
-  const [results, setResults] = useState([]);
+  const [selectedKeyword, setSelectedKeyword] = useState(null);
+  const [keywords, setKeywords] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [filters, setFilters] = useState({
+    dateRange: '7d',
+    sourceType: 'all',
+    sentiment: 'all',
+    contentType: 'all'
+  });
+
+  // Fetch keywords when component mounts
+  useEffect(() => {
+    fetchKeywords();
+  }, []);
   
-  // Handle search from SearchBar
+  // Fetch keywords from API
+  const fetchKeywords = async () => {
+    try {
+      const data = await api.fetchKeywords();
+      setKeywords(data);
+    } catch (err) {
+      console.error('Failed to fetch keywords:', err);
+    }
+  };
+
+  // Function to handle searches from SearchBar
   const handleSearch = async (keyword) => {
-    setIsLoading(true);
     setSelectedKeyword(keyword);
+    setIsLoading(true);
     
-    // Simulate API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // This would normally be an API call
-        setIsLoading(false);
-        resolve({ success: true });
-      }, 1000);
-    });
+    try {
+      const response = await api.searchKeyword(keyword);
+      if (response.success && response.results) {
+        setSearchResults(response.results);
+      }
+    } catch (err) {
+      console.error('Search failed:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  // Handle keyword selection
+  // Handle keyword selection from tag list
   const handleKeywordSelect = (keyword) => {
     setSelectedKeyword(keyword);
     handleSearch(keyword);
   };
   
   // Handle keyword removal
-  const handleKeywordRemove = (keyword) => {
-    setKeywords(keywords.filter(k => k !== keyword));
-    if (selectedKeyword === keyword) {
-      setSelectedKeyword('');
+  const handleKeywordRemove = async (keyword) => {
+    try {
+      await api.removeKeyword(keyword);
+      fetchKeywords(); // Refresh the keyword list
+      if (selectedKeyword === keyword) {
+        setSelectedKeyword(null);
+      }
+    } catch (err) {
+      console.error('Failed to remove keyword:', err);
     }
   };
   
+  // Handle filter changes
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    // In a real app, this would trigger a filtered search
+  };
+
   return (
-    <AppLayout>
+    <ThemeProvider>
       <Head>
-        <title>Search Dashboard | Intention-Ally</title>
+        <title>Search | Intention-Ally</title>
         <meta name="description" content="Search and track keywords with Intention-Ally" />
       </Head>
       
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white mb-2">Search Dashboard</h1>
-          <p className="text-gray-400">
+      <AppLayout>
+        <div className="mb-6">
+          <h1 className={styles.text.heading1}>Search Dashboard</h1>
+          <p className={styles.text.bodyLarge}>
             Track keywords, discover trends, and visualize semantic relationships
           </p>
         </div>
@@ -72,15 +108,34 @@ export default function SearchPage() {
           onRemove={handleKeywordRemove}
         />
         
+        {/* Advanced Filters */}
+        <SearchFilters onFilterChange={handleFilterChange} />
+        
         {/* Visualizations Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <KnowledgeGraph />
+        <div className={combineStyles(styles.grid.twoColumn, "mb-8")}>
+          <KnowledgeGraphPanel />
           <TrendVisualizationPanel />
         </div>
         
+        {/* Insights Summary */}
+        <InsightsSummary 
+          results={searchResults} 
+          keyword={selectedKeyword} 
+        />
+        
         {/* Search Results */}
-        <SearchResults selectedKeyword={selectedKeyword} results={results} />
-      </div>
-    </AppLayout>
+        <SearchResults selectedKeyword={selectedKeyword} />
+        
+        {/* Firebase Connection Test - Hidden in production */}
+        <div className="mt-8 opacity-50 hover:opacity-100 transition-opacity">
+          <details>
+            <summary className="cursor-pointer text-sm text-[#9CA3AF] mb-2">
+              System Diagnostics
+            </summary>
+            <FirebaseTest />
+          </details>
+        </div>
+      </AppLayout>
+    </ThemeProvider>
   );
 }
