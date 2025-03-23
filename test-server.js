@@ -45,7 +45,7 @@ const server = http.createServer((req, res) => {
   `);
 });
 
-// Listen on port 5000
+// Listen on port 5000 instead of 8000
 server.listen(5000, '0.0.0.0', () => {
   console.log('Test server running at http://0.0.0.0:5000/');
 });
