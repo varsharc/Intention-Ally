@@ -27,6 +27,10 @@ args = "FastAPI Backend"
 task = "workflow.run"
 args = "Next.js App"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "HTML Test Server"
+
 [[workflows.workflow]]
 name = "FastAPI Backend"
 author = "agent"
@@ -65,6 +69,21 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "node next-app-server.js"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "HTML Test Server"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node html-test-server.js"
+waitForPort = 5001
 
 [[ports]]
 localPort = 3000
