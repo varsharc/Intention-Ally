@@ -32,11 +32,25 @@ const nextConfig = {
       },
     ];
   },
-  // Allow embedding in Replit webview from any origin
-  allowedDevOrigins: ['*', 'https://*.replit.dev', 'https://*.replit.app'],
-  // Disable strict mode for static optimization
+  // Configuration for Replit and optimization
   experimental: {
     optimizeCss: true,
+    // Fix for cross-origin requests in Replit
+    allowedDevOrigins: [
+      'https://*.replit.dev',
+      'https://*.replit.app',
+      'https://*.repl.co'
+    ],
+  },
+  // Optional: Configure webpack for better watching
+  webpack: (config, { dev, isServer }) => {
+    if (dev && !isServer) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+      }
+    }
+    return config
   },
   // Ensure Next.js works with Replit
   poweredByHeader: false,

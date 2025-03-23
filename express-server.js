@@ -355,4 +355,9 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://0.0.0.0:${PORT}`);
   console.log(`API health check available at http://0.0.0.0:${PORT}/api/health`);
   console.log(`Test endpoint available at http://0.0.0.0:${PORT}/test`);
+  
+  // Output a message specifically for the Replit environment
+  if (process.env.REPL_SLUG || process.env.REPL_OWNER) {
+    console.log(`Running in Replit environment - accessible at port ${PORT}`);
+  }
 });

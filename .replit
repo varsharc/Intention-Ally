@@ -63,7 +63,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node express-server.js"
+args = "node next-server.js"
 waitForPort = 5000
 
 [[ports]]
