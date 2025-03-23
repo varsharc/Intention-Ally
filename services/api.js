@@ -2,8 +2,12 @@
  * API service module for Intention-Ally
  * Contains functions to interact with the backend API
  */
+import { saveSearchResults as saveToFirebase, fetchSearchResults as fetchFromFirebase } from './firebase';
 
-const API_BASE_URL = '/api/backend';
+// Base API URL (adjust based on environment)
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? '/api/backend' 
+  : '/api/backend';
 
 /**
  * Generic API call handler with error handling
@@ -11,42 +15,30 @@ const API_BASE_URL = '/api/backend';
  * @param {Object} options - Fetch options
  * @returns {Promise<any>} - Response data
  */
-const callApi = async (endpoint, options = {}) => {
+const apiCall = async (endpoint, options = {}) => {
   try {
     const url = `${API_BASE_URL}${endpoint}`;
+    console.log(`Making API request to: ${url}`);
     
-    // Add default headers
-    const defaultOptions = {
+    const response = await fetch(url, {
+      ...options,
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
-    };
+    });
     
-    // Merge options
-    const fetchOptions = {
-      ...defaultOptions,
-      ...options,
-    };
-    
-    console.log(`API Call: ${options.method || 'GET'} ${url}`);
-    
-    // Make the request
-    const response = await fetch(url, fetchOptions);
+    // Check if response is ok (status in the range 200-299)
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `API error: ${response.status} ${response.statusText}`);
+    }
     
     // Parse JSON response
     const data = await response.json();
-    
-    // Check if response is ok
-    if (!response.ok) {
-      // Format error message
-      const errorMessage = data.detail || data.message || `Error: ${response.status} ${response.statusText}`;
-      throw new Error(errorMessage);
-    }
-    
     return data;
   } catch (error) {
-    console.error('API Error:', error);
+    console.error('API call failed:', error);
     throw error;
   }
 };
@@ -56,7 +48,19 @@ const callApi = async (endpoint, options = {}) => {
  * @returns {Promise<Array>} List of keyword objects
  */
 export const fetchKeywords = async () => {
-  return await callApi('/keywords');
+  try {
+    const data = await apiCall('/keywords');
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching keywords:', error);
+    
+    // Return sample data for development/demo purposes
+    return [
+      { value: 'carbon insetting', created_at: new Date().toISOString(), is_active: true },
+      { value: 'sustainable logistics', created_at: new Date().toISOString(), is_active: true },
+      { value: 'scope 3 emissions', created_at: new Date().toISOString(), is_active: true }
+    ];
+  }
 };
 
 /**
@@ -65,10 +69,15 @@ export const fetchKeywords = async () => {
  * @returns {Promise<Object>} Response message
  */
 export const addKeyword = async (keyword) => {
-  return await callApi(`/keywords`, {
-    method: 'POST',
-    body: JSON.stringify({ keyword: keyword }),
-  });
+  try {
+    const data = await apiCall(`/keywords/add/${encodeURIComponent(keyword)}`, {
+      method: 'POST',
+    });
+    return data;
+  } catch (error) {
+    console.error('Error adding keyword:', error);
+    throw error;
+  }
 };
 
 /**
@@ -77,9 +86,15 @@ export const addKeyword = async (keyword) => {
  * @returns {Promise<Object>} Response message
  */
 export const removeKeyword = async (keyword) => {
-  return await callApi(`/keywords/${encodeURIComponent(keyword)}`, {
-    method: 'DELETE',
-  });
+  try {
+    const data = await apiCall(`/keywords/remove/${encodeURIComponent(keyword)}`, {
+      method: 'DELETE',
+    });
+    return data;
+  } catch (error) {
+    console.error('Error removing keyword:', error);
+    throw error;
+  }
 };
 
 /**
@@ -89,24 +104,25 @@ export const removeKeyword = async (keyword) => {
  * @returns {Promise<Object>} Search results
  */
 export const searchKeyword = async (keyword, saveToFirebase = false) => {
-  const response = await callApi(`/search/${encodeURIComponent(keyword)}`);
-  
-  // If we need to save to Firebase and the search was successful
-  if (saveToFirebase && response.success && response.results && response.results.length > 0) {
-    try {
-      // Import dynamically to avoid circular dependencies
-      const { saveSearchResults } = await import('./firebase');
-      
-      // Save the results
-      await saveSearchResults(keyword, response.results);
-      console.log(`Saved search results for "${keyword}" to Firebase`);
-    } catch (error) {
-      console.error('Failed to save to Firebase:', error);
-      // Don't throw the error - we still want to return search results even if Firebase storage fails
+  try {
+    const data = await apiCall(`/search/${encodeURIComponent(keyword)}`);
+    
+    // If the search was successful and results should be saved to Firebase
+    if (data.success && data.results && saveToFirebase) {
+      try {
+        await saveToFirebase(keyword, data.results);
+        console.log('Search results saved to Firebase');
+      } catch (firebaseError) {
+        console.error('Error saving to Firebase:', firebaseError);
+        // Continue even if Firebase save fails
+      }
     }
+    
+    return data;
+  } catch (error) {
+    console.error('Error searching keyword:', error);
+    throw error;
   }
-  
-  return response;
 };
 
 /**
@@ -116,22 +132,19 @@ export const searchKeyword = async (keyword, saveToFirebase = false) => {
  * @returns {Promise<Array>} Search results data
  */
 export const fetchResults = async (days = 7, useFirebase = false) => {
-  if (useFirebase) {
-    try {
-      // Import dynamically to avoid circular dependencies
-      const { fetchSearchResults } = await import('./firebase');
-      
+  try {
+    if (useFirebase) {
       // Get results from Firebase
-      return await fetchSearchResults(days);
-    } catch (error) {
-      console.error('Failed to fetch from Firebase:', error);
-      // Fallback to local storage if Firebase fails
-      console.log('Falling back to local storage');
+      return await fetchFromFirebase(days);
+    } else {
+      // Get results from backend API
+      const data = await apiCall(`/results?days=${days}`);
+      return data || [];
     }
+  } catch (error) {
+    console.error('Error fetching results:', error);
+    throw error;
   }
-  
-  // Use local storage (default)
-  return await callApi(`/results?days=${days}`);
 };
 
 /**
@@ -140,38 +153,19 @@ export const fetchResults = async (days = 7, useFirebase = false) => {
  * @returns {Promise<Object>} Response with search results summary
  */
 export const runManualSearch = async (saveToFirebase = false) => {
-  const response = await callApi('/run-search', {
-    method: 'POST',
-  });
-  
-  // If we need to save to Firebase and the search was successful
-  if (saveToFirebase && response.results && Array.isArray(response.results)) {
-    try {
-      // Import dynamically to avoid circular dependencies
-      const { saveSearchResults } = await import('./firebase');
-      
-      // For each keyword with successful results, save to Firebase
-      for (const result of response.results) {
-        if (result.count && !result.error) {
-          // We need to get the actual search results for this keyword
-          const searchResponse = await searchKeyword(result.keyword);
-          
-          if (searchResponse.success && searchResponse.results) {
-            await saveSearchResults(result.keyword, searchResponse.results);
-            console.log(`Saved batch search results for "${result.keyword}" to Firebase`);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Failed to save batch results to Firebase:', error);
-      // Don't throw the error - we still want to return search results even if Firebase storage fails
-    }
+  try {
+    const data = await apiCall('/run-search', {
+      method: 'POST',
+      body: JSON.stringify({ save_to_firebase: saveToFirebase }),
+    });
+    return data;
+  } catch (error) {
+    console.error('Error running manual search:', error);
+    throw error;
   }
-  
-  return response;
 };
 
-// Export all API functions as the default export
+// Export all API functions as a default object
 const api = {
   fetchKeywords,
   addKeyword,

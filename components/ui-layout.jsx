@@ -1,173 +1,165 @@
 import React, { useState } from 'react';
+import { Menu, X, Search, Trending, Zap, Settings, User, Home, BarChart, BookOpen, Clock, Star } from 'lucide-react';
 import Link from 'next/link';
-import { Search, BarChart3, Settings, Bookmark, ChevronRight, ChevronLeft, Bell, User, Home, LogOut } from 'lucide-react';
-import { styles, combineStyles } from '../styles/app-styles';
+import { useRouter } from 'next/router';
 
 /**
- * AppLayout component
- * Provides consistent layout with sidebar navigation for the application
+ * Main application layout with responsive sidebar
  */
 export const AppLayout = ({ children }) => {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
   
   return (
-    <div className="flex min-h-screen bg-black text-white">
-      {/* Sidebar Navigation */}
-      <div 
-        className={combineStyles(
-          "bg-[#111827] border-r border-[#374151] transition-all duration-300",
-          sidebarCollapsed ? "w-20" : "w-64"
-        )}
-      >
-        {/* Brand/Logo */}
-        <div className={combineStyles(
-          "py-6 px-4 border-b border-[#374151] flex items-center",
-          sidebarCollapsed ? "justify-center" : "justify-between"
-        )}>
-          {!sidebarCollapsed && (
-            <div>
-              <h1 className="text-xl font-bold text-[#EAB308]">Intention-Ally</h1>
-              <p className="text-xs text-[#9CA3AF]">Semantic Search Tool</p>
-            </div>
-          )}
-          
-          {sidebarCollapsed && (
-            <div className="h-8 w-8 bg-[#EAB308] rounded-full flex items-center justify-center">
-              <span className="font-bold text-black">IA</span>
-            </div>
-          )}
-          
-          <button 
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="text-[#D1D5DB] hover:text-white transition-colors"
-          >
-            {sidebarCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-          </button>
-        </div>
-        
-        {/* Navigation Links */}
-        <nav className="py-4">
-          <ul>
-            <NavigationItem 
-              href="/"
-              icon={<Home size={20} />}
-              label="Home"
-              collapsed={sidebarCollapsed}
-              active={true}
-            />
-            <NavigationItem 
-              href="/search"
-              icon={<Search size={20} />}
-              label="Search"
-              collapsed={sidebarCollapsed}
-              active={true} // Since we're on the search page
-            />
-            <NavigationItem 
-              href="/analytics"
-              icon={<BarChart3 size={20} />}
-              label="Analytics"
-              collapsed={sidebarCollapsed}
-            />
-            <NavigationItem 
-              href="/saved"
-              icon={<Bookmark size={20} />}
-              label="Saved"
-              collapsed={sidebarCollapsed}
-            />
-            <NavigationItem 
-              href="/settings"
-              icon={<Settings size={20} />}
-              label="Settings"
-              collapsed={sidebarCollapsed}
-            />
-          </ul>
-        </nav>
-        
-        {/* User Profile */}
-        <div className={combineStyles(
-          "mt-auto border-t border-[#374151] p-4",
-          sidebarCollapsed ? "text-center" : ""
-        )}>
-          {!sidebarCollapsed ? (
-            <div className="flex items-center">
-              <div className="bg-[#4B5563] rounded-full h-10 w-10 flex items-center justify-center">
-                <User size={20} />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-[#F9FAFB]">User</p>
-                <p className="text-xs text-[#9CA3AF]">Researcher</p>
-              </div>
-              <button className="ml-auto text-[#9CA3AF] hover:text-[#F9FAFB]">
-                <LogOut size={18} />
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center">
-              <div className="bg-[#4B5563] rounded-full h-10 w-10 flex items-center justify-center mb-2">
-                <User size={20} />
-              </div>
-              <LogOut size={18} className="text-[#9CA3AF] hover:text-[#F9FAFB] cursor-pointer" />
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Main Content */}
-      <div className="flex-1">
-        {/* Header */}
-        <header className="bg-[#111827] border-b border-[#374151] py-4 px-6 flex items-center justify-between">
-          <h1 className="text-xl font-medium text-white">Search Dashboard</h1>
-          
-          <div className="flex items-center">
-            {/* Notifications */}
-            <button className="p-2 text-[#D1D5DB] hover:text-white rounded-full hover:bg-[#374151] transition-colors relative">
-              <Bell size={20} />
-              <span className="absolute top-1 right-1 bg-[#EAB308] h-2 w-2 rounded-full"></span>
+    <div className="flex flex-col h-screen bg-gray-900 text-gray-200">
+      <header className="bg-black p-4 border-b border-gray-800 z-20">
+        <div className="flex items-center justify-between max-w-screen-xl mx-auto">
+          <div className="flex items-center space-x-2">
+            <button 
+              onClick={toggleSidebar}
+              className="text-gray-400 hover:text-white md:hidden mr-2"
+            >
+              <Menu size={24} />
             </button>
-            
-            {/* User */}
-            <button className="ml-3 p-2 text-[#D1D5DB] hover:text-white rounded-full hover:bg-[#374151] transition-colors">
+            <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+              <span className="font-bold text-black">A</span>
+            </div>
+            <h1 className="text-xl font-bold text-white">Intention-Ally</h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button className="p-2 text-gray-400 hover:text-white">
               <User size={20} />
             </button>
+            <button className="p-2 text-gray-400 hover:text-white">
+              <Settings size={20} />
+            </button>
           </div>
-        </header>
+        </div>
+      </header>
+      
+      <div className="flex flex-1 overflow-hidden">
+        {/* Mobile sidebar backdrop */}
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+      
+        {/* Sidebar - responsive */}
+        <aside 
+          className={`fixed md:relative w-64 bg-gray-900 border-r border-gray-800 h-full z-20 transition-transform duration-300 ease-in-out ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+          }`}
+        >
+          <div className="flex justify-between items-center p-4 md:hidden">
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
+                <span className="font-bold text-black text-xs">A</span>
+              </div>
+              <span className="font-bold">Intention-Ally</span>
+            </div>
+            <button 
+              onClick={() => setSidebarOpen(false)}
+              className="text-gray-400 hover:text-white"
+            >
+              <X size={24} />
+            </button>
+          </div>
+          
+          <SidebarContent />
+        </aside>
         
-        {/* Main content area */}
-        <main className="p-6">
-          {children}
+        {/* Main content */}
+        <main className="flex-1 overflow-auto p-4 md:p-6">
+          <div className="max-w-screen-xl mx-auto">
+            {children}
+          </div>
         </main>
-        
-        {/* Footer */}
-        <footer className="bg-[#111827] border-t border-[#374151] py-4 px-6 text-center">
-          <p className="text-sm text-[#9CA3AF]">
-            &copy; {new Date().getFullYear()} Intention-Ally | Semantic Search and Clustering Tool
-          </p>
-        </footer>
       </div>
     </div>
   );
 };
 
 /**
- * NavigationItem component
- * Individual navigation item for the sidebar
+ * Sidebar content component
  */
-const NavigationItem = ({ href, icon, label, active = false, collapsed = false }) => {
+export const SidebarContent = () => {
+  const router = useRouter();
+  const currentPath = router.pathname;
+  
+  // Helper to determine if a link is active
+  const isActive = (path) => {
+    return currentPath === path ? 
+      'bg-gray-800 text-white' : 
+      'text-gray-400 hover:bg-gray-800 hover:text-white';
+  };
+  
   return (
-    <li className="mb-1">
-      <Link 
-        href={href}
-        className={combineStyles(
-          "flex items-center py-3 px-4 rounded-md transition-colors",
-          active 
-            ? "bg-[#EAB308] bg-opacity-10 text-[#EAB308]" 
-            : "text-[#D1D5DB] hover:bg-[#1F2937] hover:text-white",
-          collapsed ? "justify-center" : ""
-        )}
-      >
-        <span className={collapsed ? "" : "mr-3"}>{icon}</span>
-        {!collapsed && <span>{label}</span>}
-      </Link>
-    </li>
+    <div className="flex flex-col h-full">
+      <div className="p-4 flex-1 overflow-y-auto">
+        <div className="space-y-1 mb-8">
+          <Link href="/search" className={`flex items-center space-x-2 p-2 rounded ${isActive('/search')}`}>
+            <Search size={18} />
+            <span>Search</span>
+          </Link>
+          <Link href="/trends" className={`flex items-center space-x-2 p-2 rounded ${isActive('/trends')}`}>
+            <Trending size={18} />
+            <span>Trends</span>
+          </Link>
+          <Link href="/insights" className={`flex items-center space-x-2 p-2 rounded ${isActive('/insights')}`}>
+            <Zap size={18} />
+            <span>Insights</span>
+          </Link>
+        </div>
+        
+        <div className="mb-6">
+          <h2 className="text-xs uppercase text-gray-500 font-semibold mb-2 px-2">My Search Topics</h2>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between p-2 bg-gray-800 rounded text-white">
+              <span>Carbon Insetting</span>
+              <span className="text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded">3</span>
+            </div>
+            <div className="flex items-center justify-between p-2 hover:bg-gray-800 rounded text-gray-400 hover:text-white">
+              <span>Sustainable Logistics</span>
+              <span className="text-xs bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded">2</span>
+            </div>
+            <div className="flex items-center justify-between p-2 hover:bg-gray-800 rounded text-gray-400 hover:text-white">
+              <span>Scope 3 Emissions</span>
+              <span className="text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded">1</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mb-6">
+          <h2 className="text-xs uppercase text-gray-500 font-semibold mb-2 px-2">Collections</h2>
+          <div className="space-y-1">
+            <div className="flex items-center space-x-2 p-2 hover:bg-gray-800 rounded text-gray-400 hover:text-white">
+              <Star size={18} />
+              <span>Favorites</span>
+            </div>
+            <div className="flex items-center space-x-2 p-2 hover:bg-gray-800 rounded text-gray-400 hover:text-white">
+              <Clock size={18} />
+              <span>Recent Searches</span>
+            </div>
+            <div className="flex items-center space-x-2 p-2 hover:bg-gray-800 rounded text-gray-400 hover:text-white">
+              <BookOpen size={18} />
+              <span>Research Library</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="p-4 border-t border-gray-800">
+        <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium px-4 py-2 rounded-md transition-colors duration-200">
+          New Search Topic
+        </button>
+      </div>
+    </div>
   );
 };
+
+export default AppLayout;

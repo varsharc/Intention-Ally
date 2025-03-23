@@ -1,156 +1,155 @@
 import React, { useState } from 'react';
-import { Filter, ChevronDown, Calendar, Globe, AlertTriangle, Check } from 'lucide-react';
-import { styles, combineStyles } from '../styles/app-styles';
+import { Filter, ChevronDown, ChevronUp, Calendar, Hash, Award, FileText } from 'lucide-react';
 
 /**
- * SearchFilters component
- * Provides advanced filtering options for search results
+ * SearchFilters component with expandable filter options
  */
-const SearchFilters = ({ onFilterChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [dateRange, setDateRange] = useState('7d');
-  const [sourceType, setSourceType] = useState('all');
-  const [sentiment, setSentiment] = useState('all');
-  const [contentType, setContentType] = useState('all');
+const SearchFilters = ({ onFilterChange = () => {} }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [filters, setFilters] = useState({
+    dateRange: '7d',
+    sourceType: 'all',
+    sentiment: 'all',
+    contentType: 'all'
+  });
   
-  // Handle filter changes and notify parent
-  const handleFilterChange = () => {
-    if (onFilterChange) {
-      onFilterChange({
-        dateRange,
-        sourceType,
-        sentiment,
-        contentType
-      });
-    }
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
   };
   
-  // Reset all filters to default values
-  const resetFilters = () => {
-    setDateRange('7d');
-    setSourceType('all');
-    setSentiment('all');
-    setContentType('all');
+  const handleFilterChange = (filterType, value) => {
+    const updatedFilters = {
+      ...filters,
+      [filterType]: value
+    };
     
-    if (onFilterChange) {
-      onFilterChange({
-        dateRange: '7d',
-        sourceType: 'all',
-        sentiment: 'all',
-        contentType: 'all'
-      });
-    }
+    setFilters(updatedFilters);
+    onFilterChange(updatedFilters);
   };
   
   return (
-    <div className="mb-6">
+    <div className="mb-6 bg-gray-800 rounded-lg overflow-hidden">
+      {/* Header */}
       <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className={combineStyles(
-          styles.button.outline,
-          "w-full justify-between"
-        )}
+        onClick={toggleExpanded}
+        className="w-full px-4 py-3 flex justify-between items-center text-white hover:bg-gray-700 transition-colors"
       >
         <div className="flex items-center">
-          <Filter size={16} className="mr-2" />
-          <span>Advanced Filters</span>
+          <Filter size={18} className="mr-2 text-gray-400" />
+          <span className="font-medium">Advanced Filters</span>
+          <span className="ml-2 text-xs px-2 py-0.5 bg-yellow-500 text-black rounded-full">
+            {Object.values(filters).filter(v => v !== 'all').length}
+          </span>
         </div>
-        <ChevronDown size={16} className={`transform transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        {isExpanded ? (
+          <ChevronUp size={18} className="text-gray-400" />
+        ) : (
+          <ChevronDown size={18} className="text-gray-400" />
+        )}
       </button>
       
-      {isOpen && (
-        <div className="mt-3 p-4 bg-[#1F2937] rounded-lg">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            {/* Date Range Filter */}
+      {/* Filter options */}
+      {isExpanded && (
+        <div className="p-4 border-t border-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Date Range */}
             <div>
-              <label className="block text-sm font-medium text-[#D1D5DB] mb-1">
-                <Calendar size={14} className="inline mr-1" />
+              <label className="flex items-center text-sm text-gray-400 mb-2">
+                <Calendar size={14} className="mr-1.5" />
                 Date Range
               </label>
               <select
-                value={dateRange}
-                onChange={(e) => setDateRange(e.target.value)}
-                className={styles.input.default + " w-full"}
+                value={filters.dateRange}
+                onChange={(e) => handleFilterChange('dateRange', e.target.value)}
+                className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
               >
+                <option value="all">All time</option>
                 <option value="1d">Last 24 hours</option>
                 <option value="7d">Last 7 days</option>
                 <option value="30d">Last 30 days</option>
                 <option value="90d">Last 90 days</option>
-                <option value="all">All time</option>
+                <option value="1y">Last year</option>
               </select>
             </div>
             
-            {/* Source Type Filter */}
+            {/* Source Type */}
             <div>
-              <label className="block text-sm font-medium text-[#D1D5DB] mb-1">
-                <Globe size={14} className="inline mr-1" />
+              <label className="flex items-center text-sm text-gray-400 mb-2">
+                <Award size={14} className="mr-1.5" />
                 Source Type
               </label>
               <select
-                value={sourceType}
-                onChange={(e) => setSourceType(e.target.value)}
-                className={styles.input.default + " w-full"}
+                value={filters.sourceType}
+                onChange={(e) => handleFilterChange('sourceType', e.target.value)}
+                className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
               >
-                <option value="all">All Sources</option>
-                <option value="news">News Articles</option>
-                <option value="academic">Academic Papers</option>
-                <option value="blogs">Blog Posts</option>
-                <option value="social">Social Media</option>
+                <option value="all">All sources</option>
+                <option value="academic">Academic</option>
+                <option value="news">News</option>
+                <option value="industry">Industry</option>
+                <option value="nonprofit">Nonprofit</option>
+                <option value="government">Government</option>
               </select>
             </div>
             
-            {/* Sentiment Filter */}
+            {/* Sentiment */}
             <div>
-              <label className="block text-sm font-medium text-[#D1D5DB] mb-1">
-                <AlertTriangle size={14} className="inline mr-1" />
+              <label className="flex items-center text-sm text-gray-400 mb-2">
+                <Hash size={14} className="mr-1.5" />
                 Sentiment
               </label>
               <select
-                value={sentiment}
-                onChange={(e) => setSentiment(e.target.value)}
-                className={styles.input.default + " w-full"}
+                value={filters.sentiment}
+                onChange={(e) => handleFilterChange('sentiment', e.target.value)}
+                className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
               >
-                <option value="all">All Sentiment</option>
+                <option value="all">All sentiment</option>
                 <option value="positive">Positive</option>
                 <option value="neutral">Neutral</option>
                 <option value="negative">Negative</option>
               </select>
             </div>
             
-            {/* Content Type Filter */}
+            {/* Content Type */}
             <div>
-              <label className="block text-sm font-medium text-[#D1D5DB] mb-1">
-                <Check size={14} className="inline mr-1" />
+              <label className="flex items-center text-sm text-gray-400 mb-2">
+                <FileText size={14} className="mr-1.5" />
                 Content Type
               </label>
               <select
-                value={contentType}
-                onChange={(e) => setContentType(e.target.value)}
-                className={styles.input.default + " w-full"}
+                value={filters.contentType}
+                onChange={(e) => handleFilterChange('contentType', e.target.value)}
+                className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
               >
-                <option value="all">All Content</option>
+                <option value="all">All content</option>
                 <option value="article">Articles</option>
                 <option value="report">Reports</option>
-                <option value="case-study">Case Studies</option>
-                <option value="whitepaper">Whitepapers</option>
+                <option value="blog">Blogs</option>
+                <option value="paper">Research Papers</option>
+                <option value="news">News</option>
               </select>
             </div>
           </div>
           
-          <div className="flex justify-between pt-3 border-t border-[#374151]">
-            <button
-              onClick={resetFilters}
-              className="text-[#D1D5DB] hover:text-white transition-colors"
-            >
-              Reset Filters
-            </button>
-            
-            <button
+          <div className="mt-4 flex justify-end space-x-2">
+            <button 
               onClick={() => {
-                handleFilterChange();
-                setIsOpen(false);
+                const resetFilters = {
+                  dateRange: 'all',
+                  sourceType: 'all',
+                  sentiment: 'all',
+                  contentType: 'all'
+                };
+                setFilters(resetFilters);
+                onFilterChange(resetFilters);
               }}
-              className={styles.button.primary}
+              className="px-4 py-2 text-sm text-gray-300 hover:text-white"
+            >
+              Reset
+            </button>
+            <button 
+              onClick={() => onFilterChange(filters)}
+              className="px-4 py-2 text-sm bg-yellow-500 text-black rounded hover:bg-yellow-600"
             >
               Apply Filters
             </button>

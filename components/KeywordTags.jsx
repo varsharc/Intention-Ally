@@ -1,71 +1,80 @@
 import React from 'react';
-import { Tag, X } from 'lucide-react';
-import { styles, combineStyles } from '../styles/app-styles';
+import { Tag, X, Plus } from 'lucide-react';
 
 /**
- * KeywordTags component
- * Displays a list of keyword tags with selection functionality
+ * KeywordTags component displays active keywords with selection and removal functionality
  */
 const KeywordTags = ({ 
   keywords = [], 
-  selectedKeyword = null,
-  onSelect = () => {},
-  onRemove = null
+  selectedKeyword = null, 
+  onSelect = () => {}, 
+  onRemove = () => {},
+  onAdd = () => {}
 }) => {
+  const hasKeywords = keywords.length > 0;
+
   return (
     <div className="mb-6">
-      <div className="flex items-center mb-3">
-        <h3 className={styles.text.heading4}>
-          <Tag size={16} className="inline mr-2" />
-          Active Keywords
-        </h3>
-        <span className="ml-2 text-sm text-[#9CA3AF]">
-          {keywords.length} keywords tracked
-        </span>
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-sm font-medium text-gray-400">Active Keywords</h3>
+        {hasKeywords && (
+          <button 
+            onClick={onAdd}
+            className="text-xs text-yellow-500 hover:text-yellow-400 flex items-center"
+          >
+            <Plus size={14} className="mr-1" />
+            Add New
+          </button>
+        )}
       </div>
-      
-      {keywords.length === 0 ? (
-        <div className="bg-[#1F2937] rounded-md p-4 text-center">
-          <p className="text-[#9CA3AF]">No keywords are being tracked</p>
-          <p className="text-sm text-[#D1D5DB] mt-1">
-            Add keywords using the search bar above
-          </p>
-        </div>
-      ) : (
+
+      {hasKeywords ? (
         <div className="flex flex-wrap gap-2">
           {keywords.map((keyword, index) => (
-            <div
-              key={index}
-              className={combineStyles(
-                "px-3 py-1.5 rounded-md flex items-center cursor-pointer group transition-colors",
-                selectedKeyword === keyword.value
-                  ? "bg-[#EAB308] text-black"
-                  : "bg-[#374151] text-[#D1D5DB] hover:bg-[#4B5563]"
-              )}
+            <div 
+              key={index} 
+              className={`group flex items-center px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
+                selectedKeyword === keyword.value 
+                  ? 'bg-yellow-500 text-black' 
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
               onClick={() => onSelect(keyword.value)}
             >
-              <Tag size={14} className="mr-1.5" />
-              <span className="mr-1">{keyword.value}</span>
-              
-              {onRemove && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRemove(keyword.value);
-                  }}
-                  className={combineStyles(
-                    "opacity-0 group-hover:opacity-100 transition-opacity",
-                    selectedKeyword === keyword.value 
-                      ? "text-black hover:text-[#111827]" 
-                      : "text-[#9CA3AF] hover:text-[#F9FAFB]"
-                  )}
-                  title="Remove keyword"
-                >
-                  <X size={14} />
-                </button>
-              )}
+              <Tag 
+                size={14} 
+                className={`mr-1.5 ${
+                  selectedKeyword === keyword.value
+                    ? 'text-black'
+                    : 'text-gray-400'
+                }`} 
+              />
+              <span className="text-sm">{keyword.value}</span>
+              <button 
+                className={`ml-2 opacity-70 hover:opacity-100 ${
+                  selectedKeyword === keyword.value
+                    ? 'hover:text-gray-800'
+                    : 'hover:text-white'
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove(keyword.value);
+                }}
+                aria-label={`Remove ${keyword.value}`}
+              >
+                <X size={14} />
+              </button>
             </div>
           ))}
+        </div>
+      ) : (
+        <div className="flex items-center justify-center border border-dashed border-gray-700 rounded-md h-16">
+          <button 
+            onClick={onAdd}
+            className="flex items-center text-sm text-gray-400 hover:text-yellow-500"
+          >
+            <Plus size={16} className="mr-1" />
+            Add keyword to track
+          </button>
         </div>
       )}
     </div>
