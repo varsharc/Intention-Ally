@@ -93,7 +93,7 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node next-app-server.js"
+args = "node next-app-server.js --port 3000"
 
 [[ports]]
 localPort = 3000
