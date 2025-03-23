@@ -6,7 +6,7 @@ import { styles, combineStyles } from '../styles/app-styles';
  * Advanced Filters Sidebar component
  * Provides filtering options for search results
  */
-export const AdvancedFilters = ({ isOpen, onClose }) => {
+export const AdvancedFiltersSidebar = ({ isOpen, onClose }) => {
   // Filter state
   const [dateRange, setDateRange] = useState('30');
   const [selectedSources, setSelectedSources] = useState(['news', 'academic', 'government']);
