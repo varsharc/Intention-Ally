@@ -5,7 +5,7 @@ import { Settings, User, Clock, Star, Search, Filter, Analytics } from 'lucide-r
 // Sidebar Component
 const Sidebar = () => {
   return (
-    <div className="w-72 bg-gray-950 border-r border-gray-800 flex flex-col shadow-xl">
+    <div className="w-72 bg-black border-r border-gray-800 flex flex-col shadow-xl">
       <div className="p-5 flex-1">
         <h2 className="text-lg font-semibold text-white mb-6 flex items-center">
           <Search size={18} className="mr-2 text-yellow-500" />
@@ -89,7 +89,7 @@ const Sidebar = () => {
 // Main Layout Component
 export const AppLayout = ({ children }) => {
   return (
-    <div className="flex flex-col h-screen bg-gray-950 text-gray-100">
+    <div className="flex flex-col h-screen bg-black text-gray-100">
       <header className="bg-black p-4 border-b border-yellow-600">
         <div className="flex items-center justify-between max-w-screen-xl mx-auto">
           <div className="flex items-center space-x-3">

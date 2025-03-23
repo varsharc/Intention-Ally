@@ -8,7 +8,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "streamlit run frontend/app.py"]
 
 [workflows]
-runButton = "Next.js Dev"
+runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
@@ -21,11 +21,11 @@ args = "Test FastAPI"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Next.js Frontend"
+args = "FastAPI Backend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "FastAPI Backend"
+args = "Test Server"
 
 [[workflows.workflow]]
 name = "FastAPI Backend"
@@ -43,7 +43,16 @@ args = "python -m uvicorn backend.api:app --host 0.0.0.0 --port=8002"
 waitForPort = 8002
 
 [[workflows.workflow]]
-name = "Next.js Frontend"
+name = "Next.js Dev"
+author = 36978150
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+
+[[workflows.workflow]]
+name = "Test Server"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -54,17 +63,8 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node next-dev.js"
+args = "node test-server.js"
 waitForPort = 5000
-
-[[workflows.workflow]]
-name = "Next.js Dev"
-author = 36978150
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev"
 
 [[ports]]
 localPort = 3000

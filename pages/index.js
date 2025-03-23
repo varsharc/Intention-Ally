@@ -5,7 +5,7 @@ import { Settings, User, Clock, Star, Search, Filter, Analytics, ArrowRight } fr
 // Minimal home page with improved styling
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-950 text-gray-100">
+    <div className="flex flex-col min-h-screen bg-black text-gray-100">
       <header className="bg-black p-4 border-b border-yellow-500 shadow-md">
         <div className="flex items-center justify-between max-w-screen-xl mx-auto">
           <div className="flex items-center space-x-3">
@@ -27,7 +27,7 @@ export default function Home() {
       
       <main className="flex-1 p-6 bg-gray-900">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gray-950 p-6 rounded-lg shadow-lg mb-6 border-2 border-gray-800">
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-6 border-2 border-gray-800">
             <h2 className="text-2xl font-bold text-yellow-500 mb-3 flex items-center">
               <Search className="mr-3 text-yellow-500" size={24} />
               Intention-Ally Search Interface
@@ -75,7 +75,7 @@ export default function Home() {
           </div>
 
           {/* Demo section */}
-          <div className="bg-gray-950 p-6 rounded-lg shadow-lg mb-6 border-2 border-gray-800">
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-6 border-2 border-gray-800">
             <h2 className="text-xl font-bold text-yellow-500 mb-4 flex items-center">
               <span className="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center mr-3 text-black">
                 <span>→</span>
