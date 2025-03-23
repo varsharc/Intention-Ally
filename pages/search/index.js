@@ -1,21 +1,34 @@
 import React from 'react';
-import { AppLayout } from '../../components/ui-layout';
-import { ResultSummary } from '../../components/ui-results-list';
-import { KnowledgeGraph } from '../../components/ui-knowledge-graph';
-import { ResultsList } from '../../components/ui-results-list';
+import { 
+  MainLayout, 
+  SearchPageLayout, 
+  KnowledgeGraph, 
+  ResultsList, 
+  ResultSummary 
+} from '../../components';
 
 export default function SearchPage() {
   return (
-    <AppLayout>
-      <ResultSummary />
-      <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2">
-          <KnowledgeGraph />
+    <MainLayout activePage="search">
+      <SearchPageLayout>
+        <div className="grid grid-cols-5 gap-6">
+          {/* Left Column (3/5) - Knowledge Graph */}
+          <div className="col-span-3">
+            {/* Result Summary Row */}
+            <ResultSummary />
+            
+            {/* Knowledge Graph */}
+            <div className="h-96">
+              <KnowledgeGraph />
+            </div>
+          </div>
+          
+          {/* Right Column (2/5) - Results List */}
+          <div className="col-span-2">
+            <ResultsList />
+          </div>
         </div>
-        <div className="col-span-1">
-          <ResultsList />
-        </div>
-      </div>
-    </AppLayout>
+      </SearchPageLayout>
+    </MainLayout>
   );
 }

@@ -1,408 +1,169 @@
-// Search Results List Component
-import React, { useState } from 'react';
-import { 
-  List, 
-  Grid, 
-  Filter, 
-  ChevronDown, 
-  ChevronRight, 
-  ExternalLink, 
-  Star,
-  ArrowUpDown,
-  Clock,
-  Bookmark
-} from 'lucide-react';
+// Results List Component
+import React from 'react';
+import { ExternalLink, Save } from 'lucide-react';
 
-// Search Results Summary Component
-export const ResultSummary = () => {
-  return (
-    <div className="bg-gray-800 rounded-lg p-4 mb-6">
-      <h1 className="text-2xl font-bold text-white mb-3">
-        Search Results: <span className="text-yellow-500">EU Textile Regulations</span>
-      </h1>
-      
-      <div className="flex items-center flex-wrap gap-2 mb-4">
-        <div className="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-medium">
-          textile regulation
-        </div>
-        <div className="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-medium">
-          EU sustainability
-        </div>
-        <div className="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-medium">
-          carbon textile
-        </div>
-        <div className="bg-gray-700 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
-          <Filter size={14} className="mr-1" />
-          Add Filter
-        </div>
-      </div>
-      
-      <div className="flex flex-wrap items-center justify-between text-sm text-gray-300">
-        <div>
-          <span className="mr-1 text-gray-400">36 results found</span>
-          <span className="mx-2 text-gray-500">|</span>
-          <span className="text-gray-400">Last updated: </span>
-          <span>March 23, 2025 - 12:45 PM</span>
-        </div>
-        
-        <div className="flex items-center mt-2 sm:mt-0">
-          <button className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded-l flex items-center">
-            <Clock size={14} className="mr-1" />
-            <span>Latest First</span>
-          </button>
-          <button className="bg-gray-700 hover:bg-gray-600 px-3 py-1 border-l border-gray-600 rounded-r">
-            <ArrowUpDown size={14} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Search Results List Component
 export const ResultsList = () => {
-  const [viewMode, setViewMode] = useState('list');
-  
   return (
-    <div className="bg-gray-800 rounded-lg p-4 h-full flex flex-col">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-white">Results</h2>
-        
-        <div className="flex items-center space-x-2">
-          <div className="flex bg-gray-700 rounded">
-            <button 
-              className={`p-1.5 ${viewMode === 'list' ? 'bg-yellow-500 text-black' : 'text-white hover:bg-gray-600'} rounded-l`}
-              onClick={() => setViewMode('list')}
-              title="List View"
-            >
-              <List size={16} />
-            </button>
-            <button 
-              className={`p-1.5 ${viewMode === 'grid' ? 'bg-yellow-500 text-black' : 'text-white hover:bg-gray-600'} rounded-r`}
-              onClick={() => setViewMode('grid')}
-              title="Grid View"
-            >
-              <Grid size={16} />
-            </button>
-          </div>
-          
-          <button className="p-1.5 bg-gray-700 hover:bg-gray-600 rounded" title="Filter Results">
-            <Filter size={16} className="text-white" />
-          </button>
-          
-          <select className="bg-gray-700 text-white text-sm p-1.5 rounded border-none focus:outline-none">
-            <option>All Sources</option>
-            <option>Academic</option>
-            <option>Regulatory</option>
-            <option>Industry</option>
-            <option>News</option>
+    <div className="bg-gray-800 rounded-lg overflow-hidden">
+      <div className="flex justify-between items-center p-4 border-b border-gray-700">
+        <h3 className="text-lg font-medium text-white">Latest Discoveries</h3>
+        <div className="flex items-center text-sm">
+          <span className="text-gray-400 mr-2">Sort by:</span>
+          <select className="bg-transparent text-yellow-500 border-none">
+            <option>Relevance</option>
+            <option>Date (Newest)</option>
+            <option>Authority</option>
           </select>
         </div>
       </div>
       
-      <div className="flex-1 overflow-y-auto pr-2 space-y-3">
-        {viewMode === 'list' ? (
-          <ListViewResults />
-        ) : (
-          <GridViewResults />
-        )}
-      </div>
-      
-      <div className="flex justify-center mt-4">
-        <div className="flex bg-gray-700 rounded text-sm">
-          <button className="px-3 py-1 border-r border-gray-600">
-            Prev
-          </button>
-          <button className="px-3 py-1 bg-yellow-500 text-black">
-            1
-          </button>
-          <button className="px-3 py-1 border-l border-gray-600">
-            2
-          </button>
-          <button className="px-3 py-1 border-l border-gray-600">
-            3
-          </button>
-          <button className="px-3 py-1 border-l border-gray-600">
-            Next
-          </button>
+      <div className="p-4 space-y-4">
+        {/* Result Item 1 */}
+        <div className="border border-gray-700 rounded-lg p-4 hover:bg-gray-750 transition-colors">
+          <div className="flex items-start justify-between mb-2">
+            <h4 className="text-white font-medium">New EU Textile Sustainability Policy Draft Released</h4>
+            <div className="flex items-center space-x-2">
+              <span className="bg-yellow-500 text-black text-xs px-2 py-0.5 rounded">High Authority</span>
+              <span className="text-gray-400 text-xs">2 hours ago</span>
+            </div>
+          </div>
+          <p className="text-gray-300 text-sm mb-3">
+            European Commission proposes stricter sustainability requirements for textile imports with 30% 
+            recycled content minimum by 2026. The draft includes new supply chain transparency 
+            requirements and carbon footprint disclosures.
+          </p>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center text-sm">
+              <span className="bg-gray-700 text-gray-300 px-2 py-0.5 rounded mr-2">european-commission.eu</span>
+              <span className="text-yellow-500">Regulatory</span>
+            </div>
+            <div className="flex space-x-2">
+              <button className="text-gray-400 hover:text-white">
+                <ExternalLink size={16} />
+              </button>
+              <button className="text-gray-400 hover:text-white">
+                <Save size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Result Item 2 */}
+        <div className="border border-gray-700 rounded-lg p-4 hover:bg-gray-750 transition-colors">
+          <div className="flex items-start justify-between mb-2">
+            <h4 className="text-white font-medium">German Research Institute Develops New Biodiversity Measurement Framework</h4>
+            <div className="flex items-center space-x-2">
+              <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded">Academic</span>
+              <span className="text-gray-400 text-xs">Yesterday</span>
+            </div>
+          </div>
+          <p className="text-gray-300 text-sm mb-3">
+            Fraunhofer Institute publishes peer-reviewed methodology for measuring textile production impact 
+            on local ecosystems. The framework includes 12 indicators for biodiversity assessment 
+            and is compatible with existing ESG reporting standards.
+          </p>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center text-sm">
+              <span className="bg-gray-700 text-gray-300 px-2 py-0.5 rounded mr-2">fraunhofer-institute.de</span>
+              <span className="text-blue-500">Academic</span>
+            </div>
+            <div className="flex space-x-2">
+              <button className="text-gray-400 hover:text-white">
+                <ExternalLink size={16} />
+              </button>
+              <button className="text-gray-400 hover:text-white">
+                <Save size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Result Item 3 */}
+        <div className="border border-gray-700 rounded-lg p-4 hover:bg-gray-750 transition-colors">
+          <div className="flex items-start justify-between mb-2">
+            <h4 className="text-white font-medium">Industry Report: Carbon Insets Gaining Traction in Textile Supply Chains</h4>
+            <div className="flex items-center space-x-2">
+              <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded">Market</span>
+              <span className="text-gray-400 text-xs">2 days ago</span>
+            </div>
+          </div>
+          <p className="text-gray-300 text-sm mb-3">
+            McKinsey analysis shows 34% increase in carbon inset programs among leading textile manufacturers. 
+            Companies are shifting from offsetting to insetting to address Scope 3 emissions more directly 
+            within their own supply chains.
+          </p>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center text-sm">
+              <span className="bg-gray-700 text-gray-300 px-2 py-0.5 rounded mr-2">mckinsey.com</span>
+              <span className="text-green-500">Market</span>
+            </div>
+            <div className="flex space-x-2">
+              <button className="text-gray-400 hover:text-white">
+                <ExternalLink size={16} />
+              </button>
+              <button className="text-gray-400 hover:text-white">
+                <Save size={16} />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// List View Component
-const ListViewResults = () => {
+// Result Summary Card Component
+export const ResultSummary = () => {
   return (
-    <>
-      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded">
-        <div className="flex items-start justify-between">
-          <h3 className="text-md font-medium text-white mb-1 flex-1">
-            <a href="#" className="hover:text-yellow-400">European Commission Adopts New Textile Strategy for Sustainable Products</a>
-          </h3>
-          <div className="flex items-center">
-            <span className="text-xs text-yellow-500 bg-yellow-500 bg-opacity-10 px-2 py-0.5 rounded mr-1">
-              REGULATORY
-            </span>
-            <button className="text-gray-400 hover:text-white">
-              <Bookmark size={16} />
-            </button>
-          </div>
-        </div>
-        <p className="text-sm text-gray-300 mb-2">
-          The European Commission has adopted a comprehensive strategy to transition the EU textile industry towards sustainability and circularity...
+    <div className="grid grid-cols-2 gap-4 mb-4">
+      {/* Summary Card */}
+      <div className="bg-gray-800 rounded-lg p-4">
+        <h3 className="text-lg font-medium text-white mb-2">Key Insights</h3>
+        <p className="text-gray-300 text-sm mb-3">
+          Recent EU textile regulations focus on three main areas: sustainability requirements, 
+          supply chain transparency, and chemical restrictions. New policy draft expected in Q2 2025.
         </p>
-        <div className="flex items-center justify-between text-xs">
-          <div>
-            <span className="text-blue-400">ec.europa.eu</span>
-            <span className="mx-2 text-gray-500">|</span>
-            <span className="text-gray-400">Mar 18, 2025</span>
-          </div>
-          <a href="#" className="text-gray-400 hover:text-white flex items-center">
-            <span className="mr-1">Read more</span>
-            <ExternalLink size={12} />
-          </a>
+        <div className="flex justify-between text-sm text-gray-400">
+          <span>Generated from 24 sources</span>
+          <button className="text-yellow-500 hover:text-yellow-400">Refresh</button>
         </div>
       </div>
       
-      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded">
-        <div className="flex items-start justify-between">
-          <h3 className="text-md font-medium text-white mb-1 flex-1">
-            <a href="#" className="hover:text-yellow-400">Research Paper: Carbon Footprint Metrics in Textile Manufacturing</a>
-          </h3>
-          <div className="flex items-center">
-            <span className="text-xs text-blue-500 bg-blue-500 bg-opacity-10 px-2 py-0.5 rounded mr-1">
-              ACADEMIC
-            </span>
-            <button className="text-gray-400 hover:text-white">
-              <Bookmark size={16} />
-            </button>
-          </div>
+      {/* Trend Card */}
+      <div className="bg-gray-800 rounded-lg p-4">
+        <h3 className="text-lg font-medium text-white mb-2">Topic Trends</h3>
+        <div className="h-32 bg-gray-900 rounded relative">
+          <svg width="100%" height="100%" viewBox="0 0 400 120">
+            {/* Grid lines */}
+            <line x1="0" y1="30" x2="400" y2="30" stroke="#333" strokeWidth="1" />
+            <line x1="0" y1="60" x2="400" y2="60" stroke="#333" strokeWidth="1" />
+            <line x1="0" y1="90" x2="400" y2="90" stroke="#333" strokeWidth="1" />
+            
+            {/* Time labels */}
+            <text x="0" y="115" fill="#666" fontSize="10">30d</text>
+            <text x="130" y="115" fill="#666" fontSize="10">20d</text>
+            <text x="265" y="115" fill="#666" fontSize="10">10d</text>
+            <text x="390" y="115" fill="#666" fontSize="10">Now</text>
+            
+            {/* ESG Rules line */}
+            <path d="M10,80 L50,70 L100,85 L150,60 L200,55 L250,40 L300,30 L350,15 L390,25" 
+                  stroke="#FFD700" strokeWidth="2" fill="none" />
+            
+            {/* Supply Chain line */}
+            <path d="M10,90 L50,85 L100,80 L150,85 L200,70 L250,75 L300,60 L350,70 L390,50" 
+                  stroke="#2ECC71" strokeWidth="2" fill="none" />
+                  
+            {/* Legend */}
+            <circle cx="10" cy="15" r="4" fill="#FFD700" />
+            <text x="20" y="18" fill="#fff" fontSize="10">ESG Rules</text>
+            
+            <circle cx="100" cy="15" r="4" fill="#2ECC71" />
+            <text x="110" y="18" fill="#fff" fontSize="10">Supply Chain</text>
+          </svg>
         </div>
-        <p className="text-sm text-gray-300 mb-2">
-          This paper presents a comprehensive analysis of carbon footprint measurement methodologies specific to textile manufacturing processes...
-        </p>
-        <div className="flex items-center justify-between text-xs">
-          <div>
-            <span className="text-blue-400">sciencedirect.com</span>
-            <span className="mx-2 text-gray-500">|</span>
-            <span className="text-gray-400">Mar 15, 2025</span>
-          </div>
-          <a href="#" className="text-gray-400 hover:text-white flex items-center">
-            <span className="mr-1">Read more</span>
-            <ExternalLink size={12} />
-          </a>
-        </div>
-      </div>
-      
-      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded">
-        <div className="flex items-start justify-between">
-          <h3 className="text-md font-medium text-white mb-1 flex-1">
-            <a href="#" className="hover:text-yellow-400">Industry Response to New EU Textile Regulation Requirements</a>
-          </h3>
-          <div className="flex items-center">
-            <span className="text-xs text-purple-500 bg-purple-500 bg-opacity-10 px-2 py-0.5 rounded mr-1">
-              INDUSTRY
-            </span>
-            <button className="text-gray-400 hover:text-white">
-              <Bookmark size={16} />
-            </button>
-          </div>
-        </div>
-        <p className="text-sm text-gray-300 mb-2">
-          European textile industry leaders outlined adaptation strategies at the annual Textile Sustainability Conference in response to the EU's new regulations...
-        </p>
-        <div className="flex items-center justify-between text-xs">
-          <div>
-            <span className="text-blue-400">textilefederation.eu</span>
-            <span className="mx-2 text-gray-500">|</span>
-            <span className="text-gray-400">Mar 12, 2025</span>
-          </div>
-          <a href="#" className="text-gray-400 hover:text-white flex items-center">
-            <span className="mr-1">Read more</span>
-            <ExternalLink size={12} />
-          </a>
-        </div>
-      </div>
-      
-      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded">
-        <div className="flex items-start justify-between">
-          <h3 className="text-md font-medium text-white mb-1 flex-1">
-            <a href="#" className="hover:text-yellow-400">New Carbon Textile Tracking Technology Launched by Tech Startup</a>
-          </h3>
-          <div className="flex items-center">
-            <span className="text-xs text-green-500 bg-green-500 bg-opacity-10 px-2 py-0.5 rounded mr-1">
-              TECHNOLOGY
-            </span>
-            <button className="text-gray-400 hover:text-white">
-              <Bookmark size={16} />
-            </button>
-          </div>
-        </div>
-        <p className="text-sm text-gray-300 mb-2">
-          TechFabrix introduces a groundbreaking blockchain-based platform for tracking carbon emissions throughout the textile supply chain...
-        </p>
-        <div className="flex items-center justify-between text-xs">
-          <div>
-            <span className="text-blue-400">techcrunch.com</span>
-            <span className="mx-2 text-gray-500">|</span>
-            <span className="text-gray-400">Mar 10, 2025</span>
-          </div>
-          <a href="#" className="text-gray-400 hover:text-white flex items-center">
-            <span className="mr-1">Read more</span>
-            <ExternalLink size={12} />
-          </a>
-        </div>
-      </div>
-      
-      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded">
-        <div className="flex items-start justify-between">
-          <h3 className="text-md font-medium text-white mb-1 flex-1">
-            <a href="#" className="hover:text-yellow-400">Sustainability in Textile Manufacturing: Compliance Guide 2025</a>
-          </h3>
-          <div className="flex items-center">
-            <span className="text-xs text-yellow-500 bg-yellow-500 bg-opacity-10 px-2 py-0.5 rounded mr-1">
-              REGULATORY
-            </span>
-            <button className="text-white">
-              <Star size={16} className="text-yellow-500 fill-yellow-500" />
-            </button>
-          </div>
-        </div>
-        <p className="text-sm text-gray-300 mb-2">
-          Comprehensive guide to meeting the latest EU textile sustainability regulations, including carbon footprint requirements and circularity assessments...
-        </p>
-        <div className="flex items-center justify-between text-xs">
-          <div>
-            <span className="text-blue-400">sustainabletextileguide.org</span>
-            <span className="mx-2 text-gray-500">|</span>
-            <span className="text-gray-400">Mar 5, 2025</span>
-          </div>
-          <a href="#" className="text-gray-400 hover:text-white flex items-center">
-            <span className="mr-1">Read more</span>
-            <ExternalLink size={12} />
-          </a>
-        </div>
-      </div>
-    </>
-  );
-};
-
-// Grid View Component
-const GridViewResults = () => {
-  return (
-    <div className="grid grid-cols-2 gap-3">
-      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
-        <div className="flex items-start justify-between mb-2">
-          <span className="text-xs text-yellow-500 bg-yellow-500 bg-opacity-10 px-2 py-0.5 rounded">
-            REGULATORY
-          </span>
-          <button className="text-gray-400 hover:text-white">
-            <Bookmark size={14} />
-          </button>
-        </div>
-        <h3 className="text-sm font-medium text-white mb-auto">
-          <a href="#" className="hover:text-yellow-400">European Commission Adopts New Textile Strategy</a>
-        </h3>
-        <div className="text-xs mt-2">
-          <span className="text-blue-400">ec.europa.eu</span>
-          <span className="mx-1 text-gray-500">|</span>
-          <span className="text-gray-400">Mar 18, 2025</span>
-        </div>
-      </div>
-      
-      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
-        <div className="flex items-start justify-between mb-2">
-          <span className="text-xs text-blue-500 bg-blue-500 bg-opacity-10 px-2 py-0.5 rounded">
-            ACADEMIC
-          </span>
-          <button className="text-gray-400 hover:text-white">
-            <Bookmark size={14} />
-          </button>
-        </div>
-        <h3 className="text-sm font-medium text-white mb-auto">
-          <a href="#" className="hover:text-yellow-400">Carbon Footprint Metrics in Textile Manufacturing</a>
-        </h3>
-        <div className="text-xs mt-2">
-          <span className="text-blue-400">sciencedirect.com</span>
-          <span className="mx-1 text-gray-500">|</span>
-          <span className="text-gray-400">Mar 15, 2025</span>
-        </div>
-      </div>
-      
-      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
-        <div className="flex items-start justify-between mb-2">
-          <span className="text-xs text-purple-500 bg-purple-500 bg-opacity-10 px-2 py-0.5 rounded">
-            INDUSTRY
-          </span>
-          <button className="text-gray-400 hover:text-white">
-            <Bookmark size={14} />
-          </button>
-        </div>
-        <h3 className="text-sm font-medium text-white mb-auto">
-          <a href="#" className="hover:text-yellow-400">Industry Response to New EU Textile Regulation</a>
-        </h3>
-        <div className="text-xs mt-2">
-          <span className="text-blue-400">textilefederation.eu</span>
-          <span className="mx-1 text-gray-500">|</span>
-          <span className="text-gray-400">Mar 12, 2025</span>
-        </div>
-      </div>
-      
-      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
-        <div className="flex items-start justify-between mb-2">
-          <span className="text-xs text-green-500 bg-green-500 bg-opacity-10 px-2 py-0.5 rounded">
-            TECHNOLOGY
-          </span>
-          <button className="text-gray-400 hover:text-white">
-            <Bookmark size={14} />
-          </button>
-        </div>
-        <h3 className="text-sm font-medium text-white mb-auto">
-          <a href="#" className="hover:text-yellow-400">New Carbon Textile Tracking Technology</a>
-        </h3>
-        <div className="text-xs mt-2">
-          <span className="text-blue-400">techcrunch.com</span>
-          <span className="mx-1 text-gray-500">|</span>
-          <span className="text-gray-400">Mar 10, 2025</span>
-        </div>
-      </div>
-      
-      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
-        <div className="flex items-start justify-between mb-2">
-          <span className="text-xs text-yellow-500 bg-yellow-500 bg-opacity-10 px-2 py-0.5 rounded">
-            REGULATORY
-          </span>
-          <button className="text-white">
-            <Star size={14} className="text-yellow-500 fill-yellow-500" />
-          </button>
-        </div>
-        <h3 className="text-sm font-medium text-white mb-auto">
-          <a href="#" className="hover:text-yellow-400">Sustainability in Textile Manufacturing Guide</a>
-        </h3>
-        <div className="text-xs mt-2">
-          <span className="text-blue-400">sustainabletextileguide.org</span>
-          <span className="mx-1 text-gray-500">|</span>
-          <span className="text-gray-400">Mar 5, 2025</span>
-        </div>
-      </div>
-      
-      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
-        <div className="flex items-start justify-between mb-2">
-          <span className="text-xs text-gray-500 bg-gray-500 bg-opacity-10 px-2 py-0.5 rounded">
-            NEWS
-          </span>
-          <button className="text-gray-400 hover:text-white">
-            <Bookmark size={14} />
-          </button>
-        </div>
-        <h3 className="text-sm font-medium text-white mb-auto">
-          <a href="#" className="hover:text-yellow-400">Global Implications of EU's Textile Sustainability Rules</a>
-        </h3>
-        <div className="text-xs mt-2">
-          <span className="text-blue-400">reuters.com</span>
-          <span className="mx-1 text-gray-500">|</span>
-          <span className="text-gray-400">Mar 2, 2025</span>
+        <div className="flex justify-between text-sm text-gray-400 mt-2">
+          <span>Based on mention frequency</span>
+          <button className="text-yellow-500 hover:text-yellow-400">Change Metrics</button>
         </div>
       </div>
     </div>

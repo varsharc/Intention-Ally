@@ -1,35 +1,38 @@
 import React from 'react';
-import { AppLayout } from '../../components/ui-layout';
-import { AdminOverviewCards, ResourceUsageChart, UsageLimitsPanel, UserResourceAllocation } from '../../components/ui-admin-components';
-import { Clock } from 'lucide-react';
+import { 
+  MainLayout, 
+  AdminOverviewCards,
+  ResourceUsageChart,
+  UsageLimitsPanel,
+  UserResourceAllocation
+} from '../../components';
 
 export default function AdminPage() {
   return (
-    <AppLayout>
+    <MainLayout activePage="admin">
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-white">Admin Dashboard</h2>
-          
-          <div className="flex space-x-2">
-            <div className="p-2 bg-gray-800 rounded flex items-center space-x-2">
-              <Clock size={16} className="text-gray-400" />
-              <select className="bg-transparent text-sm text-white border-none">
-                <option>Last 30 days</option>
-                <option>Last 7 days</option>
-                <option>Last 24 hours</option>
-              </select>
-            </div>
-            <button className="p-2 bg-yellow-500 text-black rounded hover:bg-yellow-600">
-              Export Report
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
+          <div className="flex items-center space-x-3">
+            <button className="bg-gray-800 text-white px-3 py-1 rounded text-sm">Export Data</button>
+            <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium px-3 py-1 rounded text-sm">
+              Run Manual Scan
             </button>
           </div>
         </div>
         
+        {/* Overview Cards */}
         <AdminOverviewCards />
-        <ResourceUsageChart />
+        
+        {/* Resource Chart and Allocation */}
+        <div className="grid grid-cols-3 gap-6">
+          <ResourceUsageChart />
+          <UserResourceAllocation />
+        </div>
+        
+        {/* Usage Limits */}
         <UsageLimitsPanel />
-        <UserResourceAllocation />
       </div>
-    </AppLayout>
+    </MainLayout>
   );
 }

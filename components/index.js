@@ -1,18 +1,12 @@
-// Intention-Ally Component Index
-// Export all components for easy importing
-import React from 'react';
-import { Clock } from 'lucide-react';
+// Export all UI components from a single file for easier imports
 
-// Layout Components
-export { AppLayout, Sidebar } from './ui-layout';
+// Main Layout Components
+export { MainLayout, SearchPageLayout, KeywordTag } from './ui-layout';
 
-// Search Configuration Components
-export { SearchConfigForm } from './ui-search-config';
-
-// Knowledge Graph Components
+// Knowledge Graph Component
 export { KnowledgeGraph } from './ui-knowledge-graph';
 
-// Results List Components
+// Results Components
 export { ResultsList, ResultSummary } from './ui-results-list';
 
 // Admin Dashboard Components
@@ -23,8 +17,11 @@ export {
   UserResourceAllocation
 } from './ui-admin-components';
 
+// Search Configuration Components
+export { SearchConfigForm } from './ui-search-config';
+
 // Advanced Filter Components
-export {
+export { 
   AdvancedFilters,
   SourceTypesFilter,
   DomainPreferencesFilter,
@@ -32,58 +29,31 @@ export {
   VisualizationSettings
 } from './ui-advanced-filters';
 
-// Main Pages
+// Page Components for Next.js Router
 export const SearchResultsPage = () => (
-  <AppLayout>
-    <ResultSummary />
-    <div className="grid grid-cols-3 gap-4">
-      <div className="col-span-2">
-        <KnowledgeGraph />
-      </div>
-      <div className="col-span-1">
-        <ResultsList />
-      </div>
-    </div>
-  </AppLayout>
+  <div className="text-white">
+    <h1>Search Results Page</h1>
+    <p>This component will be rendered at /search</p>
+  </div>
 );
 
 export const AdminDashboardPage = () => (
-  <AppLayout>
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-white">Admin Dashboard</h2>
-        
-        <div className="flex space-x-2">
-          <div className="p-2 bg-gray-800 rounded flex items-center space-x-2">
-            <Clock size={16} />
-            <select className="bg-transparent text-sm">
-              <option>Last 30 days</option>
-              <option>Last 7 days</option>
-              <option>Last 24 hours</option>
-            </select>
-          </div>
-          <button className="p-2 bg-yellow-500 text-black rounded hover:bg-yellow-600">
-            Export Report
-          </button>
-        </div>
-      </div>
-      
-      <AdminOverviewCards />
-      <ResourceUsageChart />
-      <UsageLimitsPanel />
-      <UserResourceAllocation />
-    </div>
-  </AppLayout>
+  <div className="text-white">
+    <h1>Admin Dashboard Page</h1>
+    <p>This component will be rendered at /admin</p>
+  </div>
 );
 
 export const SearchConfigPage = () => (
-  <AppLayout>
-    <SearchConfigForm />
-  </AppLayout>
+  <div className="text-white">
+    <h1>Search Configuration Page</h1>
+    <p>This component will be rendered at /search/configure</p>
+  </div>
 );
 
 export const AdvancedSettingsPage = () => (
-  <AppLayout>
-    <AdvancedFilters />
-  </AppLayout>
+  <div className="text-white">
+    <h1>Advanced Settings Page</h1>
+    <p>This component will be rendered at /search/filters</p>
+  </div>
 );
