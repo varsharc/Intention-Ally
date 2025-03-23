@@ -4,12 +4,12 @@
  */
 
 export const styles = {
-  // Container and card styles
+  // Card components
   card: {
     base: "bg-[#111827] rounded-xl shadow-md overflow-hidden",
-    header: "bg-[#1F2937] px-6 py-4 border-b border-[#374151]",
-    body: "px-6 py-4",
-    footer: "bg-[#1F2937] px-6 py-4 border-t border-[#374151]",
+    header: "px-6 py-4 border-b border-[#374151]",
+    body: "p-6 text-[#F9FAFB]",
+    footer: "px-6 py-4 border-t border-[#374151] bg-[#1F2937]"
   },
   
   // Text styles
@@ -18,45 +18,44 @@ export const styles = {
     heading2: "text-2xl font-bold text-[#F9FAFB]",
     heading3: "text-xl font-semibold text-[#F9FAFB]",
     paragraph: "text-[#D1D5DB]",
-    muted: "text-[#9CA3AF]",
-    highlight: "text-[#EAB308]",
+    muted: "text-[#9CA3AF]"
   },
   
   // Button styles
   button: {
-    primary: "px-4 py-2 bg-[#EAB308] text-black font-medium rounded-md hover:bg-[#CA8A04] transition-colors flex items-center",
-    secondary: "px-4 py-2 bg-[#1F2937] text-[#F9FAFB] font-medium rounded-md hover:bg-[#374151] transition-colors flex items-center",
-    outline: "px-4 py-2 border border-[#374151] text-[#F9FAFB] font-medium rounded-md hover:bg-[#1F2937] transition-colors flex items-center",
-    icon: "p-2 text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#1F2937] rounded-md transition-colors",
+    primary: "bg-[#EAB308] hover:bg-[#CA8A04] text-black font-medium px-4 py-2 rounded-md transition-colors flex items-center justify-center",
+    secondary: "bg-[#4B5563] hover:bg-[#6B7280] text-white font-medium px-4 py-2 rounded-md transition-colors flex items-center justify-center",
+    outline: "border border-[#4B5563] hover:border-[#9CA3AF] text-[#D1D5DB] hover:text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center",
+    icon: "text-[#9CA3AF] hover:text-[#F9FAFB] p-2 rounded-md hover:bg-[#374151] transition-colors",
+    danger: "bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-md transition-colors flex items-center justify-center"
   },
   
   // Input styles
   input: {
-    default: "bg-[#1F2937] border border-[#374151] rounded-md text-[#F9FAFB] placeholder-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#EAB308] focus:border-transparent",
-    search: "pl-10 pr-4 py-2 w-full",
+    default: "bg-[#1F2937] border border-[#374151] focus:border-[#EAB308] text-[#F9FAFB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#EAB308] transition-colors",
+    search: "bg-[#1F2937] border border-[#374151] focus:border-[#EAB308] text-[#F9FAFB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#EAB308] pl-10 pr-4 py-2 transition-colors"
   },
   
-  // Badge/tag styles
+  // Badge styles
   badge: {
     default: "px-2 py-1 rounded-md text-xs font-medium",
-    primary: "bg-[#EAB308] bg-opacity-20 text-[#EAB308]",
-    secondary: "bg-[#374151] text-[#D1D5DB]",
-    colored: "bg-[#374151] text-[#D1D5DB]",
+    colored: "bg-[#1F2937] text-[#D1D5DB] px-2 py-1 rounded-md text-xs font-medium",
+    tag: "bg-[#374151] text-[#D1D5DB] px-2 py-1 rounded-md text-xs font-medium"
   },
   
   // Layout utilities
   grid: {
     twoColumn: "grid grid-cols-1 md:grid-cols-2 gap-6",
     threeColumn: "grid grid-cols-1 md:grid-cols-3 gap-6",
+    fourColumn: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
   },
   
-  // Utility styles
+  // Utility classes
   utils: {
     flexCenter: "flex items-center",
-    flexBetween: "flex items-center justify-between",
+    flexBetween: "flex justify-between items-center",
     flexColumn: "flex flex-col",
-    roundedFull: "rounded-full",
-    shadow: "shadow-md",
+    transition: "transition-all duration-300 ease-in-out"
   }
 };
 

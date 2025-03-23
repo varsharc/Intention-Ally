@@ -35,7 +35,7 @@ const nextConfig = {
   // Configuration for Replit and optimization
   // Add allowedDevOrigins to allow cross-origin in development
   experimental: {
-    allowedDevOrigins: ['*', '.replit.dev', '.repl.co', '.replit.app', '.picard.replit.dev'],
+    allowedDevOrigins: ['*', '.replit.dev', '.repl.co', '.replit.app', '.picard.replit.dev', 'replit.com'],
   },
   // The CORS settings are better handled in the Express server directly
   // Optional: Configure webpack for better watching

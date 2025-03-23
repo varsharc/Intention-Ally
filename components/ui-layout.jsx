@@ -1,136 +1,173 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Home, Search, BarChart2, Settings, User, List, X } from 'lucide-react';
+import { Search, BarChart3, Settings, Bookmark, ChevronRight, ChevronLeft, Bell, User, Home, LogOut } from 'lucide-react';
 import { styles, combineStyles } from '../styles/app-styles';
 
 /**
- * Sidebar component with navigation links
- */
-export const Sidebar = ({ isOpen, onClose }) => {
-  return (
-    <div 
-      className={combineStyles(
-        "fixed inset-y-0 left-0 z-30 w-64 bg-[#111827] shadow-xl transform transition-transform duration-300 ease-in-out",
-        isOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0",
-        "sm:static sm:w-20 sm:translate-x-0 flex flex-col"
-      )}
-    >
-      {/* Close button (mobile only) */}
-      <div className="sm:hidden p-4 flex justify-end">
-        <button onClick={onClose} className="text-[#9CA3AF] hover:text-white">
-          <X size={20} />
-        </button>
-      </div>
-      
-      {/* Logo */}
-      <div className="p-4 flex justify-center">
-        <Link href="/" className="text-white">
-          <div className="bg-[#EAB308] h-10 w-10 rounded-md flex items-center justify-center text-black font-bold text-xl">
-            IA
-          </div>
-        </Link>
-      </div>
-      
-      {/* Nav links */}
-      <nav className="flex-1 px-2 py-4 space-y-2">
-        <NavLink href="/" icon={<Home size={20} />} label="Home" />
-        <NavLink href="/search" icon={<Search size={20} />} label="Search" />
-        <NavLink href="/analytics" icon={<BarChart2 size={20} />} label="Analytics" />
-        <NavLink href="/admin" icon={<Settings size={20} />} label="Settings" />
-      </nav>
-      
-      {/* User */}
-      <div className="p-4 border-t border-[#374151]">
-        <div className="flex items-center sm:justify-center">
-          <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#374151] text-white">
-            <User size={14} />
-          </div>
-          <span className="ml-2 text-[#D1D5DB] sm:hidden">User</span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/**
- * Individual nav link component
- */
-const NavLink = ({ href, icon, label }) => {
-  // Check if current page matches the link
-  const isActive = typeof window !== 'undefined' && window.location.pathname === href;
-  
-  return (
-    <Link 
-      href={href}
-      className={combineStyles(
-        "flex items-center py-2 px-4 rounded-md transition-colors",
-        "sm:flex-col sm:justify-center sm:px-0 sm:py-3",
-        isActive ? 
-          "bg-[#1F2937] text-[#EAB308]" : 
-          "text-[#9CA3AF] hover:bg-[#1F2937] hover:text-[#F9FAFB]"
-      )}
-    >
-      <div className="sm:mb-1">{icon}</div>
-      <span className="ml-3 sm:ml-0 sm:text-xs">{label}</span>
-    </Link>
-  );
-};
-
-/**
- * Main layout component with header, sidebar, and content area
+ * AppLayout component
+ * Provides consistent layout with sidebar navigation for the application
  */
 export const AppLayout = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="flex min-h-screen">
-        {/* Sidebar */}
-        <Sidebar 
-          isOpen={sidebarOpen} 
-          onClose={() => setSidebarOpen(false)} 
-        />
+    <div className="flex min-h-screen bg-black text-white">
+      {/* Sidebar Navigation */}
+      <div 
+        className={combineStyles(
+          "bg-[#111827] border-r border-[#374151] transition-all duration-300",
+          sidebarCollapsed ? "w-20" : "w-64"
+        )}
+      >
+        {/* Brand/Logo */}
+        <div className={combineStyles(
+          "py-6 px-4 border-b border-[#374151] flex items-center",
+          sidebarCollapsed ? "justify-center" : "justify-between"
+        )}>
+          {!sidebarCollapsed && (
+            <div>
+              <h1 className="text-xl font-bold text-[#EAB308]">Intention-Ally</h1>
+              <p className="text-xs text-[#9CA3AF]">Semantic Search Tool</p>
+            </div>
+          )}
+          
+          {sidebarCollapsed && (
+            <div className="h-8 w-8 bg-[#EAB308] rounded-full flex items-center justify-center">
+              <span className="font-bold text-black">IA</span>
+            </div>
+          )}
+          
+          <button 
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="text-[#D1D5DB] hover:text-white transition-colors"
+          >
+            {sidebarCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          </button>
+        </div>
         
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
-          <header className="bg-[#111827] shadow-md py-4 px-6 flex items-center justify-between">
+        {/* Navigation Links */}
+        <nav className="py-4">
+          <ul>
+            <NavigationItem 
+              href="/"
+              icon={<Home size={20} />}
+              label="Home"
+              collapsed={sidebarCollapsed}
+              active={true}
+            />
+            <NavigationItem 
+              href="/search"
+              icon={<Search size={20} />}
+              label="Search"
+              collapsed={sidebarCollapsed}
+              active={true} // Since we're on the search page
+            />
+            <NavigationItem 
+              href="/analytics"
+              icon={<BarChart3 size={20} />}
+              label="Analytics"
+              collapsed={sidebarCollapsed}
+            />
+            <NavigationItem 
+              href="/saved"
+              icon={<Bookmark size={20} />}
+              label="Saved"
+              collapsed={sidebarCollapsed}
+            />
+            <NavigationItem 
+              href="/settings"
+              icon={<Settings size={20} />}
+              label="Settings"
+              collapsed={sidebarCollapsed}
+            />
+          </ul>
+        </nav>
+        
+        {/* User Profile */}
+        <div className={combineStyles(
+          "mt-auto border-t border-[#374151] p-4",
+          sidebarCollapsed ? "text-center" : ""
+        )}>
+          {!sidebarCollapsed ? (
             <div className="flex items-center">
-              {/* Hamburger menu (mobile only) */}
-              <button 
-                onClick={() => setSidebarOpen(true)}
-                className="sm:hidden text-[#9CA3AF] hover:text-white mr-4"
-              >
-                <List size={24} />
+              <div className="bg-[#4B5563] rounded-full h-10 w-10 flex items-center justify-center">
+                <User size={20} />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-[#F9FAFB]">User</p>
+                <p className="text-xs text-[#9CA3AF]">Researcher</p>
+              </div>
+              <button className="ml-auto text-[#9CA3AF] hover:text-[#F9FAFB]">
+                <LogOut size={18} />
               </button>
-              <h1 className="text-xl font-semibold text-white">Intention-Ally</h1>
             </div>
-            
-            <div className="flex items-center space-x-3">
-              <span className="text-sm text-[#D1D5DB]">Semantic Search & Clustering</span>
-            </div>
-          </header>
-          
-          {/* Main Content */}
-          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#111827] p-6">
-            <div className="container mx-auto">
-              {children}
-            </div>
-          </main>
-          
-          {/* Footer */}
-          <footer className="bg-[#111827] border-t border-[#1F2937] py-4 px-6">
-            <div className="flex justify-between items-center">
-              <div className="text-sm text-[#9CA3AF]">
-                © 2025 Intention-Ally
+          ) : (
+            <div className="flex flex-col items-center justify-center">
+              <div className="bg-[#4B5563] rounded-full h-10 w-10 flex items-center justify-center mb-2">
+                <User size={20} />
               </div>
-              <div className="text-sm text-[#9CA3AF]">
-                Version 1.0.0
-              </div>
+              <LogOut size={18} className="text-[#9CA3AF] hover:text-[#F9FAFB] cursor-pointer" />
             </div>
-          </footer>
+          )}
         </div>
       </div>
+      
+      {/* Main Content */}
+      <div className="flex-1">
+        {/* Header */}
+        <header className="bg-[#111827] border-b border-[#374151] py-4 px-6 flex items-center justify-between">
+          <h1 className="text-xl font-medium text-white">Search Dashboard</h1>
+          
+          <div className="flex items-center">
+            {/* Notifications */}
+            <button className="p-2 text-[#D1D5DB] hover:text-white rounded-full hover:bg-[#374151] transition-colors relative">
+              <Bell size={20} />
+              <span className="absolute top-1 right-1 bg-[#EAB308] h-2 w-2 rounded-full"></span>
+            </button>
+            
+            {/* User */}
+            <button className="ml-3 p-2 text-[#D1D5DB] hover:text-white rounded-full hover:bg-[#374151] transition-colors">
+              <User size={20} />
+            </button>
+          </div>
+        </header>
+        
+        {/* Main content area */}
+        <main className="p-6">
+          {children}
+        </main>
+        
+        {/* Footer */}
+        <footer className="bg-[#111827] border-t border-[#374151] py-4 px-6 text-center">
+          <p className="text-sm text-[#9CA3AF]">
+            &copy; {new Date().getFullYear()} Intention-Ally | Semantic Search and Clustering Tool
+          </p>
+        </footer>
+      </div>
     </div>
+  );
+};
+
+/**
+ * NavigationItem component
+ * Individual navigation item for the sidebar
+ */
+const NavigationItem = ({ href, icon, label, active = false, collapsed = false }) => {
+  return (
+    <li className="mb-1">
+      <Link 
+        href={href}
+        className={combineStyles(
+          "flex items-center py-3 px-4 rounded-md transition-colors",
+          active 
+            ? "bg-[#EAB308] bg-opacity-10 text-[#EAB308]" 
+            : "text-[#D1D5DB] hover:bg-[#1F2937] hover:text-white",
+          collapsed ? "justify-center" : ""
+        )}
+      >
+        <span className={collapsed ? "" : "mr-3"}>{icon}</span>
+        {!collapsed && <span>{label}</span>}
+      </Link>
+    </li>
   );
 };
