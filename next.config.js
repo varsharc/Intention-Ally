@@ -47,6 +47,9 @@ const nextConfig = {
       'https://*.picard.replit.dev',
       'https://replit.com',
       'https://ce132cda-9e2d-417d-8fed-b0ec64c27ca5-00-2tx172xuax2xs.picard.replit.dev',
+      '*.picard.replit.dev', // Add wildcard for picard subdomains
+      'ce132cda-9e2d-417d-8fed-b0ec64c27ca5-00-2tx172xuax2xs.picard.replit.dev', // Specific domain
+      '.picard.replit.dev', // Root domain with subdomain wildcard
     ],
   },
   // The CORS settings are better handled in the Express server directly
