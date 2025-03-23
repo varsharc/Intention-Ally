@@ -105,22 +105,23 @@ export default function Home() {
 // Navigation Card Component
 const NavigationCard = ({ title, description, icon, href, primary = false }) => {
   return (
-    <Link href={href}>
-      <a className={`block rounded-lg p-6 transition-all hover:translate-y-[-4px] ${
+    <Link 
+      href={href}
+      className={`block rounded-lg p-6 transition-all hover:translate-y-[-4px] ${
         primary 
           ? 'bg-yellow-500 text-black hover:bg-yellow-600' 
           : 'bg-gray-800 text-white hover:bg-gray-750'
-      }`}>
-        <div className={`mb-4 ${primary ? 'text-black' : 'text-yellow-500'}`}>
-          {icon}
-        </div>
-        <h3 className={`text-lg font-medium mb-2 ${primary ? 'text-black' : 'text-white'}`}>
-          {title}
-        </h3>
-        <p className={primary ? 'text-gray-800' : 'text-gray-400'}>
-          {description}
-        </p>
-      </a>
+      }`}
+    >
+      <div className={`mb-4 ${primary ? 'text-black' : 'text-yellow-500'}`}>
+        {icon}
+      </div>
+      <h3 className={`text-lg font-medium mb-2 ${primary ? 'text-black' : 'text-white'}`}>
+        {title}
+      </h3>
+      <p className={primary ? 'text-gray-800' : 'text-gray-400'}>
+        {description}
+      </p>
     </Link>
   );
 };

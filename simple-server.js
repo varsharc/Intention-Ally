@@ -1,42 +1,38 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
-
+const cors = require('cors');
 const app = express();
+const PORT = 5000;
 
-// Add CORS headers
+// Enable CORS for all routes
+app.use(cors({ origin: '*' }));
+
+// Add basic security headers
 app.use((req, res, next) => {
-  res.header('X-Frame-Options', 'ALLOWALL');
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.header('Access-Control-Allow-Headers', '*');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  res.setHeader('X-Frame-Options', 'ALLOWALL');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', '*');
   next();
 });
 
-// Serve static files
-app.use(express.static('.'));
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
 
-// Default route
+// Serve the simple test HTML
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'simple-test.html'));
 });
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'Application is running' });
+// API health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Simple Express server is healthy' });
 });
 
-// Catch-all route
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-const PORT = 5000;
+// Start the server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on http://0.0.0.0:${PORT}`);
+  console.log(`Simple Express server listening at http://0.0.0.0:${PORT}`);
 });
