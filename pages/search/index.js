@@ -6,6 +6,7 @@ import { KnowledgeGraphPanel } from '../../components/ui-knowledge-graph';
 import { TrendVisualizationPanel } from '../../components/ui-trend-visualization';
 import SearchBar from '../../components/SearchBar';
 import SearchResults from '../../components/SearchResults';
+import FirebaseTest from '../../components/FirebaseTest';
 
 export default function SearchPage() {
   const [selectedKeyword, setSelectedKeyword] = useState(null);
@@ -25,6 +26,9 @@ export default function SearchPage() {
       <AppLayout>
         {/* Search functionality */}
         <SearchBar onSearch={handleSearch} />
+        
+        {/* Firebase Connection Test */}
+        <FirebaseTest />
         
         {/* Visualizations Grid */}
         <div className={combineStyles(styles.grid.twoColumn, "mb-8")}>

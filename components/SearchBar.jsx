@@ -57,7 +57,8 @@ const SearchBar = ({ onSearch }) => {
     
     try {
       const result = await api.addKeyword(addKeywordInput.trim());
-      if (result.success) {
+      // The API returns a message property, not a success property
+      if (result && result.message) {
         setSuccessMessage(`Added "${addKeywordInput}" to tracked keywords`);
         setAddKeywordInput('');
         fetchKeywords(); // Refresh keywords list
@@ -86,11 +87,12 @@ const SearchBar = ({ onSearch }) => {
     
     try {
       const result = await api.removeKeyword(keyword);
-      if (result.success) {
+      // The API returns a message property, not a success property
+      if (result && result.message) {
         setSuccessMessage(`Removed "${keyword}" from tracked keywords`);
         fetchKeywords(); // Refresh keywords list
       } else {
-        setError(result.message || 'Failed to remove keyword');
+        setError('Failed to remove keyword');
       }
     } catch (err) {
       console.error('Failed to remove keyword:', err);
@@ -114,7 +116,8 @@ const SearchBar = ({ onSearch }) => {
     
     try {
       const result = await api.runManualSearch();
-      if (result.success) {
+      // The API returns a message property, not a success property
+      if (result && result.message) {
         setSuccessMessage('Manual search completed successfully');
       } else {
         setError(result.message || 'Failed to run manual search');

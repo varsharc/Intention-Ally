@@ -7,7 +7,8 @@ const cors = require('cors');
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
-const PORT = 5000;
+// Ensure we're using port 5000 for Replit compatibility
+const PORT = process.env.PORT || 5000;
 
 // Prepare the Next.js app
 app.prepare().then(() => {
@@ -57,7 +58,7 @@ app.prepare().then(() => {
   
   // Proxy API requests to the FastAPI backend
   server.use('/api/backend', createProxyMiddleware({
-    target: 'http://localhost:8002',
+    target: 'http://0.0.0.0:8002',
     changeOrigin: true,
     pathRewrite: {
       '^/api/backend': '', // remove the /api/backend path

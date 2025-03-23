@@ -65,8 +65,9 @@ export const fetchKeywords = async () => {
  * @returns {Promise<Object>} Response message
  */
 export const addKeyword = async (keyword) => {
-  return await callApi(`/add-keyword/${encodeURIComponent(keyword)}`, {
+  return await callApi(`/keywords`, {
     method: 'POST',
+    body: JSON.stringify({ keyword: keyword }),
   });
 };
 
@@ -76,37 +77,98 @@ export const addKeyword = async (keyword) => {
  * @returns {Promise<Object>} Response message
  */
 export const removeKeyword = async (keyword) => {
-  return await callApi(`/remove-keyword/${encodeURIComponent(keyword)}`, {
+  return await callApi(`/keywords/${encodeURIComponent(keyword)}`, {
     method: 'DELETE',
   });
 };
 
 /**
- * Performs a search for a specific keyword
+ * Performs a search for a specific keyword and optionally saves to Firebase
  * @param {string} keyword - The keyword to search for
+ * @param {boolean} saveToFirebase - Whether to save results to Firebase
  * @returns {Promise<Object>} Search results
  */
-export const searchKeyword = async (keyword) => {
-  return await callApi(`/search/${encodeURIComponent(keyword)}`);
+export const searchKeyword = async (keyword, saveToFirebase = false) => {
+  const response = await callApi(`/search/${encodeURIComponent(keyword)}`);
+  
+  // If we need to save to Firebase and the search was successful
+  if (saveToFirebase && response.success && response.results && response.results.length > 0) {
+    try {
+      // Import dynamically to avoid circular dependencies
+      const { saveSearchResults } = await import('./firebase');
+      
+      // Save the results
+      await saveSearchResults(keyword, response.results);
+      console.log(`Saved search results for "${keyword}" to Firebase`);
+    } catch (error) {
+      console.error('Failed to save to Firebase:', error);
+      // Don't throw the error - we still want to return search results even if Firebase storage fails
+    }
+  }
+  
+  return response;
 };
 
 /**
  * Fetches recent search results for all keywords
  * @param {number} days - Number of days to look back (default: 7)
+ * @param {boolean} useFirebase - Whether to fetch from Firebase instead of local storage
  * @returns {Promise<Array>} Search results data
  */
-export const fetchResults = async (days = 7) => {
+export const fetchResults = async (days = 7, useFirebase = false) => {
+  if (useFirebase) {
+    try {
+      // Import dynamically to avoid circular dependencies
+      const { fetchSearchResults } = await import('./firebase');
+      
+      // Get results from Firebase
+      return await fetchSearchResults(days);
+    } catch (error) {
+      console.error('Failed to fetch from Firebase:', error);
+      // Fallback to local storage if Firebase fails
+      console.log('Falling back to local storage');
+    }
+  }
+  
+  // Use local storage (default)
   return await callApi(`/results?days=${days}`);
 };
 
 /**
  * Manually triggers a search for all active keywords
+ * @param {boolean} saveToFirebase - Whether to save results to Firebase
  * @returns {Promise<Object>} Response with search results summary
  */
-export const runManualSearch = async () => {
-  return await callApi('/run-search', {
+export const runManualSearch = async (saveToFirebase = false) => {
+  const response = await callApi('/run-search', {
     method: 'POST',
   });
+  
+  // If we need to save to Firebase and the search was successful
+  if (saveToFirebase && response.results && Array.isArray(response.results)) {
+    try {
+      // Import dynamically to avoid circular dependencies
+      const { saveSearchResults } = await import('./firebase');
+      
+      // For each keyword with successful results, save to Firebase
+      for (const result of response.results) {
+        if (result.count && !result.error) {
+          // We need to get the actual search results for this keyword
+          const searchResponse = await searchKeyword(result.keyword);
+          
+          if (searchResponse.success && searchResponse.results) {
+            await saveSearchResults(result.keyword, searchResponse.results);
+            console.log(`Saved batch search results for "${result.keyword}" to Firebase`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to save batch results to Firebase:', error);
+      // Don't throw the error - we still want to return search results even if Firebase storage fails
+    }
+  }
+  
+  return response;
 };
 
 // Export all API functions as the default export
