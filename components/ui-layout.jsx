@@ -1,144 +1,136 @@
-import React, { useState } from 'react';
-import { Search, Menu, X } from 'lucide-react';
-import { AdvancedFiltersSidebar } from './ui-advanced-filters';
-import { KnowledgeGraphPanel } from './ui-knowledge-graph';
-import { TrendVisualizationPanel } from './ui-trend-visualization';
-import { SearchResultsList } from './ui-results-list';
+import React from 'react';
+import Link from 'next/link';
+import { Home, Search, BarChart2, Settings, User, List, X } from 'lucide-react';
 import { styles, combineStyles } from '../styles/app-styles';
 
 /**
- * Main application layout component
+ * Sidebar component with navigation links
  */
-export const AppLayout = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+export const Sidebar = ({ isOpen, onClose }) => {
   return (
-    <div className={styles.layout.page}>
-      {/* Header */}
-      <header className="bg-[#000000] border-b border-[#374151]">
-        <div className={styles.layout.container}>
-          <div className={styles.utils.flexBetween + " py-4"}>
-            <div className={styles.utils.flexStart + " space-x-2"}>
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-8 w-8 text-[#EAB308]" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <circle cx="12" cy="12" r="10" strokeWidth="2" />
-                <line x1="12" y1="8" x2="12" y2="12" strokeWidth="2" />
-                <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="2" />
-              </svg>
-              <h1 className="text-2xl font-bold text-[#EAB308]">Intention-Ally</h1>
-            </div>
-            <div className={styles.utils.flexCenter + " space-x-4"}>
-              <button className="text-[#9CA3AF] hover:text-[#F9FAFB] transition-colors">
-                <Search size={20} />
-              </button>
-              <button 
-                onClick={() => setSidebarOpen(true)}
-                className="text-[#9CA3AF] hover:text-[#F9FAFB] transition-colors"
-              >
-                <Menu size={20} />
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className={combineStyles(styles.layout.container, styles.layout.section)}>
-        {children}
-      </main>
+    <div 
+      className={combineStyles(
+        "fixed inset-y-0 left-0 z-30 w-64 bg-[#111827] shadow-xl transform transition-transform duration-300 ease-in-out",
+        isOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0",
+        "sm:static sm:w-20 sm:translate-x-0 flex flex-col"
+      )}
+    >
+      {/* Close button (mobile only) */}
+      <div className="sm:hidden p-4 flex justify-end">
+        <button onClick={onClose} className="text-[#9CA3AF] hover:text-white">
+          <X size={20} />
+        </button>
+      </div>
       
-      {/* Advanced Filters Sidebar */}
-      <AdvancedFiltersSidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-      />
-
-      {/* Footer */}
-      <footer className="bg-[#000000] text-[#9CA3AF] py-6 border-t border-[#374151]">
-        <div className={combineStyles(styles.layout.container, styles.utils.flexCenter)}>
-          <p className={styles.text.muted}>Intention-Ally © 2025 | Semantic Search & Clustering Tool</p>
+      {/* Logo */}
+      <div className="p-4 flex justify-center">
+        <Link href="/" className="text-white">
+          <div className="bg-[#EAB308] h-10 w-10 rounded-md flex items-center justify-center text-black font-bold text-xl">
+            IA
+          </div>
+        </Link>
+      </div>
+      
+      {/* Nav links */}
+      <nav className="flex-1 px-2 py-4 space-y-2">
+        <NavLink href="/" icon={<Home size={20} />} label="Home" />
+        <NavLink href="/search" icon={<Search size={20} />} label="Search" />
+        <NavLink href="/analytics" icon={<BarChart2 size={20} />} label="Analytics" />
+        <NavLink href="/admin" icon={<Settings size={20} />} label="Settings" />
+      </nav>
+      
+      {/* User */}
+      <div className="p-4 border-t border-[#374151]">
+        <div className="flex items-center sm:justify-center">
+          <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#374151] text-white">
+            <User size={14} />
+          </div>
+          <span className="ml-2 text-[#D1D5DB] sm:hidden">User</span>
         </div>
-      </footer>
+      </div>
     </div>
   );
 };
 
 /**
- * Search page layout with all components
+ * Individual nav link component
  */
-export const SearchPageLayout = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeKeywords, setActiveKeywords] = useState([
-    'carbon insetting', 
-    'sustainable logistics', 
-    'scope 3 emissions'
-  ]);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim() && !activeKeywords.includes(searchTerm.trim())) {
-      setActiveKeywords([...activeKeywords, searchTerm.trim()]);
-      setSearchTerm('');
-    }
-  };
-
-  const removeKeyword = (keyword) => {
-    setActiveKeywords(activeKeywords.filter(k => k !== keyword));
-  };
-
+const NavLink = ({ href, icon, label }) => {
+  // Check if current page matches the link
+  const isActive = typeof window !== 'undefined' && window.location.pathname === href;
+  
   return (
-    <AppLayout>
-      {/* Search Bar */}
-      <div className="mb-6">
-        <h2 className={combineStyles(styles.text.heading1, "mb-4")}>Semantic Search & Clustering</h2>
-        <form onSubmit={handleSearch} className={styles.utils.flexRow + " mb-4"}>
-          <input
-            type="text"
-            placeholder="Enter keyword to track..."
-            className="flex-1 bg-[#374151] border border-[#4B5563] rounded-l-md p-3 text-[#F9FAFB] focus:outline-none focus:ring-1 focus:ring-[#EAB308] focus:border-[#EAB308]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button 
-            type="submit"
-            className={styles.button.primary + " rounded-l-none"}
-          >
-            Search
-          </button>
-        </form>
+    <Link 
+      href={href}
+      className={combineStyles(
+        "flex items-center py-2 px-4 rounded-md transition-colors",
+        "sm:flex-col sm:justify-center sm:px-0 sm:py-3",
+        isActive ? 
+          "bg-[#1F2937] text-[#EAB308]" : 
+          "text-[#9CA3AF] hover:bg-[#1F2937] hover:text-[#F9FAFB]"
+      )}
+    >
+      <div className="sm:mb-1">{icon}</div>
+      <span className="ml-3 sm:ml-0 sm:text-xs">{label}</span>
+    </Link>
+  );
+};
+
+/**
+ * Main layout component with header, sidebar, and content area
+ */
+export const AppLayout = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <div className="flex min-h-screen">
+        {/* Sidebar */}
+        <Sidebar 
+          isOpen={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)} 
+        />
         
-        {/* Keyword Tags */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {activeKeywords.map((keyword, index) => (
-            <div 
-              key={index} 
-              className={combineStyles(styles.badge.yellow, styles.utils.flexCenter)}
-            >
-              {keyword}
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Header */}
+          <header className="bg-[#111827] shadow-md py-4 px-6 flex items-center justify-between">
+            <div className="flex items-center">
+              {/* Hamburger menu (mobile only) */}
               <button 
-                onClick={() => removeKeyword(keyword)}
-                className="ml-2 focus:outline-none"
+                onClick={() => setSidebarOpen(true)}
+                className="sm:hidden text-[#9CA3AF] hover:text-white mr-4"
               >
-                <X size={14} />
+                <List size={24} />
               </button>
+              <h1 className="text-xl font-semibold text-white">Intention-Ally</h1>
             </div>
-          ))}
+            
+            <div className="flex items-center space-x-3">
+              <span className="text-sm text-[#D1D5DB]">Semantic Search & Clustering</span>
+            </div>
+          </header>
+          
+          {/* Main Content */}
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#111827] p-6">
+            <div className="container mx-auto">
+              {children}
+            </div>
+          </main>
+          
+          {/* Footer */}
+          <footer className="bg-[#111827] border-t border-[#1F2937] py-4 px-6">
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-[#9CA3AF]">
+                © 2025 Intention-Ally
+              </div>
+              <div className="text-sm text-[#9CA3AF]">
+                Version 1.0.0
+              </div>
+            </div>
+          </footer>
         </div>
       </div>
-      
-      {/* Visualizations Grid */}
-      <div className={combineStyles(styles.grid.twoColumn, "mb-8")}>
-        <KnowledgeGraphPanel />
-        <TrendVisualizationPanel />
-      </div>
-      
-      {/* Search Results */}
-      <SearchResultsList />
-    </AppLayout>
+    </div>
   );
 };

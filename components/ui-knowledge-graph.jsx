@@ -1,97 +1,140 @@
-import React from 'react';
-import { Filter, Maximize2, Layers, Grid, List } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { NetworkIcon, ZoomIn, ZoomOut, Info } from 'lucide-react';
 import { styles, combineStyles } from '../styles/app-styles';
 
 /**
- * Knowledge Graph Panel component
- * Displays a visual representation of relationships between search topics
+ * KnowledgeGraphPanel component
+ * Displays a knowledge graph visualization of search results
  */
 export const KnowledgeGraphPanel = () => {
-  return (
-    <div className={combineStyles(styles.card.base, "flex flex-col")}>
-      <div className={combineStyles(styles.card.header, styles.utils.flexBetween)}>
-        <h2 className={styles.text.heading3}>Knowledge Graph: EU Textile Regulations</h2>
+  const graphRef = useRef(null);
+  
+  // Simulate graph data
+  const sampleData = {
+    nodes: [
+      { id: 'carbon-insetting', label: 'Carbon Insetting', group: 'primary' },
+      { id: 'sustainable-logistics', label: 'Sustainable Logistics', group: 'secondary' },
+      { id: 'scope3', label: 'Scope 3 Emissions', group: 'secondary' },
+      { id: 'supply-chain', label: 'Supply Chain', group: 'tertiary' },
+      { id: 'climate-targets', label: 'Climate Targets', group: 'tertiary' },
+      { id: 'offsetting', label: 'Carbon Offsetting', group: 'related' },
+      { id: 'esg', label: 'ESG Metrics', group: 'tertiary' },
+    ],
+    links: [
+      { source: 'carbon-insetting', target: 'sustainable-logistics', strength: 0.8 },
+      { source: 'carbon-insetting', target: 'scope3', strength: 0.9 },
+      { source: 'sustainable-logistics', target: 'supply-chain', strength: 0.7 },
+      { source: 'scope3', target: 'climate-targets', strength: 0.6 },
+      { source: 'carbon-insetting', target: 'offsetting', strength: 0.5 },
+      { source: 'sustainable-logistics', target: 'esg', strength: 0.4 },
+    ]
+  };
+  
+  useEffect(() => {
+    // This would typically load D3 and create a proper knowledge graph
+    // For now, let's just create a placeholder visualization
+    if (graphRef.current) {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("width", "100%");
+      svg.setAttribute("height", "100%");
+      svg.style.minHeight = "200px";
+      
+      // Clear existing content
+      while (graphRef.current.firstChild) {
+        graphRef.current.removeChild(graphRef.current.firstChild);
+      }
+      
+      // Placeholder circles and lines to represent a graph
+      sampleData.links.forEach((link, index) => {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        const sourceNode = sampleData.nodes.find(n => n.id === link.source);
+        const targetNode = sampleData.nodes.find(n => n.id === link.target);
         
-        <div className={combineStyles(styles.utils.flexCenter, "space-x-2")}>
-          <div className="p-2 bg-[#374151] rounded flex items-center space-x-2">
-            <Filter size={16} />
-            <select className="bg-transparent text-sm focus:outline-none">
-              <option>Last 30 days</option>
-              <option>Last 7 days</option>
-              <option>Last 24 hours</option>
-            </select>
-          </div>
-          <button className="p-2 bg-[#374151] rounded hover:bg-[#4B5563] transition-colors">
-            <Maximize2 size={16} />
+        const sourceIndex = sampleData.nodes.indexOf(sourceNode);
+        const targetIndex = sampleData.nodes.indexOf(targetNode);
+        
+        // Position based on index
+        const centerX = 150;
+        const centerY = 100;
+        const radius = 80;
+        const sourceAngle = (sourceIndex / sampleData.nodes.length) * Math.PI * 2;
+        const targetAngle = (targetIndex / sampleData.nodes.length) * Math.PI * 2;
+        
+        const x1 = centerX + radius * Math.cos(sourceAngle);
+        const y1 = centerY + radius * Math.sin(sourceAngle);
+        const x2 = centerX + radius * Math.cos(targetAngle);
+        const y2 = centerY + radius * Math.sin(targetAngle);
+        
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", "#4B5563");
+        line.setAttribute("stroke-width", link.strength * 2);
+        line.setAttribute("opacity", "0.6");
+        svg.appendChild(line);
+      });
+      
+      sampleData.nodes.forEach((node, index) => {
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        
+        const centerX = 150;
+        const centerY = 100;
+        const radius = 80;
+        const angle = (index / sampleData.nodes.length) * Math.PI * 2;
+        
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        
+        // Circle for node
+        circle.setAttribute("cx", x);
+        circle.setAttribute("cy", y);
+        circle.setAttribute("r", node.group === 'primary' ? 8 : node.group === 'secondary' ? 6 : 4);
+        circle.setAttribute("fill", node.group === 'primary' ? "#EAB308" : 
+                             node.group === 'secondary' ? "#9CA3AF" : 
+                             node.group === 'tertiary' ? "#4B5563" : "#6B7280");
+        
+        // Text label
+        text.setAttribute("x", x);
+        text.setAttribute("y", y + 15);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("fill", "#D1D5DB");
+        text.setAttribute("font-size", "8px");
+        text.textContent = node.label;
+        
+        svg.appendChild(circle);
+        svg.appendChild(text);
+      });
+      
+      graphRef.current.appendChild(svg);
+    }
+  }, []);
+  
+  return (
+    <div className={styles.card.base}>
+      <div className={combineStyles(styles.card.header, styles.utils.flexBetween)}>
+        <h2 className={styles.text.heading3}>
+          <NetworkIcon size={18} className="inline-block mr-2" />
+          Knowledge Graph
+        </h2>
+        
+        <div className="flex space-x-2">
+          <button className={styles.button.icon} title="Zoom In">
+            <ZoomIn size={16} />
+          </button>
+          <button className={styles.button.icon} title="Zoom Out">
+            <ZoomOut size={16} />
+          </button>
+          <button className={styles.button.icon} title="Information">
+            <Info size={16} />
           </button>
         </div>
       </div>
       
-      <div className={combineStyles(styles.card.body, "flex-1")}>
-        <div className={styles.utils.flexStart + " space-x-2 mb-4"}>
-          <button className="px-3 py-1 bg-[#EAB308] text-black rounded-md text-sm flex items-center">
-            <Layers size={14} className="mr-1" />
-            <span>Clusters</span>
-          </button>
-          <button className="px-3 py-1 bg-[#374151] hover:bg-[#4B5563] rounded-md text-sm flex items-center transition-colors">
-            <Grid size={14} className="mr-1" />
-            <span>Grid</span>
-          </button>
-          <button className="px-3 py-1 bg-[#374151] hover:bg-[#4B5563] rounded-md text-sm flex items-center transition-colors">
-            <List size={14} className="mr-1" />
-            <span>Tree</span>
-          </button>
-        </div>
-
-        {/* Mock Knowledge Graph Visualization */}
-        <div className="relative h-64 bg-[#111111] rounded-lg p-4 flex items-center justify-center">
-          {/* This is a simplified visual representation of a knowledge graph */}
-          <svg width="100%" height="100%" viewBox="0 0 500 200">
-            {/* Central Node */}
-            <circle cx="250" cy="100" r="20" fill="#EAB308" />
-            <text x="250" y="105" textAnchor="middle" fill="#000" fontSize="10">EU Textile</text>
-            
-            {/* Connection Lines */}
-            <line x1="250" y1="100" x2="150" y2="50" stroke="#EAB308" strokeWidth="2" />
-            <line x1="250" y1="100" x2="150" y2="150" stroke="#EAB308" strokeWidth="2" />
-            <line x1="250" y1="100" x2="350" y2="50" stroke="#EAB308" strokeWidth="2" />
-            <line x1="250" y1="100" x2="350" y2="150" stroke="#EAB308" strokeWidth="2" />
-            <line x1="150" y1="50" x2="70" y2="50" stroke="#6B7280" strokeWidth="1" />
-            <line x1="150" y1="150" x2="70" y2="150" stroke="#6B7280" strokeWidth="1" />
-            <line x1="350" y1="50" x2="430" y2="50" stroke="#6B7280" strokeWidth="1" />
-            <line x1="350" y1="150" x2="430" y2="150" stroke="#6B7280" strokeWidth="1" />
-            
-            {/* Secondary Nodes */}
-            <circle cx="150" cy="50" r="15" fill="#374151" />
-            <text x="150" y="54" textAnchor="middle" fill="#F9FAFB" fontSize="8">Sustainability</text>
-            
-            <circle cx="150" cy="150" r="15" fill="#374151" />
-            <text x="150" y="154" textAnchor="middle" fill="#F9FAFB" fontSize="8">Transparency</text>
-            
-            <circle cx="350" cy="50" r="15" fill="#374151" />
-            <text x="350" y="54" textAnchor="middle" fill="#F9FAFB" fontSize="8">Chemicals</text>
-            
-            <circle cx="350" cy="150" r="15" fill="#374151" />
-            <text x="350" y="154" textAnchor="middle" fill="#F9FAFB" fontSize="8">Compliance</text>
-            
-            {/* Tertiary Nodes */}
-            <circle cx="70" cy="50" r="10" fill="#1F2937" />
-            <text x="70" y="54" textAnchor="middle" fill="#F9FAFB" fontSize="6">Recycling</text>
-            
-            <circle cx="70" cy="150" r="10" fill="#1F2937" />
-            <text x="70" y="154" textAnchor="middle" fill="#F9FAFB" fontSize="6">Supply Chain</text>
-            
-            <circle cx="430" cy="50" r="10" fill="#1F2937" />
-            <text x="430" y="54" textAnchor="middle" fill="#F9FAFB" fontSize="6">REACH</text>
-            
-            <circle cx="430" cy="150" r="10" fill="#1F2937" />
-            <text x="430" y="154" textAnchor="middle" fill="#F9FAFB" fontSize="6">Standards</text>
-          </svg>
-        </div>
-
-        <div className={combineStyles(styles.utils.flexBetween, "mt-3 text-xs text-[#9CA3AF]")}>
-          <span>16 related concepts identified</span>
-          <span>Last updated: 2 hours ago</span>
+      <div className={combineStyles(styles.card.body, "h-64")}>
+        <div ref={graphRef} className="w-full h-full">
+          {/* Graph will be rendered here */}
         </div>
       </div>
     </div>

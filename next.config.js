@@ -33,8 +33,10 @@ const nextConfig = {
     ];
   },
   // Configuration for Replit and optimization
-  // Remove experimental options to eliminate unwanted warnings
-  experimental: {},
+  // Add allowedDevOrigins to allow cross-origin in development
+  experimental: {
+    allowedDevOrigins: ['*', '.replit.dev', '.repl.co'],
+  },
   // The CORS settings are better handled in the Express server directly
   // Optional: Configure webpack for better watching
   webpack: (config, { dev, isServer }) => {

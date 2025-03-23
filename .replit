@@ -25,7 +25,7 @@ args = "FastAPI Backend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Test Server"
+args = "Next.js App"
 
 [[workflows.workflow]]
 name = "FastAPI Backend"
@@ -52,7 +52,7 @@ task = "shell.exec"
 args = "npm run dev"
 
 [[workflows.workflow]]
-name = "Test Server"
+name = "Next.js App"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -63,7 +63,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node test-server.js"
+args = "node next-app-server.js"
 waitForPort = 5000
 
 [[ports]]
