@@ -10,7 +10,7 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 // Ensure we're using port 5000 for Replit compatibility
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // Prepare the Next.js app
 app.prepare().then(() => {
