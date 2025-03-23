@@ -1,0 +1,49 @@
+I need you to implement the Intention-Ally UI components in Next.js following these specific guidelines:
+
+1. STOP modifying the server configuration repeatedly. The connectivity issue with the web application feedback tool is a separate concern that we'll address later. Focus only on implementing the UI components correctly.
+
+2. Create the component files exactly matching the structure shown in the index.jsx file:
+   - ui-layout
+   - ui-search-config
+   - ui-knowledge-graph
+   - ui-results-list
+   - ui-admin-components
+   - ui-advanced-filters
+
+3. When implementing each component:
+   - Copy the JSX structure exactly as shown in the provided files (ui-layout.jsx, ui-knowledge-graph.jsx, etc.)
+   - Preserve the dark theme color palette: Dark gray (#1C1C1C), Black (#000000), Accent Yellow (#FFCE00), Light gray (#E5E5E5), Medium gray (#808080)
+   - Maintain the CSS class names and styling from the original files
+   - Do not add extra functionality or modify the component structure
+
+4. Create the main page components as shown in index.jsx:
+   - SearchResultsPage
+   - AdminDashboardPage
+   - SearchConfigPage
+   - AdvancedSettingsPage
+
+5. Set up Next.js routing for these pages at:
+   - /search
+   - /admin
+   - /config
+   - /advanced
+
+6. Once the components are implemented, show me the resulting component tree and page structure without making further changes.
+
+7. Throughout the implementation process, maintain a comprehensive log of ALL errors encountered, including:
+   - Network errors and connectivity issues
+   - Backend API errors
+   - Next.js build errors
+   - Component rendering errors
+   - Any other technical issues
+
+8. After completing the implementation, publish a detailed error log showing ALL errors and issues encountered during development. This should include error messages, timestamps, and the context in which they occurred. This error log will be critical for our next phase of troubleshooting.
+
+Do NOT:
+- Modify the Next.js configuration
+- Alter the server setup
+- Change the port configuration
+- Focus on fixing the web application feedback tool issue
+- Refactor the component structure or styling
+
+Just implement the UI components exactly as specified in the files provided, track all errors meticulously, and present both the implementation and the comprehensive error log when complete.

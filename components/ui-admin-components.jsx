@@ -1,241 +1,418 @@
 // Admin Dashboard Components
 import React from 'react';
-import { Clock, Database, User, BarChart } from 'lucide-react';
+import { 
+  Database, 
+  Server, 
+  Search, 
+  HardDrive, 
+  Calendar, 
+  User,
+  Zap
+} from 'lucide-react';
 
-// Admin Overview Cards
+// Admin Overview Cards Component
 export const AdminOverviewCards = () => {
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="bg-gray-800 rounded-lg p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-sm font-medium text-gray-400">Total API Calls</h3>
-          <Database size={16} className="text-yellow-500" />
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-gray-400 text-sm">Active Search Topics</p>
+            <h3 className="text-2xl font-bold text-white mt-1">12</h3>
+          </div>
+          <div className="p-2 bg-indigo-500 bg-opacity-20 rounded">
+            <Search size={20} className="text-indigo-400" />
+          </div>
         </div>
-        <p className="text-2xl font-bold text-white">1,243</p>
-        <p className="text-xs text-gray-500">75% of monthly limit</p>
-        <div className="w-full h-1 bg-gray-700 mt-2">
-          <div className="h-1 bg-yellow-500 w-3/4"></div>
+        <div className="mt-2 flex items-center text-sm">
+          <span className="text-green-500">+3</span>
+          <span className="text-gray-400 ml-1">since last month</span>
         </div>
       </div>
       
       <div className="bg-gray-800 rounded-lg p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-sm font-medium text-gray-400">Active Users</h3>
-          <User size={16} className="text-yellow-500" />
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-gray-400 text-sm">Query Volume (30 days)</p>
+            <h3 className="text-2xl font-bold text-white mt-1">1,482</h3>
+          </div>
+          <div className="p-2 bg-yellow-500 bg-opacity-20 rounded">
+            <Database size={20} className="text-yellow-500" />
+          </div>
         </div>
-        <p className="text-2xl font-bold text-white">7</p>
-        <p className="text-xs text-green-500">+2 from last month</p>
-        <div className="w-full h-1 bg-gray-700 mt-2">
-          <div className="h-1 bg-green-500 w-1/4"></div>
-        </div>
-      </div>
-      
-      <div className="bg-gray-800 rounded-lg p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-sm font-medium text-gray-400">Database Storage</h3>
-          <Database size={16} className="text-yellow-500" />
-        </div>
-        <p className="text-2xl font-bold text-white">128 MB</p>
-        <p className="text-xs text-gray-500">25% of free tier limit</p>
-        <div className="w-full h-1 bg-gray-700 mt-2">
-          <div className="h-1 bg-blue-500 w-1/4"></div>
+        <div className="mt-2 flex items-center text-sm">
+          <span className="text-green-500">+18%</span>
+          <span className="text-gray-400 ml-1">vs previous period</span>
         </div>
       </div>
       
       <div className="bg-gray-800 rounded-lg p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-sm font-medium text-gray-400">Claude API Costs</h3>
-          <BarChart size={16} className="text-yellow-500" />
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-gray-400 text-sm">Storage Used</p>
+            <h3 className="text-2xl font-bold text-white mt-1">38.4 GB</h3>
+          </div>
+          <div className="p-2 bg-cyan-500 bg-opacity-20 rounded">
+            <HardDrive size={20} className="text-cyan-400" />
+          </div>
         </div>
-        <p className="text-2xl font-bold text-white">$8.75</p>
-        <p className="text-xs text-gray-500">This month</p>
-        <div className="w-full h-1 bg-gray-700 mt-2">
-          <div className="h-1 bg-purple-500 w-1/3"></div>
+        <div className="mt-2 flex items-center text-sm">
+          <span className="text-yellow-500">76%</span>
+          <span className="text-gray-400 ml-1">of allocated quota</span>
         </div>
       </div>
     </div>
   );
 };
 
-// Resource Usage Chart
+// Resource Usage Chart Component
 export const ResourceUsageChart = () => {
   return (
-    <div className="bg-gray-800 rounded-lg p-4 col-span-2 flex flex-col">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-white">Resource Usage Over Time</h3>
-        <div className="flex items-center space-x-2">
-          <button className="px-2 py-1 text-xs bg-gray-700 rounded text-white">API Calls</button>
-          <button className="px-2 py-1 text-xs bg-gray-900 rounded text-gray-400">Storage</button>
-          <button className="px-2 py-1 text-xs bg-gray-900 rounded text-gray-400">Costs</button>
+    <div className="bg-gray-800 rounded-lg p-4">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-bold text-white">Resource Usage</h3>
+        
+        <div className="flex space-x-2">
+          <button className="bg-gray-700 px-3 py-1 rounded text-sm">Day</button>
+          <button className="bg-yellow-500 text-black px-3 py-1 rounded text-sm">Week</button>
+          <button className="bg-gray-700 px-3 py-1 rounded text-sm">Month</button>
         </div>
       </div>
       
-      <div className="flex-1 bg-gray-900 rounded p-2 relative h-64">
-        <svg width="100%" height="100%" viewBox="0 0 600 200">
-          {/* Grid */}
-          <line x1="0" y1="0" x2="0" y2="200" stroke="#333" strokeWidth="1" />
-          <line x1="0" y1="0" x2="600" y2="0" stroke="#333" strokeWidth="1" />
-          <line x1="0" y1="50" x2="600" y2="50" stroke="#333" strokeWidth="1" strokeDasharray="2,2" />
-          <line x1="0" y1="100" x2="600" y2="100" stroke="#333" strokeWidth="1" strokeDasharray="2,2" />
-          <line x1="0" y1="150" x2="600" y2="150" stroke="#333" strokeWidth="1" strokeDasharray="2,2" />
-          <line x1="0" y1="200" x2="600" y2="200" stroke="#333" strokeWidth="1" />
-          
-          {/* X axis labels */}
-          <text x="0" y="220" fill="#666" fontSize="12">Mar 1</text>
-          <text x="150" y="220" fill="#666" fontSize="12">Mar 8</text>
-          <text x="300" y="220" fill="#666" fontSize="12">Mar 15</text>
-          <text x="450" y="220" fill="#666" fontSize="12">Mar 22</text>
-          <text x="590" y="220" fill="#666" fontSize="12">Today</text>
-          
-          {/* Y axis labels */}
-          <text x="-25" y="200" fill="#666" fontSize="12">0</text>
-          <text x="-25" y="150" fill="#666" fontSize="12">25</text>
-          <text x="-25" y="100" fill="#666" fontSize="12">50</text>
-          <text x="-25" y="50" fill="#666" fontSize="12">75</text>
-          <text x="-30" y="10" fill="#666" fontSize="12">100</text>
-          
-          {/* Data line */}
-          <path d="M0,180 L30,170 L60,175 L90,160 L120,140 L150,145 L180,130 L210,125 L240,100 L270,110 L300,90 L330,95 L360,80 L390,85 L420,75 L450,65 L480,70 L510,50 L540,55 L570,40 L600,30" 
-                stroke="#FFD700" strokeWidth="2" fill="none" />
-                
-          {/* Limit threshold */}
-          <line x1="0" y1="20" x2="600" y2="20" stroke="#E74C3C" strokeWidth="1" strokeDasharray="5,3" />
-          <text x="550" y="15" fill="#E74C3C" fontSize="10">Limit (100%)</text>
-          
-          {/* Warning threshold */}
-          <line x1="0" y1="40" x2="600" y2="40" stroke="#F39C12" strokeWidth="1" strokeDasharray="5,3" />
-          <text x="550" y="35" fill="#F39C12" fontSize="10">Warning (90%)</text>
-        </svg>
+      {/* Chart Placeholder */}
+      <div className="h-64 bg-gray-900 rounded-lg relative overflow-hidden">
+        {/* Y-axis labels */}
+        <div className="absolute top-0 left-4 bottom-0 flex flex-col justify-between py-4 text-xs text-gray-400">
+          <span>100%</span>
+          <span>75%</span>
+          <span>50%</span>
+          <span>25%</span>
+          <span>0%</span>
+        </div>
+        
+        {/* Sample bar chart - would be replaced with actual chart library */}
+        <div className="absolute inset-0 flex items-end justify-around px-12 pb-8">
+          {/* API Calls */}
+          <div className="flex flex-col items-center">
+            <div className="w-10 bg-indigo-500 rounded-t" style={{ height: '70%' }}></div>
+            <span className="mt-2 text-xs text-gray-400">Mon</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-10 bg-indigo-500 rounded-t" style={{ height: '55%' }}></div>
+            <span className="mt-2 text-xs text-gray-400">Tue</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-10 bg-indigo-500 rounded-t" style={{ height: '85%' }}></div>
+            <span className="mt-2 text-xs text-gray-400">Wed</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-10 bg-indigo-500 rounded-t" style={{ height: '65%' }}></div>
+            <span className="mt-2 text-xs text-gray-400">Thu</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-10 bg-indigo-500 rounded-t" style={{ height: '75%' }}></div>
+            <span className="mt-2 text-xs text-gray-400">Fri</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-10 bg-indigo-500 rounded-t" style={{ height: '40%' }}></div>
+            <span className="mt-2 text-xs text-gray-400">Sat</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-10 bg-indigo-500 rounded-t" style={{ height: '30%' }}></div>
+            <span className="mt-2 text-xs text-gray-400">Sun</span>
+          </div>
+        </div>
       </div>
       
-      <div className="flex justify-between text-sm text-gray-400 mt-2">
-        <span>Daily average: 42 API calls</span>
-        <span>Projected monthly: 1,260</span>
-        <span>Monthly limit: 2,000</span>
+      <div className="mt-4 flex justify-center space-x-8">
+        <div className="flex items-center">
+          <div className="w-3 h-3 bg-indigo-500 rounded-full mr-2"></div>
+          <span className="text-sm text-gray-300">API Calls</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+          <span className="text-sm text-gray-300">Storage</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 bg-cyan-500 rounded-full mr-2"></div>
+          <span className="text-sm text-gray-300">Computation</span>
+        </div>
       </div>
     </div>
   );
 };
 
-// Usage Limits Panel
+// Usage Limits Panel Component
 export const UsageLimitsPanel = () => {
   return (
-    <div className="bg-gray-800 rounded-lg p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-white">Usage Limits</h3>
-        <button className="text-yellow-500 text-sm hover:text-yellow-400">Configure</button>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="bg-gray-800 rounded-lg p-4">
+        <h3 className="text-lg font-bold text-white mb-4">Service Usage Limits</h3>
+        
+        <div className="space-y-4">
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <div className="flex items-center">
+                <Server size={14} className="text-yellow-500 mr-2" />
+                <span className="text-sm text-gray-300">API Calls</span>
+              </div>
+              <span className="text-xs text-yellow-500">7,482 / 10,000</span>
+            </div>
+            <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full bg-yellow-500 rounded-full" style={{ width: '75%' }}></div>
+            </div>
+          </div>
+          
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <div className="flex items-center">
+                <HardDrive size={14} className="text-cyan-500 mr-2" />
+                <span className="text-sm text-gray-300">Storage</span>
+              </div>
+              <span className="text-xs text-cyan-500">38.4 GB / 50 GB</span>
+            </div>
+            <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full bg-cyan-500 rounded-full" style={{ width: '76%' }}></div>
+            </div>
+          </div>
+          
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <div className="flex items-center">
+                <Calendar size={14} className="text-green-500 mr-2" />
+                <span className="text-sm text-gray-300">Data Retention</span>
+              </div>
+              <span className="text-xs text-green-500">90 days / 90 days</span>
+            </div>
+            <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full bg-green-500 rounded-full" style={{ width: '100%' }}></div>
+            </div>
+          </div>
+          
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <div className="flex items-center">
+                <Zap size={14} className="text-indigo-500 mr-2" />
+                <span className="text-sm text-gray-300">Computation</span>
+              </div>
+              <span className="text-xs text-indigo-500">432 min / 600 min</span>
+            </div>
+            <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full bg-indigo-500 rounded-full" style={{ width: '72%' }}></div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mt-6">
+          <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-medium px-4 py-2 rounded-md w-full">
+            Upgrade Plan
+          </button>
+        </div>
       </div>
       
-      <div className="grid grid-cols-3 gap-6">
-        <div>
-          <h4 className="text-sm font-medium text-gray-400 mb-2">Global API Limit</h4>
-          <div className="flex items-center space-x-3">
-            <input 
-              type="range" 
-              min="0" 
-              max="5000" 
-              defaultValue="2000" 
-              className="flex-1 h-2 rounded-lg appearance-none bg-gray-700"
-            />
-            <div className="w-16 text-right text-white">2,000</div>
+      <div className="bg-gray-800 rounded-lg p-4">
+        <h3 className="text-lg font-bold text-white mb-4">Current Plan Details</h3>
+        
+        <div className="bg-gray-750 rounded-lg p-3 mb-4">
+          <div className="flex justify-between items-center">
+            <span className="text-white font-medium">Business Plan</span>
+            <span className="bg-yellow-500 text-black text-xs font-medium px-2 py-0.5 rounded">ACTIVE</span>
           </div>
-          <div className="text-xs text-gray-500 mt-1">Monthly maximum across all users</div>
+          <div className="text-2xl font-bold text-white mt-1 mb-2">$49.99<span className="text-sm text-gray-400 font-normal"> / month</span></div>
+          <div className="text-sm text-gray-300">Renews on April 23, 2025</div>
         </div>
         
-        <div>
-          <h4 className="text-sm font-medium text-gray-400 mb-2">Per User Limit</h4>
-          <div className="flex items-center space-x-3">
-            <input 
-              type="range" 
-              min="0" 
-              max="1000" 
-              defaultValue="500" 
-              className="flex-1 h-2 rounded-lg appearance-none bg-gray-700"
-            />
-            <div className="w-16 text-right text-white">500</div>
+        <div className="space-y-2">
+          <div className="flex items-center">
+            <div className="w-5 h-5 rounded-full bg-gray-700 flex items-center justify-center mr-3">
+              <span className="text-yellow-500 text-xs">✓</span>
+            </div>
+            <span className="text-sm text-gray-300">10,000 monthly API calls</span>
           </div>
-          <div className="text-xs text-gray-500 mt-1">Monthly maximum per user</div>
+          <div className="flex items-center">
+            <div className="w-5 h-5 rounded-full bg-gray-700 flex items-center justify-center mr-3">
+              <span className="text-yellow-500 text-xs">✓</span>
+            </div>
+            <span className="text-sm text-gray-300">50GB storage</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-5 h-5 rounded-full bg-gray-700 flex items-center justify-center mr-3">
+              <span className="text-yellow-500 text-xs">✓</span>
+            </div>
+            <span className="text-sm text-gray-300">90 days data retention</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-5 h-5 rounded-full bg-gray-700 flex items-center justify-center mr-3">
+              <span className="text-yellow-500 text-xs">✓</span>
+            </div>
+            <span className="text-sm text-gray-300">Email & priority support</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-5 h-5 rounded-full bg-gray-700 flex items-center justify-center mr-3">
+              <span className="text-yellow-500 text-xs">✓</span>
+            </div>
+            <span className="text-sm text-gray-300">Custom API integrations</span>
+          </div>
         </div>
         
-        <div>
-          <h4 className="text-sm font-medium text-gray-400 mb-2">Alert Thresholds</h4>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-yellow-500">Warning</span>
-              <span className="text-xs text-white">75%</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-orange-500">Critical</span>
-              <span className="text-xs text-white">90%</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-red-500">Lockout</span>
-              <span className="text-xs text-white">100%</span>
-            </div>
-          </div>
+        <div className="mt-6 flex space-x-3">
+          <button className="bg-transparent border border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black font-medium px-4 py-2 rounded-md flex-1">
+            Change Plan
+          </button>
+          <button className="bg-transparent border border-gray-600 text-gray-400 hover:bg-gray-700 font-medium px-4 py-2 rounded-md flex-1">
+            Billing History
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-// User Resource Allocation
+// User Resource Allocation Component
 export const UserResourceAllocation = () => {
   return (
     <div className="bg-gray-800 rounded-lg p-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-white">User Resource Allocation</h3>
-        <select className="bg-transparent text-sm border-none text-yellow-500">
-          <option>API Usage</option>
-          <option>Storage</option>
-          <option>Searches</option>
-        </select>
+        <h3 className="text-lg font-bold text-white">User Resource Allocation</h3>
+        <button className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">
+          Add User
+        </button>
       </div>
       
-      <div className="space-y-3">
-        <div className="flex items-center justify-between p-2 bg-gray-700 rounded">
-          <div className="flex items-center">
-            <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-black font-bold text-xs mr-2">A</div>
-            <span className="text-white">Archit (You)</span>
-          </div>
-          <div className="text-right">
-            <p className="text-white font-medium">874</p>
-            <p className="text-xs text-gray-400">API calls</p>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between p-2 hover:bg-gray-700 rounded">
-          <div className="flex items-center">
-            <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xs mr-2">S</div>
-            <span className="text-gray-300">Sarah</span>
-          </div>
-          <div className="text-right">
-            <p className="text-white font-medium">214</p>
-            <p className="text-xs text-gray-400">API calls</p>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between p-2 hover:bg-gray-700 rounded">
-          <div className="flex items-center">
-            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-xs mr-2">M</div>
-            <span className="text-gray-300">Michael</span>
-          </div>
-          <div className="text-right">
-            <p className="text-white font-medium">98</p>
-            <p className="text-xs text-gray-400">API calls</p>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between p-2 hover:bg-gray-700 rounded">
-          <div className="flex items-center">
-            <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center text-white font-bold text-xs mr-2">J</div>
-            <span className="text-gray-300">Jessica</span>
-          </div>
-          <div className="text-right">
-            <p className="text-white font-medium">57</p>
-            <p className="text-xs text-gray-400">API calls</p>
-          </div>
-        </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-gray-900 rounded-lg overflow-hidden">
+          <thead>
+            <tr className="bg-gray-750">
+              <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">User</th>
+              <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Role</th>
+              <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">API Usage</th>
+              <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Storage</th>
+              <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+              <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-800">
+            <tr className="hover:bg-gray-800">
+              <td className="py-3 px-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="font-medium text-black">JD</span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-white">Jane Doe</div>
+                    <div className="text-xs text-gray-400">jane@example.com</div>
+                  </div>
+                </div>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <span className="px-2 py-1 text-xs font-medium bg-indigo-900 text-indigo-300 rounded-full">Admin</span>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <div className="w-24 h-2 bg-gray-700 rounded-full mr-2 overflow-hidden">
+                    <div className="h-full bg-indigo-500" style={{ width: '65%' }}></div>
+                  </div>
+                  <span className="text-xs text-gray-400">65%</span>
+                </div>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <div className="w-24 h-2 bg-gray-700 rounded-full mr-2 overflow-hidden">
+                    <div className="h-full bg-cyan-500" style={{ width: '42%' }}></div>
+                  </div>
+                  <span className="text-xs text-gray-400">42%</span>
+                </div>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <span className="px-2 py-1 text-xs font-medium bg-green-900 text-green-300 rounded-full">Active</span>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap text-sm">
+                <button className="text-gray-400 hover:text-white mr-2">Edit</button>
+                <button className="text-gray-400 hover:text-white">Restrict</button>
+              </td>
+            </tr>
+            
+            <tr className="hover:bg-gray-800">
+              <td className="py-3 px-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="font-medium text-white">JS</span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-white">John Smith</div>
+                    <div className="text-xs text-gray-400">john@example.com</div>
+                  </div>
+                </div>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <span className="px-2 py-1 text-xs font-medium bg-cyan-900 text-cyan-300 rounded-full">Researcher</span>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <div className="w-24 h-2 bg-gray-700 rounded-full mr-2 overflow-hidden">
+                    <div className="h-full bg-indigo-500" style={{ width: '80%' }}></div>
+                  </div>
+                  <span className="text-xs text-gray-400">80%</span>
+                </div>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <div className="w-24 h-2 bg-gray-700 rounded-full mr-2 overflow-hidden">
+                    <div className="h-full bg-cyan-500" style={{ width: '35%' }}></div>
+                  </div>
+                  <span className="text-xs text-gray-400">35%</span>
+                </div>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <span className="px-2 py-1 text-xs font-medium bg-green-900 text-green-300 rounded-full">Active</span>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap text-sm">
+                <button className="text-gray-400 hover:text-white mr-2">Edit</button>
+                <button className="text-gray-400 hover:text-white">Restrict</button>
+              </td>
+            </tr>
+            
+            <tr className="hover:bg-gray-800">
+              <td className="py-3 px-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="font-medium text-white">AK</span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-white">Alice Kim</div>
+                    <div className="text-xs text-gray-400">alice@example.com</div>
+                  </div>
+                </div>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <span className="px-2 py-1 text-xs font-medium bg-gray-700 text-gray-300 rounded-full">Viewer</span>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <div className="w-24 h-2 bg-gray-700 rounded-full mr-2 overflow-hidden">
+                    <div className="h-full bg-indigo-500" style={{ width: '15%' }}></div>
+                  </div>
+                  <span className="text-xs text-gray-400">15%</span>
+                </div>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <div className="w-24 h-2 bg-gray-700 rounded-full mr-2 overflow-hidden">
+                    <div className="h-full bg-cyan-500" style={{ width: '5%' }}></div>
+                  </div>
+                  <span className="text-xs text-gray-400">5%</span>
+                </div>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap">
+                <span className="px-2 py-1 text-xs font-medium bg-yellow-900 text-yellow-300 rounded-full">Idle</span>
+              </td>
+              <td className="py-3 px-4 whitespace-nowrap text-sm">
+                <button className="text-gray-400 hover:text-white mr-2">Edit</button>
+                <button className="text-gray-400 hover:text-white">Restrict</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );

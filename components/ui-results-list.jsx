@@ -1,200 +1,408 @@
+// Search Results List Component
 import React, { useState } from 'react';
-import { ExternalLink, Clock, Tag, Calendar, Globe, RefreshCw, Copy, CheckCheck } from 'lucide-react';
-import { styles, combineStyles } from '../styles/app-styles';
+import { 
+  List, 
+  Grid, 
+  Filter, 
+  ChevronDown, 
+  ChevronRight, 
+  ExternalLink, 
+  Star,
+  ArrowUpDown,
+  Clock,
+  Bookmark
+} from 'lucide-react';
 
-/**
- * Search Results List component
- * Displays search results with filtering options and result summary
- */
-export const SearchResultsList = () => {
-  const [resultsView, setResultsView] = useState('list'); // 'list' or 'grid'
-  const [copyStatus, setCopyStatus] = useState({});
-
-  // Sample search results data
-  const searchResults = [
-    {
-      id: 1,
-      title: "What is Carbon Insetting? Greener Logistics Starts Inside Your Company",
-      url: "https://example.com/carbon-insetting-guide",
-      description: "Carbon insetting is a direct investment in sustainability projects within your own supply chain. Unlike carbon offsetting, which invests in environmental projects outside your business's value chain, insetting focuses on reducing emissions within your operational ecosystem.",
-      date: "2025-03-15",
-      domain: "example.com",
-      category: "Guide",
-      sentiment: "positive"
-    },
-    {
-      id: 2,
-      title: "EU Announces New Scope 3 Emissions Tracking Requirements for 2026",
-      url: "https://example.com/eu-scope3-requirements",
-      description: "The European Union has announced new regulations requiring companies with over 500 employees to track and report all Scope 3 emissions starting January 2026. The directive aims to create transparent supply chain emissions data and accelerate corporate climate action.",
-      date: "2025-03-10",
-      domain: "example.com",
-      category: "News",
-      sentiment: "neutral"
-    },
-    {
-      id: 3,
-      title: "Sustainable Logistics: 5 Companies Leading the Way in Carbon Reduction",
-      url: "https://example.com/sustainable-logistics-leaders",
-      description: "These five logistics companies are pioneering innovative approaches to sustainability, from electric vehicle fleets to AI-optimized routing that has reduced their carbon footprint by up to 35% in some corridors. Their case studies provide valuable insights for the industry.",
-      date: "2025-03-01",
-      domain: "example.com",
-      category: "Case Study",
-      sentiment: "positive"
-    },
-    {
-      id: 4,
-      title: "Carbon Insetting vs. Offsetting: What's the Difference?",
-      url: "https://example.com/insetting-vs-offsetting",
-      description: "While carbon offsetting involves purchasing credits to fund external environmental projects, carbon insetting directs investments to your own value chain. This article explores the benefits, challenges, and effectiveness of both approaches for logistics companies.",
-      date: "2025-02-25",
-      domain: "example.com",
-      category: "Analysis",
-      sentiment: "neutral"
-    }
-  ];
-
-  const handleCopy = (text, id) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopyStatus({...copyStatus, [id]: true});
-      setTimeout(() => {
-        setCopyStatus({...copyStatus, [id]: false});
-      }, 2000);
-    });
-  };
-
+// Search Results Summary Component
+export const ResultSummary = () => {
   return (
-    <div className={combineStyles(styles.card.base, "mt-6")}>
-      <div className={combineStyles(styles.card.header, styles.utils.flexBetween)}>
-        <h2 className={styles.text.heading3}>Search Results</h2>
-        
-        <div className={styles.utils.flexCenter + " space-x-4"}>
-          <div className={styles.utils.flexCenter + " space-x-2"}>
-            <button 
-              className={combineStyles(
-                "px-3 py-1 rounded-md text-sm transition-colors",
-                resultsView === 'list' ? 
-                  "bg-[#EAB308] text-black" : 
-                  "bg-[#374151] text-[#F9FAFB] hover:bg-[#4B5563]"
-              )}
-              onClick={() => setResultsView('list')}
-            >
-              List View
-            </button>
-            <button
-              className={combineStyles(
-                "px-3 py-1 rounded-md text-sm transition-colors",
-                resultsView === 'grid' ? 
-                  "bg-[#EAB308] text-black" : 
-                  "bg-[#374151] text-[#F9FAFB] hover:bg-[#4B5563]"
-              )}
-              onClick={() => setResultsView('grid')}
-            >
-              Grid View
-            </button>
-          </div>
-          
-          <button className="p-2 bg-[#374151] rounded hover:bg-[#4B5563] transition-colors">
-            <RefreshCw size={16} />
-          </button>
+    <div className="bg-gray-800 rounded-lg p-4 mb-6">
+      <h1 className="text-2xl font-bold text-white mb-3">
+        Search Results: <span className="text-yellow-500">EU Textile Regulations</span>
+      </h1>
+      
+      <div className="flex items-center flex-wrap gap-2 mb-4">
+        <div className="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-medium">
+          textile regulation
+        </div>
+        <div className="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-medium">
+          EU sustainability
+        </div>
+        <div className="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-medium">
+          carbon textile
+        </div>
+        <div className="bg-gray-700 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
+          <Filter size={14} className="mr-1" />
+          Add Filter
         </div>
       </div>
       
-      <div className={styles.card.body}>
-        {/* Result Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {/* Summary Card */}
-          <div className="bg-[#1F2937] rounded-lg p-4">
-            <h3 className="text-lg font-medium text-[#F9FAFB] mb-2">Key Insights</h3>
-            <p className="text-[#D1D5DB] text-sm mb-3">
-              Recent discussions on carbon insetting focus on implementation strategies, 
-              ROI measurement, and integration with existing sustainability programs. 
-              Companies are increasingly viewing insetting as complementary to offsetting rather than a replacement.
-            </p>
-            <div className={styles.utils.flexBetween + " text-sm text-[#9CA3AF]"}>
-              <span>Generated from 16 sources</span>
-              <button className="text-[#EAB308] hover:text-[#CA8A04]">Refresh</button>
-            </div>
+      <div className="flex flex-wrap items-center justify-between text-sm text-gray-300">
+        <div>
+          <span className="mr-1 text-gray-400">36 results found</span>
+          <span className="mx-2 text-gray-500">|</span>
+          <span className="text-gray-400">Last updated: </span>
+          <span>March 23, 2025 - 12:45 PM</span>
+        </div>
+        
+        <div className="flex items-center mt-2 sm:mt-0">
+          <button className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded-l flex items-center">
+            <Clock size={14} className="mr-1" />
+            <span>Latest First</span>
+          </button>
+          <button className="bg-gray-700 hover:bg-gray-600 px-3 py-1 border-l border-gray-600 rounded-r">
+            <ArrowUpDown size={14} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Search Results List Component
+export const ResultsList = () => {
+  const [viewMode, setViewMode] = useState('list');
+  
+  return (
+    <div className="bg-gray-800 rounded-lg p-4 h-full flex flex-col">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-white">Results</h2>
+        
+        <div className="flex items-center space-x-2">
+          <div className="flex bg-gray-700 rounded">
+            <button 
+              className={`p-1.5 ${viewMode === 'list' ? 'bg-yellow-500 text-black' : 'text-white hover:bg-gray-600'} rounded-l`}
+              onClick={() => setViewMode('list')}
+              title="List View"
+            >
+              <List size={16} />
+            </button>
+            <button 
+              className={`p-1.5 ${viewMode === 'grid' ? 'bg-yellow-500 text-black' : 'text-white hover:bg-gray-600'} rounded-r`}
+              onClick={() => setViewMode('grid')}
+              title="Grid View"
+            >
+              <Grid size={16} />
+            </button>
           </div>
           
-          {/* Tags Card */}
-          <div className="bg-[#1F2937] rounded-lg p-4">
-            <h3 className="text-lg font-medium text-[#F9FAFB] mb-2">Related Topics</h3>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {["scope 3 reporting", "supply chain", "ESG metrics", "carbon accounting", "climate targets", "value chain", "sustainability ROI"].map((tag, index) => (
-                <div key={index} className="bg-[#374151] text-[#D1D5DB] px-2 py-1 rounded-md text-xs">
-                  {tag}
-                </div>
-              ))}
-            </div>
-            <div className={styles.utils.flexBetween + " text-sm text-[#9CA3AF]"}>
-              <span>Based on frequency analysis</span>
-              <button className="text-[#EAB308] hover:text-[#CA8A04]">Expand</button>
-            </div>
+          <button className="p-1.5 bg-gray-700 hover:bg-gray-600 rounded" title="Filter Results">
+            <Filter size={16} className="text-white" />
+          </button>
+          
+          <select className="bg-gray-700 text-white text-sm p-1.5 rounded border-none focus:outline-none">
+            <option>All Sources</option>
+            <option>Academic</option>
+            <option>Regulatory</option>
+            <option>Industry</option>
+            <option>News</option>
+          </select>
+        </div>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto pr-2 space-y-3">
+        {viewMode === 'list' ? (
+          <ListViewResults />
+        ) : (
+          <GridViewResults />
+        )}
+      </div>
+      
+      <div className="flex justify-center mt-4">
+        <div className="flex bg-gray-700 rounded text-sm">
+          <button className="px-3 py-1 border-r border-gray-600">
+            Prev
+          </button>
+          <button className="px-3 py-1 bg-yellow-500 text-black">
+            1
+          </button>
+          <button className="px-3 py-1 border-l border-gray-600">
+            2
+          </button>
+          <button className="px-3 py-1 border-l border-gray-600">
+            3
+          </button>
+          <button className="px-3 py-1 border-l border-gray-600">
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// List View Component
+const ListViewResults = () => {
+  return (
+    <>
+      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded">
+        <div className="flex items-start justify-between">
+          <h3 className="text-md font-medium text-white mb-1 flex-1">
+            <a href="#" className="hover:text-yellow-400">European Commission Adopts New Textile Strategy for Sustainable Products</a>
+          </h3>
+          <div className="flex items-center">
+            <span className="text-xs text-yellow-500 bg-yellow-500 bg-opacity-10 px-2 py-0.5 rounded mr-1">
+              REGULATORY
+            </span>
+            <button className="text-gray-400 hover:text-white">
+              <Bookmark size={16} />
+            </button>
           </div>
         </div>
-        
-        {/* Results List */}
-        <div className={resultsView === 'list' ? 'space-y-4' : 'grid grid-cols-1 md:grid-cols-2 gap-4'}>
-          {searchResults.map((result) => (
-            <div 
-              key={result.id} 
-              className="bg-[#1F2937] rounded-lg overflow-hidden hover:bg-[#374151] transition-colors"
-            >
-              <div className="p-4">
-                <div className={styles.utils.flexBetween + " mb-2"}>
-                  <div className={combineStyles(
-                    styles.badge.default, 
-                    result.sentiment === 'positive' ? 'bg-green-500 bg-opacity-20 text-green-400' : 
-                    result.sentiment === 'negative' ? 'bg-red-500 bg-opacity-20 text-red-400' : 
-                    'bg-gray-500 bg-opacity-20 text-gray-400'
-                  )}>
-                    {result.category}
-                  </div>
-                  <button 
-                    onClick={() => handleCopy(result.url, result.id)}
-                    className="text-[#9CA3AF] hover:text-[#F9FAFB] transition-colors"
-                  >
-                    {copyStatus[result.id] ? <CheckCheck size={14} /> : <Copy size={14} />}
-                  </button>
-                </div>
-                
-                <h3 className="text-[#F9FAFB] font-medium mb-2 line-clamp-2">
-                  {result.title}
-                </h3>
-                
-                <p className="text-[#D1D5DB] text-sm mb-3 line-clamp-3">
-                  {result.description}
-                </p>
-                
-                <div className="flex flex-wrap items-center text-xs text-[#9CA3AF] gap-x-4">
-                  <a 
-                    href={result.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center text-[#EAB308] hover:text-[#CA8A04]"
-                  >
-                    <ExternalLink size={12} className="mr-1" />
-                    <span>Visit Source</span>
-                  </a>
-                  
-                  <div className="flex items-center">
-                    <Calendar size={12} className="mr-1" />
-                    <span>{result.date}</span>
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <Globe size={12} className="mr-1" />
-                    <span>{result.domain}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+        <p className="text-sm text-gray-300 mb-2">
+          The European Commission has adopted a comprehensive strategy to transition the EU textile industry towards sustainability and circularity...
+        </p>
+        <div className="flex items-center justify-between text-xs">
+          <div>
+            <span className="text-blue-400">ec.europa.eu</span>
+            <span className="mx-2 text-gray-500">|</span>
+            <span className="text-gray-400">Mar 18, 2025</span>
+          </div>
+          <a href="#" className="text-gray-400 hover:text-white flex items-center">
+            <span className="mr-1">Read more</span>
+            <ExternalLink size={12} />
+          </a>
         </div>
-        
-        <div className={styles.utils.flexCenter + " mt-6"}>
-          <button className={styles.button.outline}>View More Results</button>
+      </div>
+      
+      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded">
+        <div className="flex items-start justify-between">
+          <h3 className="text-md font-medium text-white mb-1 flex-1">
+            <a href="#" className="hover:text-yellow-400">Research Paper: Carbon Footprint Metrics in Textile Manufacturing</a>
+          </h3>
+          <div className="flex items-center">
+            <span className="text-xs text-blue-500 bg-blue-500 bg-opacity-10 px-2 py-0.5 rounded mr-1">
+              ACADEMIC
+            </span>
+            <button className="text-gray-400 hover:text-white">
+              <Bookmark size={16} />
+            </button>
+          </div>
+        </div>
+        <p className="text-sm text-gray-300 mb-2">
+          This paper presents a comprehensive analysis of carbon footprint measurement methodologies specific to textile manufacturing processes...
+        </p>
+        <div className="flex items-center justify-between text-xs">
+          <div>
+            <span className="text-blue-400">sciencedirect.com</span>
+            <span className="mx-2 text-gray-500">|</span>
+            <span className="text-gray-400">Mar 15, 2025</span>
+          </div>
+          <a href="#" className="text-gray-400 hover:text-white flex items-center">
+            <span className="mr-1">Read more</span>
+            <ExternalLink size={12} />
+          </a>
+        </div>
+      </div>
+      
+      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded">
+        <div className="flex items-start justify-between">
+          <h3 className="text-md font-medium text-white mb-1 flex-1">
+            <a href="#" className="hover:text-yellow-400">Industry Response to New EU Textile Regulation Requirements</a>
+          </h3>
+          <div className="flex items-center">
+            <span className="text-xs text-purple-500 bg-purple-500 bg-opacity-10 px-2 py-0.5 rounded mr-1">
+              INDUSTRY
+            </span>
+            <button className="text-gray-400 hover:text-white">
+              <Bookmark size={16} />
+            </button>
+          </div>
+        </div>
+        <p className="text-sm text-gray-300 mb-2">
+          European textile industry leaders outlined adaptation strategies at the annual Textile Sustainability Conference in response to the EU's new regulations...
+        </p>
+        <div className="flex items-center justify-between text-xs">
+          <div>
+            <span className="text-blue-400">textilefederation.eu</span>
+            <span className="mx-2 text-gray-500">|</span>
+            <span className="text-gray-400">Mar 12, 2025</span>
+          </div>
+          <a href="#" className="text-gray-400 hover:text-white flex items-center">
+            <span className="mr-1">Read more</span>
+            <ExternalLink size={12} />
+          </a>
+        </div>
+      </div>
+      
+      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded">
+        <div className="flex items-start justify-between">
+          <h3 className="text-md font-medium text-white mb-1 flex-1">
+            <a href="#" className="hover:text-yellow-400">New Carbon Textile Tracking Technology Launched by Tech Startup</a>
+          </h3>
+          <div className="flex items-center">
+            <span className="text-xs text-green-500 bg-green-500 bg-opacity-10 px-2 py-0.5 rounded mr-1">
+              TECHNOLOGY
+            </span>
+            <button className="text-gray-400 hover:text-white">
+              <Bookmark size={16} />
+            </button>
+          </div>
+        </div>
+        <p className="text-sm text-gray-300 mb-2">
+          TechFabrix introduces a groundbreaking blockchain-based platform for tracking carbon emissions throughout the textile supply chain...
+        </p>
+        <div className="flex items-center justify-between text-xs">
+          <div>
+            <span className="text-blue-400">techcrunch.com</span>
+            <span className="mx-2 text-gray-500">|</span>
+            <span className="text-gray-400">Mar 10, 2025</span>
+          </div>
+          <a href="#" className="text-gray-400 hover:text-white flex items-center">
+            <span className="mr-1">Read more</span>
+            <ExternalLink size={12} />
+          </a>
+        </div>
+      </div>
+      
+      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded">
+        <div className="flex items-start justify-between">
+          <h3 className="text-md font-medium text-white mb-1 flex-1">
+            <a href="#" className="hover:text-yellow-400">Sustainability in Textile Manufacturing: Compliance Guide 2025</a>
+          </h3>
+          <div className="flex items-center">
+            <span className="text-xs text-yellow-500 bg-yellow-500 bg-opacity-10 px-2 py-0.5 rounded mr-1">
+              REGULATORY
+            </span>
+            <button className="text-white">
+              <Star size={16} className="text-yellow-500 fill-yellow-500" />
+            </button>
+          </div>
+        </div>
+        <p className="text-sm text-gray-300 mb-2">
+          Comprehensive guide to meeting the latest EU textile sustainability regulations, including carbon footprint requirements and circularity assessments...
+        </p>
+        <div className="flex items-center justify-between text-xs">
+          <div>
+            <span className="text-blue-400">sustainabletextileguide.org</span>
+            <span className="mx-2 text-gray-500">|</span>
+            <span className="text-gray-400">Mar 5, 2025</span>
+          </div>
+          <a href="#" className="text-gray-400 hover:text-white flex items-center">
+            <span className="mr-1">Read more</span>
+            <ExternalLink size={12} />
+          </a>
+        </div>
+      </div>
+    </>
+  );
+};
+
+// Grid View Component
+const GridViewResults = () => {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
+        <div className="flex items-start justify-between mb-2">
+          <span className="text-xs text-yellow-500 bg-yellow-500 bg-opacity-10 px-2 py-0.5 rounded">
+            REGULATORY
+          </span>
+          <button className="text-gray-400 hover:text-white">
+            <Bookmark size={14} />
+          </button>
+        </div>
+        <h3 className="text-sm font-medium text-white mb-auto">
+          <a href="#" className="hover:text-yellow-400">European Commission Adopts New Textile Strategy</a>
+        </h3>
+        <div className="text-xs mt-2">
+          <span className="text-blue-400">ec.europa.eu</span>
+          <span className="mx-1 text-gray-500">|</span>
+          <span className="text-gray-400">Mar 18, 2025</span>
+        </div>
+      </div>
+      
+      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
+        <div className="flex items-start justify-between mb-2">
+          <span className="text-xs text-blue-500 bg-blue-500 bg-opacity-10 px-2 py-0.5 rounded">
+            ACADEMIC
+          </span>
+          <button className="text-gray-400 hover:text-white">
+            <Bookmark size={14} />
+          </button>
+        </div>
+        <h3 className="text-sm font-medium text-white mb-auto">
+          <a href="#" className="hover:text-yellow-400">Carbon Footprint Metrics in Textile Manufacturing</a>
+        </h3>
+        <div className="text-xs mt-2">
+          <span className="text-blue-400">sciencedirect.com</span>
+          <span className="mx-1 text-gray-500">|</span>
+          <span className="text-gray-400">Mar 15, 2025</span>
+        </div>
+      </div>
+      
+      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
+        <div className="flex items-start justify-between mb-2">
+          <span className="text-xs text-purple-500 bg-purple-500 bg-opacity-10 px-2 py-0.5 rounded">
+            INDUSTRY
+          </span>
+          <button className="text-gray-400 hover:text-white">
+            <Bookmark size={14} />
+          </button>
+        </div>
+        <h3 className="text-sm font-medium text-white mb-auto">
+          <a href="#" className="hover:text-yellow-400">Industry Response to New EU Textile Regulation</a>
+        </h3>
+        <div className="text-xs mt-2">
+          <span className="text-blue-400">textilefederation.eu</span>
+          <span className="mx-1 text-gray-500">|</span>
+          <span className="text-gray-400">Mar 12, 2025</span>
+        </div>
+      </div>
+      
+      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
+        <div className="flex items-start justify-between mb-2">
+          <span className="text-xs text-green-500 bg-green-500 bg-opacity-10 px-2 py-0.5 rounded">
+            TECHNOLOGY
+          </span>
+          <button className="text-gray-400 hover:text-white">
+            <Bookmark size={14} />
+          </button>
+        </div>
+        <h3 className="text-sm font-medium text-white mb-auto">
+          <a href="#" className="hover:text-yellow-400">New Carbon Textile Tracking Technology</a>
+        </h3>
+        <div className="text-xs mt-2">
+          <span className="text-blue-400">techcrunch.com</span>
+          <span className="mx-1 text-gray-500">|</span>
+          <span className="text-gray-400">Mar 10, 2025</span>
+        </div>
+      </div>
+      
+      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
+        <div className="flex items-start justify-between mb-2">
+          <span className="text-xs text-yellow-500 bg-yellow-500 bg-opacity-10 px-2 py-0.5 rounded">
+            REGULATORY
+          </span>
+          <button className="text-white">
+            <Star size={14} className="text-yellow-500 fill-yellow-500" />
+          </button>
+        </div>
+        <h3 className="text-sm font-medium text-white mb-auto">
+          <a href="#" className="hover:text-yellow-400">Sustainability in Textile Manufacturing Guide</a>
+        </h3>
+        <div className="text-xs mt-2">
+          <span className="text-blue-400">sustainabletextileguide.org</span>
+          <span className="mx-1 text-gray-500">|</span>
+          <span className="text-gray-400">Mar 5, 2025</span>
+        </div>
+      </div>
+      
+      <div className="bg-gray-700 hover:bg-gray-650 p-3 rounded flex flex-col h-full">
+        <div className="flex items-start justify-between mb-2">
+          <span className="text-xs text-gray-500 bg-gray-500 bg-opacity-10 px-2 py-0.5 rounded">
+            NEWS
+          </span>
+          <button className="text-gray-400 hover:text-white">
+            <Bookmark size={14} />
+          </button>
+        </div>
+        <h3 className="text-sm font-medium text-white mb-auto">
+          <a href="#" className="hover:text-yellow-400">Global Implications of EU's Textile Sustainability Rules</a>
+        </h3>
+        <div className="text-xs mt-2">
+          <span className="text-blue-400">reuters.com</span>
+          <span className="mx-1 text-gray-500">|</span>
+          <span className="text-gray-400">Mar 2, 2025</span>
         </div>
       </div>
     </div>

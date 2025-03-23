@@ -1,14 +1,9 @@
 import React from 'react';
 import { AppLayout } from '../../components/ui-layout';
-import { 
-  AdminOverviewCards, 
-  ResourceUsageChart, 
-  UsageLimitsPanel,
-  UserResourceAllocation 
-} from '../../components/ui-admin-components';
+import { AdminOverviewCards, ResourceUsageChart, UsageLimitsPanel, UserResourceAllocation } from '../../components/ui-admin-components';
 import { Clock } from 'lucide-react';
 
-export default function AdminDashboard() {
+export default function AdminPage() {
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -17,8 +12,8 @@ export default function AdminDashboard() {
           
           <div className="flex space-x-2">
             <div className="p-2 bg-gray-800 rounded flex items-center space-x-2">
-              <Clock size={16} />
-              <select className="bg-transparent text-sm">
+              <Clock size={16} className="text-gray-400" />
+              <select className="bg-transparent text-sm text-white border-none">
                 <option>Last 30 days</option>
                 <option>Last 7 days</option>
                 <option>Last 24 hours</option>

@@ -1,165 +1,156 @@
-import React, { useState } from 'react';
-import { Menu, X, Search, Trending, Zap, Settings, User, Home, BarChart, BookOpen, Clock, Star } from 'lucide-react';
+// Main Application Layout and Sidebar
+import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { 
+  Search, 
+  Settings, 
+  Home, 
+  Sliders, 
+  FileText,
+  BarChart, 
+  User, 
+  LogOut, 
+  HelpCircle
+} from 'lucide-react';
 
-/**
- * Main application layout with responsive sidebar
- */
+// Main Application Layout
 export const AppLayout = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-  
   return (
-    <div className="flex flex-col h-screen bg-gray-900 text-gray-200">
-      <header className="bg-black p-4 border-b border-gray-800 z-20">
-        <div className="flex items-center justify-between max-w-screen-xl mx-auto">
-          <div className="flex items-center space-x-2">
-            <button 
-              onClick={toggleSidebar}
-              className="text-gray-400 hover:text-white md:hidden mr-2"
-            >
-              <Menu size={24} />
-            </button>
-            <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-              <span className="font-bold text-black">A</span>
-            </div>
-            <h1 className="text-xl font-bold text-white">Intention-Ally</h1>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button className="p-2 text-gray-400 hover:text-white">
-              <User size={20} />
-            </button>
-            <button className="p-2 text-gray-400 hover:text-white">
-              <Settings size={20} />
-            </button>
-          </div>
-        </div>
-      </header>
-      
-      <div className="flex flex-1 overflow-hidden">
-        {/* Mobile sidebar backdrop */}
-        {sidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-      
-        {/* Sidebar - responsive */}
-        <aside 
-          className={`fixed md:relative w-64 bg-gray-900 border-r border-gray-800 h-full z-20 transition-transform duration-300 ease-in-out ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-          }`}
-        >
-          <div className="flex justify-between items-center p-4 md:hidden">
-            <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
-                <span className="font-bold text-black text-xs">A</span>
-              </div>
-              <span className="font-bold">Intention-Ally</span>
-            </div>
-            <button 
-              onClick={() => setSidebarOpen(false)}
-              className="text-gray-400 hover:text-white"
-            >
-              <X size={24} />
-            </button>
-          </div>
-          
-          <SidebarContent />
-        </aside>
-        
-        {/* Main content */}
-        <main className="flex-1 overflow-auto p-4 md:p-6">
-          <div className="max-w-screen-xl mx-auto">
-            {children}
-          </div>
+    <div className="flex h-screen bg-gray-900 text-white">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header />
+        <main className="flex-1 overflow-y-auto p-6">
+          {children}
         </main>
       </div>
     </div>
   );
 };
 
-/**
- * Sidebar content component
- */
-export const SidebarContent = () => {
-  const router = useRouter();
-  const currentPath = router.pathname;
-  
-  // Helper to determine if a link is active
-  const isActive = (path) => {
-    return currentPath === path ? 
-      'bg-gray-800 text-white' : 
-      'text-gray-400 hover:bg-gray-800 hover:text-white';
-  };
-  
+// Application Header
+const Header = () => {
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-4 flex-1 overflow-y-auto">
-        <div className="space-y-1 mb-8">
-          <Link href="/search" className={`flex items-center space-x-2 p-2 rounded ${isActive('/search')}`}>
-            <Search size={18} />
-            <span>Search</span>
+    <header className="bg-gray-800 border-b border-gray-700 shadow-md py-3 px-6">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <Link href="/" className="flex items-center">
+            <span className="text-xl font-bold text-yellow-500">Intention</span>
+            <span className="text-xl font-bold text-white">Ally</span>
           </Link>
-          <Link href="/trends" className={`flex items-center space-x-2 p-2 rounded ${isActive('/trends')}`}>
-            <Trending size={18} />
-            <span>Trends</span>
-          </Link>
-          <Link href="/insights" className={`flex items-center space-x-2 p-2 rounded ${isActive('/insights')}`}>
-            <Zap size={18} />
-            <span>Insights</span>
-          </Link>
-        </div>
-        
-        <div className="mb-6">
-          <h2 className="text-xs uppercase text-gray-500 font-semibold mb-2 px-2">My Search Topics</h2>
-          <div className="space-y-1">
-            <div className="flex items-center justify-between p-2 bg-gray-800 rounded text-white">
-              <span>Carbon Insetting</span>
-              <span className="text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded">3</span>
-            </div>
-            <div className="flex items-center justify-between p-2 hover:bg-gray-800 rounded text-gray-400 hover:text-white">
-              <span>Sustainable Logistics</span>
-              <span className="text-xs bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded">2</span>
-            </div>
-            <div className="flex items-center justify-between p-2 hover:bg-gray-800 rounded text-gray-400 hover:text-white">
-              <span>Scope 3 Emissions</span>
-              <span className="text-xs bg-yellow-500 text-black px-1.5 py-0.5 rounded">1</span>
-            </div>
+          
+          <div className="hidden md:flex items-center bg-gray-700 rounded-md py-1 px-3">
+            <Search size={16} className="text-gray-400 mr-2" />
+            <input 
+              type="text" 
+              placeholder="Search knowledge base..." 
+              className="bg-transparent border-none focus:outline-none text-white w-64"
+            />
           </div>
         </div>
         
-        <div className="mb-6">
-          <h2 className="text-xs uppercase text-gray-500 font-semibold mb-2 px-2">Collections</h2>
-          <div className="space-y-1">
-            <div className="flex items-center space-x-2 p-2 hover:bg-gray-800 rounded text-gray-400 hover:text-white">
-              <Star size={18} />
-              <span>Favorites</span>
+        <div className="flex items-center space-x-4">
+          <button className="bg-gray-700 hover:bg-gray-600 rounded-full p-2">
+            <HelpCircle size={18} className="text-yellow-500" />
+          </button>
+          
+          <button className="bg-gray-700 hover:bg-gray-600 rounded-full p-2">
+            <Settings size={18} />
+          </button>
+          
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+              <span className="font-medium text-black">JD</span>
             </div>
-            <div className="flex items-center space-x-2 p-2 hover:bg-gray-800 rounded text-gray-400 hover:text-white">
-              <Clock size={18} />
-              <span>Recent Searches</span>
-            </div>
-            <div className="flex items-center space-x-2 p-2 hover:bg-gray-800 rounded text-gray-400 hover:text-white">
-              <BookOpen size={18} />
-              <span>Research Library</span>
-            </div>
+            <span className="hidden md:inline-block">Jane Doe</span>
           </div>
         </div>
       </div>
-      
-      <div className="p-4 border-t border-gray-800">
-        <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium px-4 py-2 rounded-md transition-colors duration-200">
-          New Search Topic
-        </button>
-      </div>
-    </div>
+    </header>
   );
 };
 
-export default AppLayout;
+// Sidebar Navigation
+export const Sidebar = () => {
+  const router = useRouter();
+  
+  const isActive = (path) => {
+    return router.pathname === path;
+  };
+  
+  const navItems = [
+    { 
+      label: 'Dashboard', 
+      icon: <Home size={20} />, 
+      path: '/' 
+    },
+    { 
+      label: 'Search', 
+      icon: <Search size={20} />, 
+      path: '/search' 
+    },
+    { 
+      label: 'Insights', 
+      icon: <BarChart size={20} />, 
+      path: '/insights' 
+    },
+    { 
+      label: 'Documents', 
+      icon: <FileText size={20} />, 
+      path: '/documents' 
+    },
+    { 
+      label: 'Settings', 
+      icon: <Sliders size={20} />, 
+      path: '/settings' 
+    },
+    { 
+      label: 'Admin', 
+      icon: <User size={20} />, 
+      path: '/admin' 
+    },
+  ];
+  
+  return (
+    <aside className="w-20 md:w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
+      <div className="flex items-center justify-center md:justify-start p-4 border-b border-gray-700">
+        <div className="w-10 h-10 bg-yellow-500 rounded-md flex items-center justify-center">
+          <span className="font-bold text-xl text-black">IA</span>
+        </div>
+        <span className="hidden md:block ml-2 text-xl font-bold text-white">Intention<span className="text-yellow-500">Ally</span></span>
+      </div>
+      
+      <nav className="flex-1 py-6">
+        <ul className="space-y-1">
+          {navItems.map((item) => (
+            <li key={item.path}>
+              <Link 
+                href={item.path}
+                className={`flex items-center py-3 px-4 md:px-6 ${
+                  isActive(item.path) 
+                    ? 'bg-gray-700 border-l-4 border-yellow-500' 
+                    : 'border-l-4 border-transparent hover:bg-gray-700'
+                }`}
+              >
+                <span className={`${isActive(item.path) ? 'text-yellow-500' : 'text-gray-300'}`}>
+                  {item.icon}
+                </span>
+                <span className={`hidden md:block ml-3 ${isActive(item.path) ? 'font-medium' : ''}`}>
+                  {item.label}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      
+      <div className="p-4 border-t border-gray-700">
+        <button className="flex items-center justify-center md:justify-start w-full p-2 text-gray-300 hover:text-white rounded-md hover:bg-gray-700">
+          <LogOut size={20} />
+          <span className="hidden md:block ml-2">Log Out</span>
+        </button>
+      </div>
+    </aside>
+  );
+};
