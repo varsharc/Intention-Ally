@@ -2,8 +2,16 @@
  * Firebase service module for Intention-Ally
  * Contains functions to interact with Firebase Firestore
  */
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
+import { initializeApp } from "firebase/app";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  Timestamp,
+} from "firebase/firestore";
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -28,26 +36,28 @@ export const initFirebase = () => {
     if (!firebaseApp) {
       // Verify all required config values are present
       const configValues = Object.values(firebaseConfig);
-      if (configValues.some(value => !value)) {
-        console.error('Firebase config is incomplete:', 
-          Object.keys(firebaseConfig).filter(key => !firebaseConfig[key]));
+      if (configValues.some((value) => !value)) {
+        console.error(
+          "Firebase config is incomplete:",
+          Object.keys(firebaseConfig).filter((key) => !firebaseConfig[key])
+        );
         return null;
       }
-      
+
       // Initialize Firebase
       firebaseApp = initializeApp(firebaseConfig);
-      console.log('Firebase initialized successfully');
+      console.log("Firebase initialized successfully");
     }
-    
+
     // Get Firestore instance
     if (!firestoreDb) {
       firestoreDb = getFirestore(firebaseApp);
-      console.log('Firestore database connected');
+      console.log("Firestore database connected");
     }
-    
+
     return firestoreDb;
   } catch (error) {
-    console.error('Firebase initialization error:', error);
+    console.error("Firebase initialization error:", error);
     return null;
   }
 };
@@ -61,25 +71,25 @@ export const initFirebase = () => {
 export const saveSearchResults = async (keyword, results) => {
   try {
     const db = initFirebase();
-    if (!db) throw new Error('Firebase not initialized');
-    
+    if (!db) throw new Error("Firebase not initialized");
+
     // Create a document with the search session data
     const searchSession = {
       keyword,
       timestamp: Timestamp.now(),
-      results
+      results,
     };
-    
+
     // Add document to "searches" collection
-    const docRef = await addDoc(collection(db, 'searches'), searchSession);
-    
+    const docRef = await addDoc(collection(db, "searches"), searchSession);
+
     return {
       success: true,
       message: `Search results saved to Firebase with ID: ${docRef.id}`,
-      id: docRef.id
+      id: docRef.id,
     };
   } catch (error) {
-    console.error('Error saving search results to Firebase:', error);
+    console.error("Error saving search results to Firebase:", error);
     throw error;
   }
 };
@@ -92,35 +102,35 @@ export const saveSearchResults = async (keyword, results) => {
 export const fetchSearchResults = async (days = 7) => {
   try {
     const db = initFirebase();
-    if (!db) throw new Error('Firebase not initialized');
-    
+    if (!db) throw new Error("Firebase not initialized");
+
     // Calculate the date for filtering (days ago from now)
     const daysAgoDate = new Date();
     daysAgoDate.setDate(daysAgoDate.getDate() - days);
-    
+
     // Query the searches collection
     const searchesQuery = query(
-      collection(db, 'searches'),
-      where('timestamp', '>=', Timestamp.fromDate(daysAgoDate))
+      collection(db, "searches"),
+      where("timestamp", ">=", Timestamp.fromDate(daysAgoDate))
     );
-    
+
     const querySnapshot = await getDocs(searchesQuery);
-    
+
     // Convert query results to an array of search sessions
     const searchSessions = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       const data = doc.data();
       searchSessions.push({
         id: doc.id,
         keyword: data.keyword,
         timestamp: data.timestamp.toDate(),
-        results: data.results
+        results: data.results,
       });
     });
-    
+
     return searchSessions;
   } catch (error) {
-    console.error('Error fetching search results from Firebase:', error);
+    console.error("Error fetching search results from Firebase:", error);
     throw error;
   }
 };
@@ -128,5 +138,5 @@ export const fetchSearchResults = async (days = 7) => {
 export default {
   initFirebase,
   saveSearchResults,
-  fetchSearchResults
+  fetchSearchResults,
 };

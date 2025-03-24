@@ -1,0 +1,18 @@
+# Dependency directories
+node_modules/
+
+# Next.js build output
+.next/
+
+# Environment variables
+.env
+.env.local
+
+# Webpack hot update files
+*.hot-update.js
+*.hot-update.json
+
+# Development artifacts
+*.log
+.DS_Store
+Thumbs.db
