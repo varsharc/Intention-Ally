@@ -1,9 +1,17 @@
 /**
  * Firebase service module for Intention-Ally
- * Contains functions to interact with Firebase Firestore
+ * 
+ * Contains core Firebase and Firestore integration functions and data models.
+ * This module handles Firebase initialization and provides utility functions
+ * for interacting with Firestore collections.
  */
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
+import { 
+  getFirestore, collection, addDoc, query, 
+  where, getDocs, Timestamp, doc, setDoc,
+  serverTimestamp
+} from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -15,8 +23,10 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Global instances to avoid re-initialization
 let firebaseApp;
 let firestoreDb;
+let firebaseAuth;
 
 /**
  * Initialize Firebase app and Firestore
@@ -36,13 +46,19 @@ export const initFirebase = () => {
       
       // Initialize Firebase
       firebaseApp = initializeApp(firebaseConfig);
-      console.log('Firebase initialized successfully');
+      console.info('Firebase initialized successfully');
     }
     
     // Get Firestore instance
     if (!firestoreDb) {
       firestoreDb = getFirestore(firebaseApp);
-      console.log('Firestore database connected');
+      console.info('Firestore database connected');
+    }
+    
+    // Initialize Auth
+    if (!firebaseAuth) {
+      firebaseAuth = getAuth(firebaseApp);
+      console.info('Firebase Auth initialized');
     }
     
     return firestoreDb;
@@ -53,80 +69,229 @@ export const initFirebase = () => {
 };
 
 /**
- * Saves search results to Firebase Firestore
- * @param {string} keyword - The keyword that was searched
- * @param {Array} results - Array of search result objects
- * @returns {Promise<Object>} - Response from Firebase
+ * Get Firebase Auth instance
+ * @returns {Object} Firebase Auth instance
  */
-export const saveSearchResults = async (keyword, results) => {
+export const getFirebaseAuth = () => {
+  if (!firebaseAuth) {
+    initFirebase();
+  }
+  return firebaseAuth;
+};
+
+/**
+ * Saves search configuration to Firestore
+ * @param {Object} config - Search configuration object
+ * @param {string} userId - ID of the user who created the configuration
+ * @returns {Promise<string>} - ID of the created document
+ */
+export const saveSearchConfig = async (config, userId) => {
   try {
     const db = initFirebase();
     if (!db) throw new Error('Firebase not initialized');
     
-    // Create a document with the search session data
-    const searchSession = {
-      keyword,
-      timestamp: Timestamp.now(),
-      results
+    // Create a search configuration object
+    const searchConfig = {
+      userId,
+      name: config.name,
+      keywords: config.keywords,
+      templateType: config.templateType,
+      authorityThreshold: config.authorityThreshold,
+      updateFrequency: config.updateFrequency,
+      advancedParams: config.advancedParams || {},
+      isActive: true,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
     };
     
-    // Add document to "searches" collection
-    const docRef = await addDoc(collection(db, 'searches'), searchSession);
+    // Add document to "searchConfigs" collection
+    const docRef = await addDoc(collection(db, 'searchConfigs'), searchConfig);
     
-    return {
-      success: true,
-      message: `Search results saved to Firebase with ID: ${docRef.id}`,
-      id: docRef.id
-    };
+    return docRef.id;
   } catch (error) {
-    console.error('Error saving search results to Firebase:', error);
+    console.error('Error saving search configuration:', error);
     throw error;
   }
 };
 
 /**
- * Fetches recent search results from Firebase Firestore
- * @param {number} days - Number of days to look back
- * @returns {Promise<Array>} - Array of search sessions with results
+ * Saves search results to Firestore
+ * @param {string} configId - ID of the search configuration
+ * @param {Array} results - Array of search result objects
+ * @returns {Promise<Object>} - IDs of created documents
  */
-export const fetchSearchResults = async (days = 7) => {
+export const saveSearchResults = async (configId, results) => {
   try {
     const db = initFirebase();
     if (!db) throw new Error('Firebase not initialized');
     
-    // Calculate the date for filtering (days ago from now)
-    const daysAgoDate = new Date();
-    daysAgoDate.setDate(daysAgoDate.getDate() - days);
+    const resultIds = [];
     
-    // Query the searches collection
-    const searchesQuery = query(
-      collection(db, 'searches'),
-      where('timestamp', '>=', Timestamp.fromDate(daysAgoDate))
-    );
+    // Process each result and save individually for better performance
+    for (const result of results) {
+      // Create a search result object
+      const searchResult = {
+        configId,
+        title: result.title,
+        url: result.url,
+        snippet: result.snippet || '',
+        sourceDomain: result.sourceDomain || new URL(result.url).hostname,
+        authorityScore: result.authorityScore || 0,
+        discoveredAt: serverTimestamp(),
+        metadata: result.metadata || {},
+        cluster: result.cluster || null,
+        x: result.x || 0,
+        y: result.y || 0,
+        processed: result.processed || false
+      };
+      
+      // Add document to "searchResults" collection
+      const docRef = await addDoc(collection(db, 'searchResults'), searchResult);
+      resultIds.push(docRef.id);
+    }
     
-    const querySnapshot = await getDocs(searchesQuery);
+    // Update search config with last run timestamp
+    await updateSearchConfigTimestamp(configId);
     
-    // Convert query results to an array of search sessions
-    const searchSessions = [];
-    querySnapshot.forEach(doc => {
-      const data = doc.data();
-      searchSessions.push({
-        id: doc.id,
-        keyword: data.keyword,
-        timestamp: data.timestamp.toDate(),
-        results: data.results
-      });
-    });
-    
-    return searchSessions;
+    return {
+      success: true,
+      count: resultIds.length,
+      resultIds
+    };
   } catch (error) {
-    console.error('Error fetching search results from Firebase:', error);
+    console.error('Error saving search results:', error);
     throw error;
   }
 };
 
+/**
+ * Updates the lastRun timestamp on a search configuration
+ * @param {string} configId - ID of the search configuration
+ * @returns {Promise<void>}
+ */
+export const updateSearchConfigTimestamp = async (configId) => {
+  try {
+    const db = initFirebase();
+    if (!db) throw new Error('Firebase not initialized');
+    
+    await setDoc(doc(db, 'searchConfigs', configId), {
+      lastRun: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+  } catch (error) {
+    console.error(`Error updating timestamp for config ${configId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Fetches search configurations for a user
+ * @param {string} userId - ID of the user
+ * @returns {Promise<Array>} - Array of search configuration objects
+ */
+export const fetchSearchConfigs = async (userId) => {
+  try {
+    const db = initFirebase();
+    if (!db) throw new Error('Firebase not initialized');
+    
+    // Query the searchConfigs collection for the user
+    const configsQuery = query(
+      collection(db, 'searchConfigs'),
+      where('userId', '==', userId)
+    );
+    
+    const querySnapshot = await getDocs(configsQuery);
+    
+    // Convert query results to an array of configurations
+    const configs = [];
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      configs.push({
+        id: doc.id,
+        name: data.name,
+        keywords: data.keywords,
+        templateType: data.templateType,
+        authorityThreshold: data.authorityThreshold,
+        updateFrequency: data.updateFrequency,
+        advancedParams: data.advancedParams,
+        isActive: data.isActive,
+        createdAt: data.createdAt?.toDate(),
+        lastRun: data.lastRun?.toDate(),
+      });
+    });
+    
+    return configs;
+  } catch (error) {
+    console.error('Error fetching search configs:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetches search results for a specific configuration
+ * @param {string} configId - ID of the search configuration
+ * @param {number} limit - Maximum number of results to return
+ * @param {number} offset - Offset for pagination
+ * @returns {Promise<Array>} - Array of search result objects
+ */
+export const fetchSearchResults = async (configId, limit = 10, offset = 0) => {
+  try {
+    const db = initFirebase();
+    if (!db) throw new Error('Firebase not initialized');
+    
+    // Query the searchResults collection for the config
+    const resultsQuery = query(
+      collection(db, 'searchResults'),
+      where('configId', '==', configId)
+    );
+    
+    const querySnapshot = await getDocs(resultsQuery);
+    
+    // Convert query results to an array of results
+    const allResults = [];
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      allResults.push({
+        id: doc.id,
+        title: data.title,
+        url: data.url,
+        snippet: data.snippet,
+        sourceDomain: data.sourceDomain,
+        authorityScore: data.authorityScore,
+        discoveredAt: data.discoveredAt?.toDate(),
+        metadata: data.metadata,
+        cluster: data.cluster,
+        x: data.x,
+        y: data.y
+      });
+    });
+    
+    // Sort by authority score and apply pagination
+    const sortedResults = allResults.sort((a, b) => b.authorityScore - a.authorityScore);
+    const paginatedResults = sortedResults.slice(offset, offset + limit);
+    
+    return {
+      results: paginatedResults,
+      total: allResults.length,
+      hasMore: offset + limit < allResults.length
+    };
+  } catch (error) {
+    console.error('Error fetching search results:', error);
+    throw error;
+  }
+};
+
+// Initialize Firebase right away if not in a server environment
+if (typeof window !== 'undefined') {
+  initFirebase();
+}
+
 export default {
   initFirebase,
+  getFirebaseAuth,
+  saveSearchConfig,
   saveSearchResults,
-  fetchSearchResults
+  fetchSearchConfigs,
+  fetchSearchResults,
+  updateSearchConfigTimestamp
 };
