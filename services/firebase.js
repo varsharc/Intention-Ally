@@ -1,17 +1,24 @@
 /**
  * Firebase service module for Intention-Ally
- * 
+ *
  * Contains core Firebase and Firestore integration functions and data models.
  * This module handles Firebase initialization and provides utility functions
  * for interacting with Firestore collections.
  */
-import { initializeApp } from 'firebase/app';
-import { 
-  getFirestore, collection, addDoc, query, 
-  where, getDocs, Timestamp, doc, setDoc,
-  serverTimestamp
-} from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { initializeApp } from "firebase/app";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  Timestamp,
+  doc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -38,32 +45,34 @@ export const initFirebase = () => {
     if (!firebaseApp) {
       // Verify all required config values are present
       const configValues = Object.values(firebaseConfig);
-      if (configValues.some(value => !value)) {
-        console.error('Firebase config is incomplete:', 
-          Object.keys(firebaseConfig).filter(key => !firebaseConfig[key]));
+      if (configValues.some((value) => !value)) {
+        console.error(
+          "Firebase config is incomplete:",
+          Object.keys(firebaseConfig).filter((key) => !firebaseConfig[key])
+        );
         return null;
       }
-      
+
       // Initialize Firebase
       firebaseApp = initializeApp(firebaseConfig);
-      console.info('Firebase initialized successfully');
+      console.info("Firebase initialized successfully");
     }
-    
+
     // Get Firestore instance
     if (!firestoreDb) {
       firestoreDb = getFirestore(firebaseApp);
-      console.info('Firestore database connected');
+      console.info("Firestore database connected");
     }
-    
+
     // Initialize Auth
     if (!firebaseAuth) {
       firebaseAuth = getAuth(firebaseApp);
-      console.info('Firebase Auth initialized');
+      console.info("Firebase Auth initialized");
     }
-    
+
     return firestoreDb;
   } catch (error) {
-    console.error('Firebase initialization error:', error);
+    console.error("Firebase initialization error:", error);
     return null;
   }
 };
@@ -88,8 +97,8 @@ export const getFirebaseAuth = () => {
 export const saveSearchConfig = async (config, userId) => {
   try {
     const db = initFirebase();
-    if (!db) throw new Error('Firebase not initialized');
-    
+    if (!db) throw new Error("Firebase not initialized");
+
     // Create a search configuration object
     const searchConfig = {
       userId,
@@ -101,15 +110,15 @@ export const saveSearchConfig = async (config, userId) => {
       advancedParams: config.advancedParams || {},
       isActive: true,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
     };
-    
+
     // Add document to "searchConfigs" collection
-    const docRef = await addDoc(collection(db, 'searchConfigs'), searchConfig);
-    
+    const docRef = await addDoc(collection(db, "searchConfigs"), searchConfig);
+
     return docRef.id;
   } catch (error) {
-    console.error('Error saving search configuration:', error);
+    console.error("Error saving search configuration:", error);
     throw error;
   }
 };
@@ -123,10 +132,10 @@ export const saveSearchConfig = async (config, userId) => {
 export const saveSearchResults = async (configId, results) => {
   try {
     const db = initFirebase();
-    if (!db) throw new Error('Firebase not initialized');
-    
+    if (!db) throw new Error("Firebase not initialized");
+
     const resultIds = [];
-    
+
     // Process each result and save individually for better performance
     for (const result of results) {
       // Create a search result object
@@ -134,7 +143,7 @@ export const saveSearchResults = async (configId, results) => {
         configId,
         title: result.title,
         url: result.url,
-        snippet: result.snippet || '',
+        snippet: result.snippet || "",
         sourceDomain: result.sourceDomain || new URL(result.url).hostname,
         authorityScore: result.authorityScore || 0,
         discoveredAt: serverTimestamp(),
@@ -142,24 +151,27 @@ export const saveSearchResults = async (configId, results) => {
         cluster: result.cluster || null,
         x: result.x || 0,
         y: result.y || 0,
-        processed: result.processed || false
+        processed: result.processed || false,
       };
-      
+
       // Add document to "searchResults" collection
-      const docRef = await addDoc(collection(db, 'searchResults'), searchResult);
+      const docRef = await addDoc(
+        collection(db, "searchResults"),
+        searchResult
+      );
       resultIds.push(docRef.id);
     }
-    
+
     // Update search config with last run timestamp
     await updateSearchConfigTimestamp(configId);
-    
+
     return {
       success: true,
       count: resultIds.length,
-      resultIds
+      resultIds,
     };
   } catch (error) {
-    console.error('Error saving search results:', error);
+    console.error("Error saving search results:", error);
     throw error;
   }
 };
@@ -172,12 +184,16 @@ export const saveSearchResults = async (configId, results) => {
 export const updateSearchConfigTimestamp = async (configId) => {
   try {
     const db = initFirebase();
-    if (!db) throw new Error('Firebase not initialized');
-    
-    await setDoc(doc(db, 'searchConfigs', configId), {
-      lastRun: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    }, { merge: true });
+    if (!db) throw new Error("Firebase not initialized");
+
+    await setDoc(
+      doc(db, "searchConfigs", configId),
+      {
+        lastRun: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
   } catch (error) {
     console.error(`Error updating timestamp for config ${configId}:`, error);
     throw error;
@@ -192,19 +208,19 @@ export const updateSearchConfigTimestamp = async (configId) => {
 export const fetchSearchConfigs = async (userId) => {
   try {
     const db = initFirebase();
-    if (!db) throw new Error('Firebase not initialized');
-    
+    if (!db) throw new Error("Firebase not initialized");
+
     // Query the searchConfigs collection for the user
     const configsQuery = query(
-      collection(db, 'searchConfigs'),
-      where('userId', '==', userId)
+      collection(db, "searchConfigs"),
+      where("userId", "==", userId)
     );
-    
+
     const querySnapshot = await getDocs(configsQuery);
-    
+
     // Convert query results to an array of configurations
     const configs = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       const data = doc.data();
       configs.push({
         id: doc.id,
@@ -219,10 +235,10 @@ export const fetchSearchConfigs = async (userId) => {
         lastRun: data.lastRun?.toDate(),
       });
     });
-    
+
     return configs;
   } catch (error) {
-    console.error('Error fetching search configs:', error);
+    console.error("Error fetching search configs:", error);
     throw error;
   }
 };
@@ -237,19 +253,19 @@ export const fetchSearchConfigs = async (userId) => {
 export const fetchSearchResults = async (configId, limit = 10, offset = 0) => {
   try {
     const db = initFirebase();
-    if (!db) throw new Error('Firebase not initialized');
-    
+    if (!db) throw new Error("Firebase not initialized");
+
     // Query the searchResults collection for the config
     const resultsQuery = query(
-      collection(db, 'searchResults'),
-      where('configId', '==', configId)
+      collection(db, "searchResults"),
+      where("configId", "==", configId)
     );
-    
+
     const querySnapshot = await getDocs(resultsQuery);
-    
+
     // Convert query results to an array of results
     const allResults = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       const data = doc.data();
       allResults.push({
         id: doc.id,
@@ -262,27 +278,29 @@ export const fetchSearchResults = async (configId, limit = 10, offset = 0) => {
         metadata: data.metadata,
         cluster: data.cluster,
         x: data.x,
-        y: data.y
+        y: data.y,
       });
     });
-    
+
     // Sort by authority score and apply pagination
-    const sortedResults = allResults.sort((a, b) => b.authorityScore - a.authorityScore);
+    const sortedResults = allResults.sort(
+      (a, b) => b.authorityScore - a.authorityScore
+    );
     const paginatedResults = sortedResults.slice(offset, offset + limit);
-    
+
     return {
       results: paginatedResults,
       total: allResults.length,
-      hasMore: offset + limit < allResults.length
+      hasMore: offset + limit < allResults.length,
     };
   } catch (error) {
-    console.error('Error fetching search results:', error);
+    console.error("Error fetching search results:", error);
     throw error;
   }
 };
 
 // Initialize Firebase right away if not in a server environment
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   initFirebase();
 }
 
@@ -293,5 +311,5 @@ export default {
   saveSearchResults,
   fetchSearchConfigs,
   fetchSearchResults,
-  updateSearchConfigTimestamp
+  updateSearchConfigTimestamp,
 };

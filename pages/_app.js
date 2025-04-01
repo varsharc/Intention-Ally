@@ -1,6 +1,6 @@
 import '../styles/globals.css';
 import { FirebaseProvider } from '../contexts/FirebaseContext';
-import { ThemeProvider } from '../components/ThemeProvider';
+import ThemeProvider from '../components/ThemeProvider';
 import Head from 'next/head';
 
 /**

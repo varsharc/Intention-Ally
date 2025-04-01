@@ -1,19 +1,12 @@
-/**
- * FirebaseContext.js
- * 
- * Provides application-wide access to Firebase services and authenticated user state.
- * This context wraps the entire application to make Firebase easily accessible
- * to all components without prop drilling.
- */
-import { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  getAuth, 
-  signInWithEmailAndPassword, 
+import { createContext, useContext, useState, useEffect } from "react";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
-  onAuthStateChanged
-} from 'firebase/auth';
-import { initFirebase } from '../services/firebase';
+  onAuthStateChanged,
+} from "firebase/auth";
+import { initFirebase } from "../services/firebase";
 
 // Create context
 const FirebaseContext = createContext(null);
@@ -23,44 +16,50 @@ export const FirebaseProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // Initialize Firebase on component mount
+  const [firebaseInitialized, setFirebaseInitialized] = useState(false);
+
+  // Initialize Firebase on client side only
   useEffect(() => {
     try {
       // Initialize Firebase app and Firestore
       const db = initFirebase();
-      
+      setFirebaseInitialized(true);
+
       // Set up authentication listener
       const auth = getAuth();
-      const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-        if (authUser) {
-          // User is signed in
-          setUser({
-            uid: authUser.uid,
-            email: authUser.email,
-            displayName: authUser.displayName,
-            photoURL: authUser.photoURL,
-          });
-        } else {
-          // User is signed out
-          setUser(null);
+      const unsubscribe = onAuthStateChanged(
+        auth,
+        (authUser) => {
+          if (authUser) {
+            // User is signed in
+            setUser({
+              uid: authUser.uid,
+              email: authUser.email,
+              displayName: authUser.displayName,
+              photoURL: authUser.photoURL,
+            });
+          } else {
+            // User is signed out
+            setUser(null);
+          }
+          setLoading(false);
+        },
+        (authError) => {
+          console.error("Auth state change error:", authError);
+          setError(authError);
+          setLoading(false);
         }
-        setLoading(false);
-      }, (authError) => {
-        console.error('Auth state change error:', authError);
-        setError(authError);
-        setLoading(false);
-      });
-      
+      );
+
       // Clean up subscription on unmount
       return () => unsubscribe();
     } catch (error) {
-      console.error('Firebase initialization error:', error);
+      console.error("Firebase initialization error:", error);
       setError(error);
       setLoading(false);
     }
   }, []);
-  
+
   /**
    * Signs in a user with email and password
    * @param {string} email - User's email
@@ -71,15 +70,19 @@ export const FirebaseProvider = ({ children }) => {
     try {
       setError(null);
       const auth = getAuth();
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       return userCredential.user;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       setError(error);
       throw error;
     }
   };
-  
+
   /**
    * Creates a new user with email and password
    * @param {string} email - User's email
@@ -90,15 +93,19 @@ export const FirebaseProvider = ({ children }) => {
     try {
       setError(null);
       const auth = getAuth();
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       return userCredential.user;
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
       setError(error);
       throw error;
     }
   };
-  
+
   /**
    * Signs out the current user
    * @returns {Promise<void>}
@@ -108,13 +115,13 @@ export const FirebaseProvider = ({ children }) => {
       const auth = getAuth();
       await firebaseSignOut(auth);
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error("Sign out error:", error);
       setError(error);
       throw error;
     }
   };
-  
-  // Context value
+
+  // Context value - only include Firebase references if initialized
   const value = {
     user,
     loading,
@@ -122,10 +129,24 @@ export const FirebaseProvider = ({ children }) => {
     signIn,
     signUp,
     signOut,
-    db: initFirebase(),
-    auth: getAuth(),
+    // Only include these if Firebase is initialized
+    ...(firebaseInitialized
+      ? {
+          db: initFirebase(),
+          auth: getAuth(),
+        }
+      : {}),
   };
-  
+
+  // For server-side rendering, we don't want to try to use Firebase yet
+  if (typeof window === "undefined") {
+    return (
+      <FirebaseContext.Provider value={{ loading: true }}>
+        {children}
+      </FirebaseContext.Provider>
+    );
+  }
+
   return (
     <FirebaseContext.Provider value={value}>
       {children}
@@ -137,7 +158,7 @@ export const FirebaseProvider = ({ children }) => {
 export const useFirebase = () => {
   const context = useContext(FirebaseContext);
   if (!context) {
-    throw new Error('useFirebase must be used within a FirebaseProvider');
+    throw new Error("useFirebase must be used within a FirebaseProvider");
   }
   return context;
 };
