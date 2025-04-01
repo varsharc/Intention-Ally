@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Sliders, Info, Plus, X } from 'lucide-react';
 import { useFirestore } from '../../hooks/useFirestore';
 import { useAuth } from '../../hooks/useAuth';
-import { toast } from 'react-toastify';
 
 export const SearchConfigForm = ({ existingConfig = null, onComplete = () => {} }) => {
   const { user } = useAuth();
@@ -130,12 +129,12 @@ export const SearchConfigForm = ({ existingConfig = null, onComplete = () => {} 
     e.preventDefault();
     
     if (!name) {
-      toast.error('Please provide a topic name');
+      alert('Please provide a topic name');
       return;
     }
     
     if (keywords.length === 0) {
-      toast.error('Please add at least one keyword');
+      alert('Please add at least one keyword');
       return;
     }
     
@@ -158,16 +157,16 @@ export const SearchConfigForm = ({ existingConfig = null, onComplete = () => {} 
       
       if (existingConfig) {
         await updateDocument(existingConfig.id, configData);
-        toast.success('Search configuration updated successfully');
+        console.log('Search configuration updated successfully');
       } else {
         await addDocument(configData);
-        toast.success('Search configuration created successfully');
+        console.log('Search configuration created successfully');
       }
       
       onComplete();
     } catch (error) {
       console.error('Error saving search configuration:', error);
-      toast.error('Failed to save search configuration');
+      console.error('Failed to save search configuration');
     } finally {
       setIsSubmitting(false);
     }

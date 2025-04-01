@@ -7,7 +7,8 @@
 import { useState, useEffect } from 'react';
 import { 
   collection, doc, getDoc, getDocs, setDoc, updateDoc, 
-  deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot
+  deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot,
+  serverTimestamp
 } from 'firebase/firestore';
 import { useFirebase } from '../contexts/FirebaseContext';
 
@@ -284,5 +285,146 @@ export const useCRUD = (collectionName) => {
     loading,
     error,
     success
+  };
+};
+
+/**
+ * Main useFirestore hook for the application
+ * Combines functionality of the specialized hooks
+ * @param {string} collectionName - Name of the Firestore collection
+ * @returns {Object} - Firestore operations for the collection
+ */
+export const useFirestore = (collectionName = null) => {
+  const { db } = useFirebase();
+  const [error, setError] = useState(null);
+  const [isPending, setIsPending] = useState(false);
+  
+  // Create document
+  const addDocument = async (data, customCollection = null) => {
+    const targetCollection = customCollection || collectionName;
+    if (!targetCollection) throw new Error('Collection name is required');
+    
+    try {
+      setIsPending(true);
+      const timestamp = serverTimestamp();
+      const docRef = await addDoc(collection(db, targetCollection), {
+        ...data,
+        createdAt: timestamp,
+        updatedAt: timestamp
+      });
+      setIsPending(false);
+      return docRef.id;
+    } catch (error) {
+      console.error("Error adding document:", error);
+      setError(error.message);
+      setIsPending(false);
+      throw error;
+    }
+  };
+
+  // Get document by ID
+  const getDocument = async (targetCollection, id) => {
+    if (!targetCollection) throw new Error('Collection name is required');
+    
+    try {
+      setIsPending(true);
+      const docRef = doc(db, targetCollection, id);
+      const docSnap = await getDoc(docRef);
+      setIsPending(false);
+      
+      if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() };
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error("Error getting document:", error);
+      setError(error.message);
+      setIsPending(false);
+      throw error;
+    }
+  };
+
+  // Query documents
+  const getDocuments = async (targetCollection, field, operator, value) => {
+    if (!targetCollection) throw new Error('Collection name is required');
+    
+    try {
+      setIsPending(true);
+      let documents = [];
+      
+      if (field && operator && value !== undefined) {
+        // Query with filter
+        const q = query(collection(db, targetCollection), where(field, operator, value));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          documents.push({ id: doc.id, ...doc.data() });
+        });
+      } else {
+        // Get all documents in collection
+        const querySnapshot = await getDocs(collection(db, targetCollection));
+        querySnapshot.forEach((doc) => {
+          documents.push({ id: doc.id, ...doc.data() });
+        });
+      }
+      
+      setIsPending(false);
+      return documents;
+    } catch (error) {
+      console.error("Error getting documents:", error);
+      setError(error.message);
+      setIsPending(false);
+      throw error;
+    }
+  };
+
+  // Update document
+  const updateDocument = async (id, data, customCollection = null) => {
+    const targetCollection = customCollection || collectionName;
+    if (!targetCollection) throw new Error('Collection name is required');
+    
+    try {
+      setIsPending(true);
+      const timestamp = serverTimestamp();
+      const docRef = doc(db, targetCollection, id);
+      await updateDoc(docRef, {
+        ...data,
+        updatedAt: timestamp
+      });
+      setIsPending(false);
+    } catch (error) {
+      console.error("Error updating document:", error);
+      setError(error.message);
+      setIsPending(false);
+      throw error;
+    }
+  };
+
+  // Delete document
+  const deleteDocument = async (id, customCollection = null) => {
+    const targetCollection = customCollection || collectionName;
+    if (!targetCollection) throw new Error('Collection name is required');
+    
+    try {
+      setIsPending(true);
+      const docRef = doc(db, targetCollection, id);
+      await deleteDoc(docRef);
+      setIsPending(false);
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      setError(error.message);
+      setIsPending(false);
+      throw error;
+    }
+  };
+
+  return {
+    addDocument,
+    getDocument,
+    getDocuments,
+    updateDocument,
+    deleteDocument,
+    error,
+    isPending
   };
 };

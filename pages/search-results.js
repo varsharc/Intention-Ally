@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import MainLayout from '../components/Layout/MainLayout';
+import MainLayout from '../components/layout/MainLayout';
 import KnowledgeGraph from '../components/Graph/KnowledgeGraph';
 import { ResultsList, ResultSummary } from '../components/Results/ResultComponents';
 import { useAuth } from '../hooks/useAuth';

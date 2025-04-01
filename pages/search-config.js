@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import MainLayout from '../components/Layout/MainLayout';
+import MainLayout from '../components/layout/MainLayout';
 import SearchConfigForm from '../components/SearchConfig/SearchConfigForm';
 import { useAuth } from '../hooks/useAuth';
 import { useFirestore } from '../hooks/useFirestore';
 import { Plus, Edit2, Trash2, AlertCircle } from 'lucide-react';
-import { toast } from 'react-toastify';
 
 const SearchConfigPage = () => {
   const { user, loading: authLoading } = useAuth();
@@ -58,10 +57,10 @@ const SearchConfigPage = () => {
         setIsDeleting(true);
         await deleteDocument(id);
         setConfigs(configs.filter(config => config.id !== id));
-        toast.success('Search configuration deleted successfully');
+        console.log('Search configuration deleted successfully');
       } catch (err) {
         console.error('Error deleting search configuration:', err);
-        toast.error('Failed to delete search configuration');
+        console.error('Failed to delete search configuration');
       } finally {
         setIsDeleting(false);
       }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ExternalLink, Save, Clock, ArrowDown, ArrowUp, Filter, Refresh } from 'lucide-react';
+import { ExternalLink, Save, Clock, ArrowDown, ArrowUp, Filter, RotateCw } from 'lucide-react';
 
 export const ResultsList = ({ results = [], config = null }) => {
   const [sortBy, setSortBy] = useState('relevance');
@@ -262,7 +262,7 @@ export const ResultSummary = ({ config = null, results = [] }) => {
         <div className="flex justify-between text-sm text-gray-400">
           <span>Generated from {results.length} sources</span>
           <button className="text-yellow-500 hover:text-yellow-400 flex items-center">
-            <Refresh size={14} className="mr-1" />
+            <RotateCw size={14} className="mr-1" />
             Refresh
           </button>
         </div>
