@@ -2,6 +2,23 @@
 import React from 'react';
 import { Search, BarChart2, Settings, Users, Menu, X, Bell, MessageCircle } from 'lucide-react';
 
+// Sidebar Navigation Item Component - MOVED BEFORE MainLayout
+const NavItem = ({ icon, label, isActive, href }) => {
+  return (
+    <a 
+      href={href} 
+      className={`flex items-center px-4 py-2 my-1 text-sm ${
+        isActive 
+          ? 'bg-gray-800 text-yellow-500 border-l-2 border-yellow-500' 
+          : 'text-gray-400 hover:text-white hover:bg-gray-800'
+      }`}
+    >
+      <span className="mr-3">{icon}</span>
+      <span>{label}</span>
+    </a>
+  );
+};
+
 // Main Layout Component with Sidebar and Content Areas
 export const MainLayout = ({ children, activePage = 'search' }) => {
   return (
@@ -103,23 +120,6 @@ export const MainLayout = ({ children, activePage = 'search' }) => {
         </main>
       </div>
     </div>
-  );
-};
-
-// Sidebar Navigation Item Component
-const NavItem = ({ icon, label, isActive, href }) => {
-  return (
-    <a 
-      href={href} 
-      className={`flex items-center px-4 py-2 my-1 text-sm ${
-        isActive 
-          ? 'bg-gray-800 text-yellow-500 border-l-2 border-yellow-500' 
-          : 'text-gray-400 hover:text-white hover:bg-gray-800'
-      }`}
-    >
-      <span className="mr-3">{icon}</span>
-      <span>{label}</span>
-    </a>
   );
 };
 
