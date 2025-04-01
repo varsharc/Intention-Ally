@@ -1,4 +1,5 @@
 // Export all UI components from a single file for easier imports
+import React from 'react';
 
 // Main Layout Components
 export { MainLayout, SearchPageLayout, KeywordTag } from './ui-layout';
